@@ -1,0 +1,23 @@
+{
+  "name": "octilinear-maps",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Main.js",
+  "dependencies": {
+    "cors-anywhere": "^0.4.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VCPY/Octilinear_Maps.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VCPY/Octilinear_Maps/issues"
+  },
+  "homepage": "https://github.com/VCPY/Octilinear_Maps#readme"
+}
