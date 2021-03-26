@@ -1,12 +1,8 @@
-let trips;
-let stops;
-let routes;
+var ioWorker = new Worker('worker.js');
 
-function init() {
-  readData().then(data => {
-    trips = data[0];
-    stops = data[1];
-    routes = data[2];
-  });
-
+console.log("Started worker")
+ioWorker.postMessage("");
+ioWorker.onmessage = function(e) {
+  console.log('Message received from worker');
+  console.log(e.data);
 }
