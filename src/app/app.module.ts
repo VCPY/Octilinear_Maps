@@ -3,10 +3,12 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { GtfsTestComponent } from './gtfs-test/gtfs-test.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    GtfsTestComponent
   ],
   imports: [
     BrowserModule,
