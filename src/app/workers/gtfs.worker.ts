@@ -1,10 +1,15 @@
 /// <reference lib="webworker" />
 
+import GraphInputParser from "../graphs/graph.inputParser";
+import {InputGraph} from "../graphs/graph.classes";
+
 addEventListener('message', ({data}) => {
   console.log("Worker started");
   readData()
     .then(result => {
       postMessage(result);
+      let inputParser = new GraphInputParser(result[0], result[1], result[2], result[3]);
+      let inputGraph: InputGraph = inputParser.parseToInputGraph();
     });
 });
 
@@ -16,7 +21,7 @@ const fileTrips = 'trips.txt';
 const fileRoutes = 'routes.txt';
 const fileStopTimes = 'stop_times.txt';
 
-async function readData() {
+async function readData(): Promise<any> {
   let tripsPromise = fetchData(urlPrefix + urlBase + fileTrips, FileType.TRIPS);
   let stopsPromise = fetchData(urlPrefix + urlBase + fileStops, FileType.STOPS);
   let routesPromise = fetchData(urlPrefix + urlBase + fileRoutes, FileType.ROUTES);
