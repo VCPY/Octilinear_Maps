@@ -103,7 +103,7 @@ export class OctiNode {
 
 /**
  * An edge between two OctiNodes
- * 
+ *
  * Note: Nodes are sorted by ID.
  *   NodeA has a lower ID than NodeB
  */
@@ -173,7 +173,7 @@ export class GridNode {
     for (let i = 0; i < 8; i++) {
       for (let j = i + 1; j < 9; j++) {
         const node1 = this._octiNodes[i];
-        const node2 = this._octiNodes[i];
+        const node2 = this._octiNodes[j];
 
         const newEdge = new OctiEdge(node1, node2, this.calculateWeight(i, j));
         node1.addEdge(newEdge);
