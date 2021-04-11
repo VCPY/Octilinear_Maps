@@ -1,7 +1,8 @@
 /// <reference lib="webworker" />
 
+import {InputEdge, InputGraph, Station} from "../graphs/graph.classes";
 import GraphInputParser from "../graphs/graph.inputParser";
-import {InputGraph} from "../graphs/graph.classes";
+import {orderEdges} from "../octi-algorithm/octiMaps.algorithm";
 
 addEventListener('message', ({data}) => {
   console.log("Worker started");
@@ -10,6 +11,9 @@ addEventListener('message', ({data}) => {
       postMessage(result);
       let inputParser = new GraphInputParser(result[0], result[1], result[2], result[3]);
       let inputGraph: InputGraph = inputParser.parseToInputGraph();
+      //let inputGraph = dummyGraph();
+
+      let orderedEdges = orderEdges(inputGraph);
     });
 });
 
@@ -28,6 +32,7 @@ async function readData(): Promise<any> {
   let stopTimesPromise = fetchData(urlPrefix + urlBase + fileStopTimes, FileType.STOPTIMES);
 
   return Promise.all([tripsPromise, stopsPromise, routesPromise, stopTimesPromise]);
+  // return Promise.all([0,0,0,0]) // Use when using the dummy graph
 }
 
 async function fetchData(url: string, type: FileType) {
@@ -92,3 +97,55 @@ class FileTypeProperties {
     }
   }
 }
+
+function dummyGraph(): InputGraph {
+  let nodes = [];
+  nodes.push(createStation("1A", "1AID"));
+  nodes.push(createStation("1B", "1BID"));
+  nodes.push(createStation("1C", "1CID"));
+  nodes.push(createStation("1D", "1DID"));
+  nodes.push(createStation("2", "2ID"));
+  nodes.push(createStation("3", "3ID"));
+  nodes.push(createStation("4A", "4AID"));
+  nodes.push(createStation("4B", "4BID"));
+  nodes.push(createStation("5", "5ID"));
+  nodes.push(createStation("6", "6ID"));
+
+  let edges = [];
+  edges.push(createEdge("1AID", "3ID", "G"));
+  edges.push(createEdge("3ID", "6ID", "G"));
+  edges.push(createEdge("6ID", "4BID", "G"));
+  edges.push(createEdge("4BID", "1DID", "G"));
+  edges.push(createEdge("1BID", "5ID", "R"));
+  edges.push(createEdge("5ID", "6ID", "R"));
+  edges.push(createEdge("6ID", "1CID", "R"));
+  edges.push(createEdge("3ID", "5ID", "O"));
+  edges.push(createEdge("5ID", "4AID", "O"));
+  edges.push(createEdge("4AID", "2ID", "O"));
+  edges.push(createEdge("2ID", "4AID", "B"));
+  edges.push(createEdge("4AID", "4BID", "B"));
+  edges.push(createEdge("4BID", "6ID", "B"));
+  edges.push(createEdge("6ID", "5ID", "B"));
+
+  let inputGraph = new InputGraph();
+  inputGraph.nodes = nodes;
+  inputGraph.edges = edges;
+
+  return inputGraph;
+}
+
+
+function createEdge(station1: string, station2: string, line: string): InputEdge {
+  let edge = new InputEdge(line);
+  edge.station1 = station1;
+  edge.station2 = station2;
+  return edge;
+}
+
+function createStation(name: string, id: string) {
+  let station = new Station();
+  station.stationName = name;
+  station.stopID = id;
+  return station
+}
+

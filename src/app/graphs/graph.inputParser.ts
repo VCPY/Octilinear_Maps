@@ -76,8 +76,8 @@ export default class GraphInputParser {
         let id2 = stopSequence.get("" + i);
 
         let inputEdge = new InputEdge(routeName);
-        inputEdge.station1 = stationsByID[id1];
-        inputEdge.station2 = stationsByID[id2];
+        inputEdge.station1 = stationsByID[id1].stopID;
+        inputEdge.station2 = stationsByID[id2].stopID;
         edges.push(inputEdge);
       }
     });
