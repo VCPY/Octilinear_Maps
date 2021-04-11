@@ -20,8 +20,12 @@ export class Constants {
 export class OctiGraph {
 
   private _gridNodes: GridNode[][] = [];
+  private readonly _width;
+  private readonly _height;
 
   constructor(width: number, height: number) {
+    this._width = width;
+    this._height = height;
 
     let gridNodeId = 0;
 
@@ -70,6 +74,18 @@ export class OctiGraph {
 
   getNode(x: number, y: number): GridNode {
     return this._gridNodes[x][y];
+  }
+
+  get gridNodes(): GridNode[][] {
+    return this._gridNodes;
+  }
+
+  get width() {
+    return this._width;
+  }
+
+  get height() {
+    return this._height;
   }
 }
 
@@ -180,6 +196,11 @@ export class GridNode {
         node2.addEdge(newEdge);
       }
     }
+  }
+
+
+  get id(): number {
+    return this._id;
   }
 
   getOctiNode(index: number): OctiNode {
