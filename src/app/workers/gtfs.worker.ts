@@ -100,16 +100,16 @@ class FileTypeProperties {
 
 function dummyGraph(): InputGraph {
   let nodes = [];
-  nodes.push(createStation("1A", "1AID"));
-  nodes.push(createStation("1B", "1BID"));
-  nodes.push(createStation("1C", "1CID"));
-  nodes.push(createStation("1D", "1DID"));
-  nodes.push(createStation("2", "2ID"));
-  nodes.push(createStation("3", "3ID"));
-  nodes.push(createStation("4A", "4AID"));
-  nodes.push(createStation("4B", "4BID"));
-  nodes.push(createStation("5", "5ID"));
-  nodes.push(createStation("6", "6ID"));
+  nodes.push(createStation("1A", "1AID", "-2", "4"));
+  nodes.push(createStation("1B", "1BID", "-4", "2"));
+  nodes.push(createStation("1C", "1CID", "2", "1"));
+  nodes.push(createStation("1D", "1DID", "2", "-2"));
+  nodes.push(createStation("2", "2ID", "-2.5", "-2"));
+  nodes.push(createStation("3", "3ID", "-0.5", "3"));
+  nodes.push(createStation("4A", "4AID", "-2.5", "-2"));
+  nodes.push(createStation("4B", "4BID", "-0.5", "-2"));
+  nodes.push(createStation("5", "5ID", "-2", "1"));
+  nodes.push(createStation("6", "6ID", "0", "0"));
 
   let edges = [];
   edges.push(createEdge("1AID", "3ID", "G"));
@@ -142,10 +142,12 @@ function createEdge(station1: string, station2: string, line: string): InputEdge
   return edge;
 }
 
-function createStation(name: string, id: string) {
+function createStation(name: string, id: string, longitude: string, latitude: string) {
   let station = new Station();
   station.stationName = name;
   station.stopID = id;
+  station.latitude = parseFloat(latitude);
+  station.longitude = parseFloat(longitude);
   return station
 }
 
