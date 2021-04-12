@@ -14,6 +14,7 @@ addEventListener('message', ({data}) => {
       let inputGraph: InputGraph = inputParser.parseToInputGraph();
       //let inputGraph = dummyGraph();
 
+      Constants.D = calculateAverageNodeDistance(inputGraph);
       let orderedEdges = orderEdges(inputGraph);
     });
 });

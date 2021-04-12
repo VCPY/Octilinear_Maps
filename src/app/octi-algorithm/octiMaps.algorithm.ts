@@ -59,6 +59,34 @@ export function orderEdges(graph: InputGraph) {
   return orderedEdges;
 }
 
+/**
+ * Calculates the average distance between adjacent nodes. Needed to calculate constants
+ */
+export function calculateAverageNodeDistance(graph: InputGraph): number {
+  let sum: number = 0;
+  let amount: number = 0;
+  graph.edges.forEach(edge => {
+    let station1: Station = new Station();
+    let station2: Station = new Station();
+    graph.nodes.forEach(node => {
+      if (node.stopID == edge.station1) {
+        station1 = node;
+      } else if (node.stopID == edge.station2) {
+        station2 = node;
+      }
+    });
+    sum += euclideanDistance(station1, station2);
+    amount++;
+  });
+  return sum / amount
+}
+
+function euclideanDistance(station1: Station, station2: Station): number {
+  let latDiff = Math.pow((station1.latitude - station2.latitude), 2);
+  let longDiff = Math.pow((station1.longitude - station2.longitude), 2);
+  return Math.sqrt(latDiff + longDiff);
+}
+
 function compareByLineDegree(a: Station, b: Station) {
   return b.lineDegree - a.lineDegree
 }

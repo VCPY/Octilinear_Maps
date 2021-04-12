@@ -15,6 +15,10 @@ export class Constants {
   static readonly LEFT = 6;
   static readonly TOP_LEFT = 7;
   static readonly SINK = 8;
+
+  static readonly c_m = 0.5;
+  static readonly c_h = 1; //TODO: set it with the correct value
+  static D = 1;
 }
 
 export class OctiGraph {
@@ -42,10 +46,10 @@ export class OctiGraph {
     // for each GridNode add an edge to its neighbours
     // only 4 are needed to avoid duplicate edges
     const directions = [
-        {x:  0, y:  1, portIndex: Constants.TOP},
-        {x:  1, y:  1, portIndex: Constants.TOP_RIGHT},
-        {x:  1, y:  0, portIndex: Constants.RIGHT},
-        {x:  1, y: -1, portIndex: Constants.BOTTOM_RIGHT},
+      {x: 0, y: 1, portIndex: Constants.TOP},
+      {x: 1, y: 1, portIndex: Constants.TOP_RIGHT},
+      {x: 1, y: 0, portIndex: Constants.RIGHT},
+      {x: 1, y: -1, portIndex: Constants.BOTTOM_RIGHT},
     ];
 
     // add edges between gridNodes
@@ -132,8 +136,7 @@ export class OctiEdge {
     if (node1.id < node2.id) {
       this._nodeA = node1;
       this._nodeB = node2;
-    }
-    else {
+    } else {
       this._nodeA = node2;
       this._nodeB = node1;
     }
