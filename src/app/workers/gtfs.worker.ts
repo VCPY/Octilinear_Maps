@@ -1,8 +1,9 @@
 /// <reference lib="webworker" />
 
 import {InputEdge, InputGraph, Station} from "../graphs/graph.classes";
+import {calculateAverageNodeDistance, orderEdges} from "../octi-algorithm/octiMaps.algorithm";
+import {Constants} from "../graph/octiGraph.classes";
 import GraphInputParser from "../graphs/graph.inputParser";
-import {orderEdges} from "../octi-algorithm/octiMaps.algorithm";
 
 addEventListener('message', ({data}) => {
   console.log("Worker started");
@@ -47,16 +48,17 @@ async function fetchData(url: string, type: FileType) {
 }
 
 function parseGTFSToObjectArray(lines: string, type: FileType) {
-  lines = lines.replace(/['"]+/g, '');
   const linesArray = lines.split("\r\n");
-  const keys = linesArray.shift()?.split(",") || [];
+  let keysString: string = linesArray.shift() || "";
+  keysString = keysString.replace(/['"]+/g, '');
+  let keys = keysString.split(",");
   const values = linesArray;
 
   let result: { [id: string]: string }[] = [];
   values.forEach(line => {
     if (line.length !== 0) {
       let element: { [id: string]: string } = {};
-      let elementValues = line.split(",");
+      let elementValues = splitLine(line);
       for (let i = 0; i < keys.length; i++) {
         let elementValue = elementValues[i];
         let key = keys[i];
@@ -76,6 +78,26 @@ enum FileType {
   TRIPS,
   ROUTES,
   STOPTIMES
+}
+
+function splitLine(str: string): string[] {
+  var myRegexp = /[^\s"]+|"([^"]*)"/gi;
+  var myArray = [];
+
+  do {
+    var match = myRegexp.exec(str);
+    if (match != null) {
+      myArray.push(match[1] ? match[1] : match[0]);
+    }
+  } while (match != null);
+
+  for (let i = 0; i < myArray.length; i++) {
+    if (myArray[i] == ",") {
+      myArray.splice(i, 1);
+      i--;
+    }
+  }
+  return myArray
 }
 
 class FileTypeProperties {

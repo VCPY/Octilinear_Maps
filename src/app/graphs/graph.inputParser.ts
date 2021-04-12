@@ -21,8 +21,8 @@ export default class GraphInputParser {
       let station = new Station();
       station.stationName = stop["stop_name"];
       station.stopID = stop["stop_id"];
-      station.latitude = stop["stop_lat"];
-      station.longitude = stop["stop_lon"];
+      station.latitude = parseFloat(stop["stop_lat"]);
+      station.longitude = parseFloat(stop["stop_lon"]);
       stations.push(station);
       stationsByID[stop["stop_id"]] = station;
     });
