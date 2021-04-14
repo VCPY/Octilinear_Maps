@@ -1,21 +1,18 @@
 /// <reference lib="webworker" />
 
-import {InputEdge, InputGraph, Station} from "../graphs/graph.classes";
-import {calculateAverageNodeDistance, orderEdges} from "../octi-algorithm/octiMaps.algorithm";
-import {Constants} from "../graph/octiGraph.classes";
+import {InputGraph} from "../graphs/graph.classes";
 import GraphInputParser from "../graphs/graph.inputParser";
 
 addEventListener('message', ({data}) => {
-  console.log("Worker started");
+  console.log("[gtfs-worker] started");
   readData()
     .then(result => {
-      postMessage(result);
+      console.log("[gtfs-worker] creating InputGraph from gtfs data");
       let inputParser = new GraphInputParser(result[0], result[1], result[2], result[3]);
       let inputGraph: InputGraph = inputParser.parseToInputGraph();
-      //let inputGraph = dummyGraph();
 
-      Constants.D = calculateAverageNodeDistance(inputGraph);
-      let orderedEdges = orderEdges(inputGraph);
+      console.log("[gtfs-worker] finished");
+      postMessage(inputGraph);
     });
 });
 
@@ -28,6 +25,7 @@ const fileRoutes = 'routes.txt';
 const fileStopTimes = 'stop_times.txt';
 
 async function readData(): Promise<any> {
+  console.log("[gtfs-worker] downloading files");
   let tripsPromise = fetchData(urlPrefix + urlBase + fileTrips, FileType.TRIPS);
   let stopsPromise = fetchData(urlPrefix + urlBase + fileStops, FileType.STOPS);
   let routesPromise = fetchData(urlPrefix + urlBase + fileRoutes, FileType.ROUTES);
@@ -120,57 +118,3 @@ class FileTypeProperties {
     }
   }
 }
-
-function dummyGraph(): InputGraph {
-  let nodes = [];
-  nodes.push(createStation("1A", "1AID", "-2", "4"));
-  nodes.push(createStation("1B", "1BID", "-4", "2"));
-  nodes.push(createStation("1C", "1CID", "2", "1"));
-  nodes.push(createStation("1D", "1DID", "2", "-2"));
-  nodes.push(createStation("2", "2ID", "-2.5", "-2"));
-  nodes.push(createStation("3", "3ID", "-0.5", "3"));
-  nodes.push(createStation("4A", "4AID", "-2.5", "-2"));
-  nodes.push(createStation("4B", "4BID", "-0.5", "-2"));
-  nodes.push(createStation("5", "5ID", "-2", "1"));
-  nodes.push(createStation("6", "6ID", "0", "0"));
-
-  let edges = [];
-  edges.push(createEdge("1AID", "3ID", "G"));
-  edges.push(createEdge("3ID", "6ID", "G"));
-  edges.push(createEdge("6ID", "4BID", "G"));
-  edges.push(createEdge("4BID", "1DID", "G"));
-  edges.push(createEdge("1BID", "5ID", "R"));
-  edges.push(createEdge("5ID", "6ID", "R"));
-  edges.push(createEdge("6ID", "1CID", "R"));
-  edges.push(createEdge("3ID", "5ID", "O"));
-  edges.push(createEdge("5ID", "4AID", "O"));
-  edges.push(createEdge("4AID", "2ID", "O"));
-  edges.push(createEdge("2ID", "4AID", "B"));
-  edges.push(createEdge("4AID", "4BID", "B"));
-  edges.push(createEdge("4BID", "6ID", "B"));
-  edges.push(createEdge("6ID", "5ID", "B"));
-
-  let inputGraph = new InputGraph();
-  inputGraph.nodes = nodes;
-  inputGraph.edges = edges;
-
-  return inputGraph;
-}
-
-
-function createEdge(station1: string, station2: string, line: string): InputEdge {
-  let edge = new InputEdge(line);
-  edge.station1 = station1;
-  edge.station2 = station2;
-  return edge;
-}
-
-function createStation(name: string, id: string, longitude: string, latitude: string) {
-  let station = new Station();
-  station.stationName = name;
-  station.stopID = id;
-  station.latitude = parseFloat(latitude);
-  station.longitude = parseFloat(longitude);
-  return station
-}
-

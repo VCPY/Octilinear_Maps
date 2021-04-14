@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GtfsTestComponent } from './gtfs-test.component';
+import { OctiTestComponent } from './octi-test.component';
 
-describe('GtfsTestComponent', () => {
-  let component: GtfsTestComponent;
-  let fixture: ComponentFixture<GtfsTestComponent>;
+describe('OctiTestComponent', () => {
+  let component: OctiTestComponent;
+  let fixture: ComponentFixture<OctiTestComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GtfsTestComponent ]
+      declarations: [ OctiTestComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(GtfsTestComponent);
+    fixture = TestBed.createComponent(OctiTestComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
