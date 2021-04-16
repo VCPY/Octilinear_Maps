@@ -16,9 +16,8 @@ export class Constants {
   static readonly TOP_LEFT = 7;
   static readonly SINK = 8;
 
-  static readonly c_m = 0.5;
-  static readonly c_h = 1; //TODO: set it with the correct value
-  static D = 1;
+  static readonly COST_MOVE = 0.5;
+  static readonly COST_HOP = 0; //TODO: set it with the correct value
 }
 
 export class OctiGraph {
@@ -76,8 +75,19 @@ export class OctiGraph {
     }
   }
 
+  hasNode(x: number, y: number): boolean {
+    if (x < 0 || x >= this._width) return false;
+    if (y < 0 || y >= this._height) return false;
+
+    return true;
+  }
+
   getNode(x: number, y: number): GridNode {
     return this._gridNodes[x][y];
+  }
+
+  get allNodes(): OctiNode[] {
+    return this.gridNodes.flatMap(n => n.flatMap(n => n.octiNodes));
   }
 
   get gridNodes(): GridNode[][] {
@@ -94,7 +104,6 @@ export class OctiGraph {
 }
 
 export class OctiNode {
-
   private _id: number;
 
   /**
@@ -107,6 +116,10 @@ export class OctiNode {
    */
   private _gridNode: GridNode;
 
+  // used for path finding
+  private _dist: number = 0;
+  private _prev: OctiNode = this;
+
   constructor(gridNode: GridNode, id: number) {
     this._gridNode = gridNode;
     this._id = id;
@@ -118,6 +131,30 @@ export class OctiNode {
 
   get id(): number {
     return this._id;
+  }
+
+  get dist(): number {
+    return this._dist;
+  }
+
+  set dist(value: number) {
+    this._dist = value;
+  }
+
+  get edges(): OctiEdge[] {
+    return this._edges;
+  }
+
+  get prev(): OctiNode {
+    return this._prev;
+  }
+
+  set prev(value: OctiNode) {
+    this._prev = value;
+  }
+
+  get gridNode(): GridNode {
+    return this._gridNode;
   }
 }
 
@@ -150,6 +187,12 @@ export class OctiEdge {
 
   set weight(value: number) {
     this._weight = value;
+  }
+
+  getNeighbourOf(node: OctiNode): OctiNode {
+    if (node.id == this._nodeA.id) return this._nodeB;
+    if (node.id == this._nodeB.id) return this._nodeA;
+    throw new Error("Invalid node");
   }
 }
 
@@ -208,6 +251,10 @@ export class GridNode {
 
   getOctiNode(index: number): OctiNode {
     return this._octiNodes[index];
+  }
+
+  get octiNodes(): OctiNode[] {
+    return this._octiNodes;
   }
 
   /**

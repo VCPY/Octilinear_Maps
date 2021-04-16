@@ -1,3 +1,6 @@
+import 'reflect-metadata';
+import { Type } from 'class-transformer'
+
 export enum StationStatus {
   unprocessed,
   dangling,
@@ -132,7 +135,10 @@ export class Line {
 }
 
 export class InputGraph {
+  @Type(() => Station)
   private _nodes: Station[] = [];
+
+  @Type(() => InputEdge)
   private _edges: InputEdge[] = [];
 
   constructor() {
@@ -153,6 +159,35 @@ export class InputGraph {
 
   set edges(value: InputEdge[]) {
     this._edges = value;
+  }
+
+  getMinCoordinates(): [x: number, y: number] {
+    let minX = Infinity;
+    let minY = Infinity;
+
+    let min = this.nodes.forEach(n => {
+      if (n.longitude < minX) minX = n.longitude;
+      if (n.latitude < minY) minY = n.latitude;
+    });
+    
+    return [minX, minY];
+  }
+
+  getDimensions(): [width: number, height: number] {
+    
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity; 
+    let maxY = -Infinity;
+
+    let min = this.nodes.forEach(n => {
+      if (n.longitude < minX) minX = n.longitude;
+      if (n.longitude > maxX) maxX = n.longitude;
+      if (n.latitude < minY) minY = n.latitude;
+      if (n.latitude > maxY) maxY = n.latitude;
+    });
+    
+    return [maxX - minX, maxY - minY];
   }
 
   getNodesByStatus(status: StationStatus): Station[] {

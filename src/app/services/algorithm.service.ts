@@ -15,8 +15,7 @@ export class AlgorithmService {
     
     this.worker = new Worker('../workers/algorithm.worker', { type: 'module', name: "algorithm-worker" });
     this.worker.onmessage = ({ data }) => {
-      console.log("Got result from algorithm worker:");
-      console.log(data);
+      console.log("Got result from algorithm worker:", data);
     };
    }
 
