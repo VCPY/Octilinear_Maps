@@ -161,7 +161,7 @@ export class InputGraph {
     this._edges = value;
   }
 
-  getMinCoordinates(): [x: number, y: number] {
+  getMinCoordinates() {
     let minX = Infinity;
     let minY = Infinity;
 
@@ -173,7 +173,7 @@ export class InputGraph {
     return [minX, minY];
   }
 
-  getDimensions(): [width: number, height: number] {
+  getDimensions(){
     
     let minX = Infinity;
     let minY = Infinity;

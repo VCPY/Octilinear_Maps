@@ -3,8 +3,8 @@
 import * as algo from "../octi-algorithm/octiMaps.algorithm";
 import * as dijkstra from "../octi-algorithm/dijkstra.algorithm";
 import {InputEdge, InputGraph, Station} from "../graphs/graph.classes";
-import { Type, plainToClass } from 'class-transformer'
-import { Constants, GridNode, OctiEdge, OctiGraph, OctiNode } from "../graph/octiGraph.classes";
+import {plainToClass} from 'class-transformer'
+import {Constants, GridNode, OctiGraph, OctiNode} from "../graph/octiGraph.classes";
 
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
@@ -20,7 +20,7 @@ class AlgorithmWorker {
   private readonly r: number;
   private readonly _inputGraph: InputGraph;
   private readonly _octiGraph: OctiGraph;
-  private readonly _graphOffset: [x: number, y: number];
+  private readonly _graphOffset;
 
   constructor(inputGraph: InputGraph) {
     this.D = 0.5;
@@ -70,26 +70,26 @@ class AlgorithmWorker {
     if (settledStations.has(station)) return [settledStations.get(station) as GridNode];
 
     // convert geo to grid coordinates
-    const centerX = (station.longitude - this._graphOffset[0]) / this.D; 
+    const centerX = (station.longitude - this._graphOffset[0]) / this.D;
     const centerY = (station.latitude - this._graphOffset[1]) / this.D;
 
     const ret = [];
     for (let i = -this.r; i <= this.r; i++) {
       for (let j = -this.r; j <= this.r; j++) {
-        
+
         //check for distance to center
         const distance = Math.sqrt(i * i + j * j);
         if (this._octiGraph.hasNode(centerX + i, centerY + j)
-            && distance <= this.r)
+          && distance <= this.r)
         {
           const node = this._octiGraph.getNode(centerX + i, centerY + j);
           ret.push(node);
-          
+
           //set penalty on all sink edges
           const penalty = distance / this.D * (Constants.COST_MOVE + Constants.COST_HOP);
           node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
-        } 
-      }      
+        }
+      }
     }
 
     return ret;
