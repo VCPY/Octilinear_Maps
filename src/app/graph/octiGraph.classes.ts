@@ -1,5 +1,4 @@
 export class Constants {
-  static readonly COST_GRID = 0;
   static readonly COST_SINK = 2;
   static readonly COST_45 = 2;
   static readonly COST_90 = 1.5;
@@ -17,7 +16,7 @@ export class Constants {
   static readonly SINK = 8;
 
   static readonly COST_MOVE = 0.5;
-  static readonly COST_HOP = 0; //TODO: set it with the correct value
+  static readonly COST_HOP = 1; //TODO: set it with the correct value
 }
 
 export class OctiGraph {
@@ -67,7 +66,7 @@ export class OctiGraph {
           const otherGridNode = this._gridNodes[otherX][otherY];
           const otherPortNode = otherGridNode.getOctiNode(dir.portIndex + 4 % 8); // other direction
 
-          const newEdge = new OctiEdge(portNode, otherPortNode, Constants.COST_GRID);
+          const newEdge = new OctiEdge(portNode, otherPortNode, Constants.COST_HOP);
           portNode.addEdge(newEdge);
           otherPortNode.addEdge(newEdge);
         }
