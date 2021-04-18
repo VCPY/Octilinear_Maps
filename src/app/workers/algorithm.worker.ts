@@ -52,22 +52,49 @@ class AlgorithmWorker {
       let to = this.getCandidateNodes(settledStations, station2)
         .filter(c => !from.includes(c)); //TODO: replace this with voronoi check
 
-      const path = dijkstra.setToSet(this._octiGraph, from, to);
+      // Check if an edge between the two stations has been routed before
+      let path: OctiNode[] = [];
+      foundPaths.forEach((value: OctiNode[], key: InputEdge) => {
+        if (edge.station2 == key.station2 && edge.station1 == key.station1) {
+          path = value;
+          return
+        }
+        if (edge.station2 == key.station1 && edge.station1 == key.station2) {
+          path = value.reverse();
+          return;
+        }
+      });
+      if (path.length == 0) path = dijkstra.setToSet(this._octiGraph, from, to);
       foundPaths.set(edge, path);
 
       settledStations.set(station1, path[0].gridNode);
       settledStations.set(station2, path[path.length - 1].gridNode);
 
+      for (let i = 0; i < path.length - 1; i++) {
+        let one: OctiNode = path[i];
+        let two: OctiNode = path[i + 1];
+        let octiEdge = one.getEdge(two);
+        if (octiEdge != undefined) {
+          octiEdge.used = true;
+        }
+      }
+
       this.resetSinkCost(from);
       this.resetSinkCost(to);
 
       //to update grid weights (4.3)
+      path.forEach(node => node.setWeightForAllEdgesToInfinity());
     });
     console.log("Found paths:", foundPaths);
   }
 
   private getCandidateNodes(settledStations: Map<Station, GridNode>, station: Station): GridNode[] {
-    if (settledStations.has(station)) return [settledStations.get(station) as GridNode];
+    //TODO: Check if the station is already occupied
+    if (settledStations.has(station)) {
+      let settledStation = settledStations.get(station) as GridNode;
+      settledStation.reopenEdges();
+      return [settledStation as GridNode];
+    }
 
     // convert geo to grid coordinates
     const centerX = (station.longitude - this._graphOffset[0]) / this.D;

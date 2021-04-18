@@ -155,6 +155,24 @@ export class OctiNode {
   get gridNode(): GridNode {
     return this._gridNode;
   }
+
+  setWeightForAllEdgesToInfinity(): void {
+    this._edges.forEach(edge => edge.setWeightToInfinity())
+  }
+
+  resetWeights() {
+    this._edges.forEach(edge => {
+      if (!edge.used) edge.resetWeight()
+    })
+  }
+
+  getEdge(neighborNode: OctiNode): OctiEdge | undefined {
+    for (let i = 0; i < this.edges.length; i++) {
+      let edge = this.edges[i];
+      if (edge.nodeA == neighborNode || edge.nodeB == neighborNode) return edge;
+    }
+    return undefined
+  }
 }
 
 /**
@@ -167,6 +185,8 @@ export class OctiEdge {
   private _nodeA: OctiNode;
   private _nodeB: OctiNode;
   private _weight: number;
+  private _originalWeight: number;
+  private _used: boolean = false;
 
   constructor(node1: OctiNode, node2: OctiNode, weight: number = 0) {
     if (node1.id < node2.id) {
@@ -178,6 +198,7 @@ export class OctiEdge {
     }
 
     this._weight = weight;
+    this._originalWeight = weight
   }
 
   get weight(): number {
@@ -192,6 +213,31 @@ export class OctiEdge {
     if (node.id == this._nodeA.id) return this._nodeB;
     if (node.id == this._nodeB.id) return this._nodeA;
     throw new Error("Invalid node");
+  }
+
+  resetWeight() {
+    this.weight = this._originalWeight
+  }
+
+  setWeightToInfinity() {
+    this._originalWeight = this.weight;
+    this.weight = Infinity;
+  }
+
+  get used(): boolean {
+    return this._used;
+  }
+
+  set used(value: boolean) {
+    this._used = value;
+  }
+
+  get nodeA(): OctiNode {
+    return this._nodeA;
+  }
+
+  get nodeB(): OctiNode {
+    return this._nodeB;
   }
 }
 
@@ -254,6 +300,12 @@ export class GridNode {
 
   get octiNodes(): OctiNode[] {
     return this._octiNodes;
+  }
+
+  reopenEdges() {
+    this._octiNodes.forEach(node => {
+      node.resetWeights();
+    })
   }
 
   /**
