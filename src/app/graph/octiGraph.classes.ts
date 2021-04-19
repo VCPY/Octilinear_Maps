@@ -100,6 +100,61 @@ export class OctiGraph {
   get height() {
     return this._height;
   }
+
+  closeDiagonalEdge(edge: OctiEdge) {
+    let nodeA = edge.nodeA;
+    let nodeB = edge.nodeB;
+    if (nodeA.gridNode == nodeB.gridNode) {
+      return;
+    }
+
+    let [xA, yA] = nodeA.gridNode.getCoordinates();
+    let [xB, yB] = nodeB.gridNode.getCoordinates();
+
+    // Check if the two gridNodes are diagonal to each other
+    if (Math.abs(xA - xB) == 1 && Math.abs(yA - yB) == 1) {
+      // Get the according gridnodes with a diagonal edge
+      let diagonalNodeA = this.getNode(xA, yB);
+      let diagonalNodeB = this.getNode(xB, yA);
+      let [xAD, yAD] = diagonalNodeA.getCoordinates();
+      let [xBD, yBD] = diagonalNodeB.getCoordinates();
+      let octiNodeA: OctiNode, octiNodeB: OctiNode;
+      if (xAD > xBD && yAD > yBD) {
+        /**
+         * B - X
+         * - \ -
+         * X - A
+         */
+        octiNodeA = diagonalNodeA.getOctiNode(5);
+        octiNodeB = diagonalNodeB.getOctiNode(1);
+      } else if (xAD < xBD && yAD < yBD) {
+        /**
+         * A - X
+         * - \ -
+         * X - B
+         */
+        octiNodeA = diagonalNodeA.getOctiNode(1);
+        octiNodeB = diagonalNodeB.getOctiNode(5);
+      } else if (xAD < xBD && yBD < yAD) {
+        /**
+         * X - A
+         * - / -
+         * B - X
+         */
+        octiNodeA = diagonalNodeA.getOctiNode(3);
+        octiNodeB = diagonalNodeB.getOctiNode(7);
+      } else {
+        /**
+         * X - B
+         * - / -
+         * A - X
+         */
+        octiNodeA = diagonalNodeA.getOctiNode(7);
+        octiNodeB = diagonalNodeB.getOctiNode(3);
+      }
+      octiNodeA.setWeightToInfinity(octiNodeB);
+    }
+  }
 }
 
 export class OctiNode {
@@ -160,6 +215,18 @@ export class OctiNode {
     this._edges.forEach(edge => edge.setWeightToInfinity())
   }
 
+  setWeightToInfinity(otherNode: OctiNode): void {
+    this._edges.forEach(edge => {
+      if (edge.nodeB == this && edge.nodeA == otherNode) {
+        edge.closeEdge();
+        return
+      } else if (edge.nodeB == otherNode && edge.nodeA == this) {
+        edge.closeEdge();
+        return;
+      }
+    })
+  }
+
   resetWeights() {
     this._edges.forEach(edge => {
       if (!edge.used) edge.resetWeight()
@@ -216,12 +283,18 @@ export class OctiEdge {
   }
 
   resetWeight() {
-    this.weight = this._originalWeight
+    this._weight = this._originalWeight
   }
 
   setWeightToInfinity() {
     this._originalWeight = this.weight;
-    this.weight = Infinity;
+    this._weight = Infinity;
+  }
+
+  closeEdge() {
+    this._used = true;
+    this._originalWeight = Infinity;
+    this._weight = Infinity;
   }
 
   get used(): boolean {
@@ -292,6 +365,10 @@ export class GridNode {
 
   get id(): number {
     return this._id;
+  }
+
+  getCoordinates() {
+    return [this._x, this._y]
   }
 
   getOctiNode(index: number): OctiNode {

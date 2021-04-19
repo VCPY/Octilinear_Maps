@@ -76,6 +76,7 @@ class AlgorithmWorker {
         let octiEdge = one.getEdge(two);
         if (octiEdge != undefined) {
           octiEdge.used = true;
+          this._octiGraph.closeDiagonalEdge(octiEdge)
         }
       }
 
