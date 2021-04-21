@@ -105,11 +105,11 @@ export class Station {
       for (let j = i + 1; j < angles.length; j++) {
         let edge1 = edgesByAngle[angles[i]];
         let edge2 = edgesByAngle[angles[j]];
-        let clockwiseOrder = j - i;
-        let counterClockWiseOrder = angles.length - clockwiseOrder;
+        let counterClockwiseOrder = j - i;
+        let clockwiseOrder = angles.length - counterClockwiseOrder;
         this._clockwiseOrdering.push([edge1, edge2, clockwiseOrder]);
-        this._clockwiseOrdering.push([edge2, edge1, counterClockWiseOrder]);
-        this._counterClockwiseOrdering.push([edge1, edge2, counterClockWiseOrder]);
+        this._clockwiseOrdering.push([edge2, edge1, counterClockwiseOrder]);
+        this._counterClockwiseOrdering.push([edge1, edge2, counterClockwiseOrder]);
         this._counterClockwiseOrdering.push([edge2, edge1, clockwiseOrder])
       }
     }

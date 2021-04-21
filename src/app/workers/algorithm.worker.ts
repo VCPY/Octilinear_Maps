@@ -65,7 +65,11 @@ class AlgorithmWorker {
           return;
         }
       });
-      if (path.length == 0) path = dijkstra.setToSet(this._octiGraph, from, to);
+      if (path.length == 0) {
+        path = dijkstra.setToSet(this._octiGraph, from, to);
+        path[0].gridNode.closeInBetweenEdges(edge, station1, path[1]);
+        path[path.length - 1].gridNode.closeInBetweenEdges(edge, station2, path[path.length - 2]);
+      }
       foundPaths.set(edge, path);
 
       settledStations.set(station1, path[0].gridNode);

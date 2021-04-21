@@ -348,6 +348,8 @@ export class GridNode {
    */
   private _octiNodes: OctiNode[];
 
+  private setEdges: Array<[InputEdge, number]> = [];
+
   constructor(id: number, x: number, y: number) {
     this._id = id;
     this._x = x;
@@ -438,5 +440,64 @@ export class GridNode {
       angle -= 8;
 
     return Math.abs(angle);
+  }
+
+  closeInBetweenEdges(edge: InputEdge, station: Station, octiNode: OctiNode) {
+    if (station.clockwiseOrdering.length == 0) return;
+
+    if (this.setEdges.length != 0) {
+      this.setEdges.forEach(setEdge => {
+        let setIndex = setEdge[1];
+        let octiIndex = parseFloat(("" + octiNode.id).slice(-1));
+        let clockwiseOrderings = station.clockwiseOrdering;
+        let orderingEntry = this.findEdgesInOrdering(setEdge[0], edge, clockwiseOrderings) as [InputEdge, InputEdge, number];
+        let counterClockwiseOrderings = station.counterClockwiseOrdering;
+        let counterOrderingEntry = this.findEdgesInOrdering(setEdge[0], edge, counterClockwiseOrderings) as [InputEdge, InputEdge, number];
+        let fromIndex, toIndex;
+        if (orderingEntry[0].equalsByStation(setEdge[0])) {
+          fromIndex = setIndex;
+          toIndex = octiIndex;
+        } else {
+          toIndex = setIndex;
+          fromIndex = octiIndex;
+        }
+
+        // Close sink edges between Input Edges without other intermediate edges.
+        if (orderingEntry[2] == 1) this.closeEdgesBetweenIndices(fromIndex, toIndex);
+        if (counterOrderingEntry[2] == 1) this.closeEdgesBetweenIndices(toIndex, fromIndex);
+      })
+    }
+
+    let index = parseFloat(("" + octiNode.id).slice(-1));
+    this.setEdges.push([edge, index]);
+  }
+
+  closeEdgesBetweenIndices(from: number, to: number) {
+    let value = from + 1;
+    value = value % 9;
+    if (value == 0) value = 1;
+    while (value != to) {
+      this.octiNodes[value - 1].closeEdges();
+      value += 1;
+      value = value % 9;
+      if (value == 0) value = 1
+    }
+  }
+
+  findEdgesInOrdering(edge1: InputEdge, edge2: InputEdge, orderings: Array<[InputEdge, InputEdge, number]>) {
+    for (let i = 0; i < orderings.length; i++) {
+      let ordering = orderings[i];
+      let orderEdge1 = ordering[0];
+      let orderEdge2 = ordering[1];
+      if (orderEdge1.equalsByStation(edge1) && orderEdge2.equalsByStation(edge2))
+        return ordering;
+      else if (orderEdge2.equalsByStation(edge1) && orderEdge1.equalsByStation(edge2))
+        return ordering;
+    }
+    return undefined
+  }
+
+  setAllWeightsToInfinity() {
+    this.octiNodes.forEach(node => node.setWeightForAllEdgesToInfinity());
   }
 }
