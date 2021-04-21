@@ -38,7 +38,7 @@ export class GtfsService {
     nodes.push(this.createStation("1D", "1DID", "2", "-2"));
     nodes.push(this.createStation("2", "2ID", "-2.5", "-2"));
     nodes.push(this.createStation("3", "3ID", "-0.5", "3"));
-    nodes.push(this.createStation("4A", "4AID", "-2.5", "-2"));
+    nodes.push(this.createStation("4A", "4AID", "-2.5", "-4"));
     nodes.push(this.createStation("4B", "4BID", "-0.5", "-2"));
     nodes.push(this.createStation("5", "5ID", "-2", "1"));
     nodes.push(this.createStation("6", "6ID", "0", "0"));
