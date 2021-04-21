@@ -1,3 +1,5 @@
+import {InputEdge, Station} from "../graphs/graph.classes";
+
 export class Constants {
   static readonly COST_SINK = 2;
   static readonly COST_45 = 2;
@@ -211,6 +213,10 @@ export class OctiNode {
     return this._gridNode;
   }
 
+  setWeightForGridNodeToInfinity(): void {
+    this.gridNode.setAllWeightsToInfinity();
+  }
+
   setWeightForAllEdgesToInfinity(): void {
     this._edges.forEach(edge => edge.setWeightToInfinity())
   }
@@ -225,6 +231,10 @@ export class OctiNode {
         return;
       }
     })
+  }
+
+  closeEdges() {
+    this._edges.forEach(edge => edge.closeEdge())
   }
 
   resetWeights() {
@@ -274,6 +284,7 @@ export class OctiEdge {
 
   set weight(value: number) {
     this._weight = value;
+    this._originalWeight = this._weight;
   }
 
   getNeighbourOf(node: OctiNode): OctiNode {
@@ -287,7 +298,9 @@ export class OctiEdge {
   }
 
   setWeightToInfinity() {
-    this._originalWeight = this.weight;
+    if (this.weight != Infinity) {
+      this._originalWeight = this.weight;
+    }
     this._weight = Infinity;
   }
 

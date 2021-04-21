@@ -71,6 +71,9 @@ class AlgorithmWorker {
       settledStations.set(station1, path[0].gridNode);
       settledStations.set(station2, path[path.length - 1].gridNode);
 
+      this.resetSinkCost(from);
+      this.resetSinkCost(to);
+
       for (let i = 0; i < path.length - 1; i++) {
         let one: OctiNode = path[i];
         let two: OctiNode = path[i + 1];
@@ -81,11 +84,8 @@ class AlgorithmWorker {
         }
       }
 
-      this.resetSinkCost(from);
-      this.resetSinkCost(to);
-
       //to update grid weights (4.3)
-      path.forEach(node => node.setWeightForAllEdgesToInfinity());
+      path.forEach(node => node.setWeightForGridNodeToInfinity());
     });
     console.log("Found paths:", foundPaths);
   }
