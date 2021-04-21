@@ -28,6 +28,7 @@ class AlgorithmWorker {
     this._inputGraph = inputGraph;
 
     inputGraph.calculateNodeLineDegrees();
+    inputGraph.calculateEdgeOrderingAtNode();
 
     // create octi graph
     let inputSize = inputGraph.getDimensions();

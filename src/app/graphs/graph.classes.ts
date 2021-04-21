@@ -14,6 +14,8 @@ export class Station {
   private _stopID: string = "";
   private _lineDegree: number = 0;
   private _status: StationStatus = StationStatus.unprocessed;
+  private _clockwiseOrdering: Array<[InputEdge, InputEdge, number]> = [];  // #From, #To, #ordering
+  private _counterClockwiseOrdering: Array<[InputEdge, InputEdge, number]> = []; // #From, #To, #ordering
 
   constructor() {
   }
@@ -67,8 +69,58 @@ export class Station {
     this._status = value;
   }
 
+  get clockwiseOrdering(): Array<[InputEdge, InputEdge, number]> {
+    return this._clockwiseOrdering;
+  }
+
+  get counterClockwiseOrdering(): Array<[InputEdge, InputEdge, number]> {
+    return this._counterClockwiseOrdering;
+  }
+
   raiseLineDegreeByOne() {
     this._lineDegree += 1
+  }
+
+  calculateEdgeOrdering(edges: Set<InputEdge>, adjacentNodes: Set<Station>) {
+    // Edge ordering not needed if just one neighbour is present
+    if (adjacentNodes.size == 1) return;
+
+    let upVector = [0, 1];
+    let edgesByAngle: { [id: string]: InputEdge } = {};
+    edges.forEach(edge => {
+      let adjacentId = (edge.station1 == this.stopID) ? edge.station2 : edge.station1;
+
+      let adjacentNode = Array.from(adjacentNodes).find(obj => obj.stopID === adjacentId) as Station;
+      let vectorToNode = [adjacentNode.latitude - this.latitude, adjacentNode.longitude - this.longitude];
+
+      let angle: number = Station.calculateAngleBetweenVectors(upVector, vectorToNode);
+      edgesByAngle[angle] = edge;
+    });
+    let angles: string[] = Object.keys(edgesByAngle).sort(((a, b) => {
+      return parseFloat(a)-parseFloat(b);
+    }));
+
+    // Compare each edge with each other and note down the ordering
+    for (let i = 0; i < angles.length; i++) {
+      for (let j = i + 1; j < angles.length; j++) {
+        let edge1 = edgesByAngle[angles[i]];
+        let edge2 = edgesByAngle[angles[j]];
+        let clockwiseOrder = j - i;
+        let counterClockWiseOrder = angles.length - clockwiseOrder;
+        this._clockwiseOrdering.push([edge1, edge2, clockwiseOrder]);
+        this._clockwiseOrdering.push([edge2, edge1, counterClockWiseOrder]);
+        this._counterClockwiseOrdering.push([edge1, edge2, counterClockWiseOrder]);
+        this._counterClockwiseOrdering.push([edge2, edge1, clockwiseOrder])
+      }
+    }
+  }
+
+  private static calculateAngleBetweenVectors(p1: number[], p2: number[]) {
+    let tan = Math.atan2(p2[1], p2[0]) - Math.atan2(p1[1], p1[0]);
+    let angle = -1 * tan * (180 / Math.PI);
+    if (angle < 0) angle = 360 + angle;
+
+    return angle;
   }
 }
 
@@ -105,6 +157,16 @@ export class InputEdge {
   set line(value: string) {
     this._line = value;
   }
+
+  equalsByStation(other: InputEdge) {
+    if (this.station2 == other.station2 && this.station1 == other.station1) {
+      return true;
+    } else if (this.station1 == other.station2 && this.station2 == other.station1) {
+      return true;
+    }
+    return false;
+  }
+
 }
 
 export class Line {
@@ -169,7 +231,7 @@ export class InputGraph {
       if (n.longitude < minX) minX = n.longitude;
       if (n.latitude < minY) minY = n.latitude;
     });
-    
+
     return [minX, minY];
   }
 
@@ -177,7 +239,7 @@ export class InputGraph {
     
     let minX = Infinity;
     let minY = Infinity;
-    let maxX = -Infinity; 
+    let maxX = -Infinity;
     let maxY = -Infinity;
 
     let min = this.nodes.forEach(n => {
@@ -186,7 +248,7 @@ export class InputGraph {
       if (n.latitude < minY) minY = n.latitude;
       if (n.latitude > maxY) maxY = n.latitude;
     });
-    
+
     return [maxX - minX, maxY - minY];
   }
 
@@ -258,7 +320,7 @@ export class InputGraph {
     return result;
   }
 
-  getAdjacentNodes(nodeID: string){
+  getAdjacentNodes(nodeID: string) {
     let nodeIDs: string[] = [];
     this.edges.forEach(edge => {
       if (edge.station2 === nodeID) {
@@ -270,6 +332,22 @@ export class InputGraph {
     return this.nodes.filter(node => nodeIDs.indexOf(node.stopID) != -1);
   }
 
+  calculateEdgeOrderingAtNode() {
+    this.nodes.forEach(node => {
+      let adjacentEdges = new Set<InputEdge>();
+      let adjacentNodes = new Set<Station>();
+      this.edges.forEach(edge => {
+        if (edge.station1 == node.stopID) {
+          adjacentEdges.add(edge);
+          adjacentNodes.add(this.getNodeByID(edge.station2) as Station)
+        } else if (edge.station2 == node.stopID) {
+          adjacentEdges.add(edge);
+          adjacentNodes.add(this.getNodeByID(edge.station1) as Station)
+        }
+      });
+      node.calculateEdgeOrdering(adjacentEdges, adjacentNodes);
+    })
+  }
 }
 
 export class Trip {
