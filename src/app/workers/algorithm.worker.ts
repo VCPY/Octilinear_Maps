@@ -95,7 +95,7 @@ class AlgorithmWorker {
       }
 
       //to update grid weights (4.3)
-      path.forEach(node => node.setWeightForGridNodeToInfinity());
+      path.forEach(node => node.setWeightOfGridNodeToInfinity());
     });
     console.log("Found paths:", foundPaths);
   }
@@ -118,8 +118,7 @@ class AlgorithmWorker {
         //check for distance to center
         const distance = Math.sqrt(i * i + j * j);
         if (this._octiGraph.hasNode(centerX + i, centerY + j)
-          && distance <= this.r)
-        {
+          && distance <= this.r) {
           const node = this._octiGraph.getNode(centerX + i, centerY + j);
           ret.push(node);
 

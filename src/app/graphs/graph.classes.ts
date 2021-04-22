@@ -1,5 +1,7 @@
 import 'reflect-metadata';
 import {Type} from 'class-transformer'
+import {CircularEdgeOrdering} from "../graph/octiGraph.classes";
+import {calculateAngleBetweenVectors} from "./graph.calculation";
 
 export enum StationStatus {
   unprocessed,
@@ -14,8 +16,8 @@ export class Station {
   private _stopID: string = "";
   private _lineDegree: number = 0;
   private _status: StationStatus = StationStatus.unprocessed;
-  private _clockwiseOrdering: Array<[InputEdge, InputEdge, number, InputEdge[]]> = [];  // #From, #To, #ordering, #inbetween edges
-  private _counterClockwiseOrdering: Array<[InputEdge, InputEdge, number, InputEdge[]]> = []; // #From, #To, #ordering, #inbetween edges
+  private _clockwiseOrdering: CircularEdgeOrdering[] = [];
+  private _counterClockwiseOrdering: CircularEdgeOrdering[] = [];
   private _edgesByAngle: { [id: string]: InputEdge } = {};
 
   constructor() {
@@ -70,11 +72,11 @@ export class Station {
     this._status = value;
   }
 
-  get clockwiseOrdering(): Array<[InputEdge, InputEdge, number, InputEdge[]]> {
+  get clockwiseOrdering(): CircularEdgeOrdering[] {
     return this._clockwiseOrdering;
   }
 
-  get counterClockwiseOrdering(): Array<[InputEdge, InputEdge, number, InputEdge[]]> {
+  get counterClockwiseOrdering(): CircularEdgeOrdering[] {
     return this._counterClockwiseOrdering;
   }
 
@@ -97,7 +99,7 @@ export class Station {
       let adjacentNode = Array.from(adjacentNodes).find(obj => obj.stopID === adjacentId) as Station;
       let vectorToNode = [adjacentNode.latitude - this.latitude, adjacentNode.longitude - this.longitude];
 
-      let angle: number = Station.calculateAngleBetweenVectors(upVector, vectorToNode);
+      let angle: number = calculateAngleBetweenVectors(upVector, vectorToNode);
       this._edgesByAngle[angle] = edge;
     });
 
@@ -114,10 +116,10 @@ export class Station {
         let inBetweenEdges = this.getInBetweenEdges(i, j, angles);
         let inBetweenEdgesCounter = this.getInBetweenEdges(j, i, angles);
 
-        this._clockwiseOrdering.push([edge1, edge2, clockwiseOrder, inBetweenEdges]);
-        this._clockwiseOrdering.push([edge2, edge1, counterClockwiseOrder, inBetweenEdgesCounter]);
-        this._counterClockwiseOrdering.push([edge1, edge2, counterClockwiseOrder, inBetweenEdgesCounter]);
-        this._counterClockwiseOrdering.push([edge2, edge1, clockwiseOrder, inBetweenEdges])
+        this._clockwiseOrdering.push(new CircularEdgeOrdering(edge1, edge2, clockwiseOrder, inBetweenEdges));
+        this._clockwiseOrdering.push(new CircularEdgeOrdering(edge2, edge1, counterClockwiseOrder, inBetweenEdgesCounter));
+        this._counterClockwiseOrdering.push(new CircularEdgeOrdering(edge1, edge2, counterClockwiseOrder, inBetweenEdgesCounter));
+        this._counterClockwiseOrdering.push(new CircularEdgeOrdering(edge2, edge1, clockwiseOrder, inBetweenEdges));
       }
     }
   }
@@ -135,13 +137,6 @@ export class Station {
     return inBetweenEdges;
   }
 
-  private static calculateAngleBetweenVectors(p1: number[], p2: number[]) {
-    let tan = Math.atan2(p2[1], p2[0]) - Math.atan2(p1[1], p1[0]);
-    let angle = -1 * tan * (180 / Math.PI);
-    if (angle < 0) angle = 360 + angle;
-
-    return angle;
-  }
 }
 
 export class InputEdge {

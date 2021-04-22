@@ -213,11 +213,11 @@ export class OctiNode {
     return this._gridNode;
   }
 
-  setWeightForGridNodeToInfinity(): void {
+  setWeightOfGridNodeToInfinity(): void {
     this.gridNode.setAllWeightsToInfinity();
   }
 
-  setWeightofEdgesToInfinity(): void {
+  setWeightOfEdgesToInfinity(): void {
     this._edges.forEach(edge => edge.setWeightToInfinity())
   }
 
@@ -348,7 +348,7 @@ export class GridNode {
    */
   private _octiNodes: OctiNode[];
 
-  private _setEdges: Array<[InputEdge, number]> = [];
+  private _routedEdges: Array<[InputEdge, number]> = [];
 
   constructor(id: number, x: number, y: number) {
     this._id = id;
@@ -382,8 +382,8 @@ export class GridNode {
     return this._id;
   }
 
-  get setEdges(): Array<[InputEdge, number]> {
-    return this._setEdges;
+  get routedEdges(): Array<[InputEdge, number]> {
+    return this._routedEdges;
   }
 
   getCoordinates() {
@@ -405,7 +405,7 @@ export class GridNode {
   }
 
   /**
-   * Calculate the cost bewteen to OctiNodes by their index
+   * Calculate the cost between two OctiNodes by their index
    */
   private calculateWeight(a: number, b: number): number {
     if (a == Constants.SINK || b == Constants.SINK) {
@@ -446,34 +446,30 @@ export class GridNode {
     return Math.abs(angle);
   }
 
+  /**
+   * Closes sink edges between routedEdges and edge where no other edges are allowed.
+   */
   closeInBetweenEdges(edge: InputEdge, station: Station, octiNode: OctiNode) {
     if (station.clockwiseOrdering.length == 0) return;
 
-    if (this._setEdges.length != 0) {
-      this._setEdges.forEach(setEdge => {
-        let setIndex = setEdge[1];
-        let octiIndex = parseFloat(("" + octiNode.id).slice(-1));
-        let clockwiseOrderings = station.clockwiseOrdering;
-        let orderingEntry = GridNode.findOrderingByEdges(setEdge[0], edge, clockwiseOrderings) as [InputEdge, InputEdge, number, InputEdge[]];
-        let counterClockwiseOrderings = station.counterClockwiseOrdering;
-        let counterOrderingEntry = GridNode.findOrderingByEdges(setEdge[0], edge, counterClockwiseOrderings) as [InputEdge, InputEdge, number, InputEdge[]];
-        let fromIndex, toIndex;
-        if (orderingEntry[0].equalsByStation(setEdge[0])) {
-          fromIndex = setIndex;
-          toIndex = octiIndex;
-        } else {
-          toIndex = setIndex;
-          fromIndex = octiIndex;
-        }
+    this._routedEdges.forEach(routedEdge => {
+      let routedEdgeIndex = routedEdge[1];
+      let octiIndex = parseFloat(("" + octiNode.id).slice(-1));
+      let clockwiseOrderings = station.clockwiseOrdering;
+      let orderingEntry = GridNode.findOrderingByEdges(routedEdge[0], edge, clockwiseOrderings) as CircularEdgeOrdering;
+      let counterClockwiseOrderings = station.counterClockwiseOrdering;
+      let counterOrderingEntry = GridNode.findOrderingByEdges(routedEdge[0], edge, counterClockwiseOrderings) as CircularEdgeOrdering;
 
-        // Close sink edges between Input Edges without other intermediate edges.
-        if (orderingEntry[2] == 1) this.closeEdgesBetweenIndices(fromIndex, toIndex);
-        if (counterOrderingEntry[2] == 1) this.closeEdgesBetweenIndices(toIndex, fromIndex);
-      })
-    }
+      let fromIndex = orderingEntry.from.equalsByStation(routedEdge[0]) ? routedEdgeIndex : octiIndex;
+      let toIndex = orderingEntry.from.equalsByStation(routedEdge[0]) ? octiIndex : routedEdgeIndex;
+
+      // Close sink edges between Input Edges without other intermediate edges.
+      if (orderingEntry.distance == 1) this.closeEdgesBetweenIndices(fromIndex, toIndex);
+      if (counterOrderingEntry.distance == 1) this.closeEdgesBetweenIndices(toIndex, fromIndex);
+    });
 
     let index = parseFloat(("" + octiNode.id).slice(-1));
-    this._setEdges.push([edge, index]);
+    this._routedEdges.push([edge, index]);
   }
 
   closeEdgesBetweenIndices(from: number, to: number) {
@@ -488,11 +484,11 @@ export class GridNode {
     }
   }
 
-  static findOrderingByEdges(edge1: InputEdge, edge2: InputEdge, orderings: Array<[InputEdge, InputEdge, number, InputEdge[]]>) {
+  private static findOrderingByEdges(edge1: InputEdge, edge2: InputEdge, orderings: CircularEdgeOrdering[]): CircularEdgeOrdering | undefined {
     for (let i = 0; i < orderings.length; i++) {
       let ordering = orderings[i];
-      let orderEdge1 = ordering[0];
-      let orderEdge2 = ordering[1];
+      let orderEdge1 = ordering.from;
+      let orderEdge2 = ordering.to;
       if (orderEdge1.equalsByStation(edge1) && orderEdge2.equalsByStation(edge2))
         return ordering;
       else if (orderEdge2.equalsByStation(edge1) && orderEdge1.equalsByStation(edge2))
@@ -502,7 +498,7 @@ export class GridNode {
   }
 
   setAllWeightsToInfinity() {
-    this.octiNodes.forEach(node => node.setWeightofEdgesToInfinity());
+    this.octiNodes.forEach(node => node.setWeightOfEdgesToInfinity());
   }
 
   /**
@@ -510,35 +506,36 @@ export class GridNode {
    * if the ordering is accordingly.
    */
   reserveEdges(edge: InputEdge, station: Station) {
-    this.setEdges.forEach(setEdge => {
-      let clockwiseOrdering = GridNode.findOrderingByEdges(edge, setEdge[0], station.clockwiseOrdering) as [InputEdge, InputEdge, number, InputEdge[]];
-      if (clockwiseOrdering[2] != 1) {
-        // At least one edge should be routed in between
-        let inBetweenEdgeDrawn: boolean = this.isInBetweenEdgeDrawn(clockwiseOrdering[3]);
-
-        if (!inBetweenEdgeDrawn) {
-          if (setEdge[0].equalsByStation(clockwiseOrdering[0]))
-            this.determineAndReserveBetweenEdges(clockwiseOrdering[2] - 1, (setEdge[1] - 1) % 9, true);
-          else
-            this.determineAndReserveBetweenEdges(clockwiseOrdering[2] - 1, (setEdge[1] + 1) % 9, false)
-        }
-      }
-      let counterClockwiseOrdering = GridNode.findOrderingByEdges(edge, setEdge[0], station.counterClockwiseOrdering) as [InputEdge, InputEdge, number, InputEdge[]];
-      if (counterClockwiseOrdering[2] != 1) {
-
-        // At least one edge should be routed in between
-        let inBetweenEdgeDrawn: boolean = this.isInBetweenEdgeDrawn(counterClockwiseOrdering[3]);
-        if (!inBetweenEdgeDrawn) {
-          if (setEdge[0].equalsByStation(clockwiseOrdering[0]))
-            this.determineAndReserveBetweenEdges(counterClockwiseOrdering[2] - 1, (setEdge[1] - 1) % 9, true);
-          else
-            this.determineAndReserveBetweenEdges(counterClockwiseOrdering[2] - 1, (setEdge[1] + 1) % 9, false)
-        }
-      }
+    this.routedEdges.forEach(routedEdge => {
+      let clockwiseOrdering = GridNode.findOrderingByEdges(edge, routedEdge[0], station.clockwiseOrdering) as CircularEdgeOrdering;
+      this.checkEdgesByOrdering(clockwiseOrdering, routedEdge);
+      let counterClockwiseOrdering = GridNode.findOrderingByEdges(edge, routedEdge[0], station.counterClockwiseOrdering) as CircularEdgeOrdering;
+      this.checkEdgesByOrdering(counterClockwiseOrdering, routedEdge);
     });
   }
 
-  private determineAndReserveBetweenEdges(amount: number, startValue: number, clockwise: boolean = false) {
+  private checkEdgesByOrdering(ordering: CircularEdgeOrdering, routedEdge: [InputEdge, number]) {
+    if (ordering.distance != 1) {
+      // At least one edge should be routed in between
+      let inBetweenEdgeDrawn: boolean = this.isAnyEdgeSet(ordering.inBetweenEdges);
+      if (!inBetweenEdgeDrawn) {
+        if (routedEdge[0].equalsByStation(ordering.from))
+          this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] - 1) % 9, true);
+        else
+          this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] + 1) % 9, false)
+      }
+    }
+  }
+
+  /*
+   * Finds the sink edges between two edges and blocks the necessary amount
+   */
+  private closeIntermediateEdges(amount: number, startIndex: number, clockwise: boolean = false) {
+    let values = GridNode.determineIndexIntermediateEdges(amount, startIndex, clockwise);
+    values.forEach(value => this.getOctiNode(value - 1).setWeightOfEdgesToInfinity())
+  }
+
+  private static determineIndexIntermediateEdges(amount: number, startValue: number, clockwise: boolean = false) {
     let valuesToReserve = [];
     let value = startValue;
     if (value == 0) value = 1;
@@ -549,7 +546,6 @@ export class GridNode {
         if (value == 0) value = 1;
         amount -= 1;
       }
-      valuesToReserve.forEach(valueToReserve => this.getOctiNode(valueToReserve - 1).setWeightofEdgesToInfinity())
     } else {
       while (amount != 0) {
         valuesToReserve.push(value);
@@ -557,21 +553,52 @@ export class GridNode {
         if (value == 0) value = 8;
         amount -= 1;
       }
-      valuesToReserve.forEach(valueToReserve => this.getOctiNode(valueToReserve - 1).setWeightofEdgesToInfinity())
     }
+    return valuesToReserve;
   }
 
-
-  private isInBetweenEdgeDrawn(inBetweenEdges: InputEdge[]) {
-    for (let i = 0; i < inBetweenEdges.length; i++) {
-      let edge = inBetweenEdges[i];
-      for (let j = 0; j < this.setEdges.length; j++) {
-        let setEdge = this.setEdges[j][0];
-        if (edge.equalsByStation(setEdge)) {
-          return true;
-        }
+  /**
+   * Checks if any of the edges in edges has been routed on the map
+   */
+  private isAnyEdgeSet(edges: InputEdge[]) {
+    for (let i = 0; i < edges.length; i++) {
+      let edge = edges[i];
+      for (let j = 0; j < this.routedEdges.length; j++) {
+        let routeEdge = this.routedEdges[j][0];
+        if (edge.equalsByStation(routeEdge)) return true;
       }
     }
     return false;
+  }
+}
+
+export class CircularEdgeOrdering {
+  private _from: InputEdge;
+  private _to: InputEdge;
+  private _distance: number;
+  private _inBetweenEdges: InputEdge[];
+
+  constructor(from: InputEdge, to: InputEdge, distance: number, inBetweenEdges: InputEdge[]) {
+    this._from = from;
+    this._to = to;
+    this._distance = distance;
+    this._inBetweenEdges = inBetweenEdges;
+  }
+
+
+  get from(): InputEdge {
+    return this._from;
+  }
+
+  get to(): InputEdge {
+    return this._to;
+  }
+
+  get distance(): number {
+    return this._distance;
+  }
+
+  get inBetweenEdges(): InputEdge[] {
+    return this._inBetweenEdges;
   }
 }

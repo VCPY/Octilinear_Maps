@@ -1,4 +1,5 @@
 import {InputEdge, InputGraph, Station, StationStatus} from "../graphs/graph.classes";
+import {compareByLineDegree, euclideanDistance} from "../graphs/graph.calculation";
 
 export function orderEdges(graph: InputGraph) {
   // Set the line degree for each node and sort them by line degree
@@ -79,16 +80,6 @@ export function calculateAverageNodeDistance(graph: InputGraph): number {
     amount++;
   });
   return sum / amount
-}
-
-function euclideanDistance(station1: Station, station2: Station): number {
-  let latDiff = Math.pow((station1.latitude - station2.latitude), 2);
-  let longDiff = Math.pow((station1.longitude - station2.longitude), 2);
-  return Math.sqrt(latDiff + longDiff);
-}
-
-function compareByLineDegree(a: Station, b: Station) {
-  return b.lineDegree - a.lineDegree
 }
 
 
