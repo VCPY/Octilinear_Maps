@@ -66,7 +66,13 @@ class AlgorithmWorker {
         }
       });
       if (path.length == 0) {
+        // Check the circular ordering and block edges if the station has been used before
+        if (from.length == 1) from[0].reserveEdges(edge, station1);
+        if (to.length == 1) to[0].reserveEdges(edge, station2);
+
         path = dijkstra.setToSet(this._octiGraph, from, to);
+
+        // Close edges to nodes which would break the circular ordering
         path[0].gridNode.closeInBetweenEdges(edge, station1, path[1]);
         path[path.length - 1].gridNode.closeInBetweenEdges(edge, station2, path[path.length - 2]);
       }
@@ -95,7 +101,6 @@ class AlgorithmWorker {
   }
 
   private getCandidateNodes(settledStations: Map<Station, GridNode>, station: Station): GridNode[] {
-    //TODO: Check if the station is already occupied
     if (settledStations.has(station)) {
       let settledStation = settledStations.get(station) as GridNode;
       settledStation.reopenEdges();

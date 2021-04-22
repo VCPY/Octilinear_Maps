@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Type } from 'class-transformer'
+import {Type} from 'class-transformer'
 
 export enum StationStatus {
   unprocessed,
@@ -14,8 +14,9 @@ export class Station {
   private _stopID: string = "";
   private _lineDegree: number = 0;
   private _status: StationStatus = StationStatus.unprocessed;
-  private _clockwiseOrdering: Array<[InputEdge, InputEdge, number]> = [];  // #From, #To, #ordering
-  private _counterClockwiseOrdering: Array<[InputEdge, InputEdge, number]> = []; // #From, #To, #ordering
+  private _clockwiseOrdering: Array<[InputEdge, InputEdge, number, InputEdge[]]> = [];  // #From, #To, #ordering, #inbetween edges
+  private _counterClockwiseOrdering: Array<[InputEdge, InputEdge, number, InputEdge[]]> = []; // #From, #To, #ordering, #inbetween edges
+  private _edgesByAngle: { [id: string]: InputEdge } = {};
 
   constructor() {
   }
@@ -69,12 +70,16 @@ export class Station {
     this._status = value;
   }
 
-  get clockwiseOrdering(): Array<[InputEdge, InputEdge, number]> {
+  get clockwiseOrdering(): Array<[InputEdge, InputEdge, number, InputEdge[]]> {
     return this._clockwiseOrdering;
   }
 
-  get counterClockwiseOrdering(): Array<[InputEdge, InputEdge, number]> {
+  get counterClockwiseOrdering(): Array<[InputEdge, InputEdge, number, InputEdge[]]> {
     return this._counterClockwiseOrdering;
+  }
+
+  get edgesByAngle(): { [p: string]: InputEdge } {
+    return this._edgesByAngle;
   }
 
   raiseLineDegreeByOne() {
@@ -86,7 +91,6 @@ export class Station {
     if (adjacentNodes.size == 1) return;
 
     let upVector = [0, 1];
-    let edgesByAngle: { [id: string]: InputEdge } = {};
     edges.forEach(edge => {
       let adjacentId = (edge.station1 == this.stopID) ? edge.station2 : edge.station1;
 
@@ -94,25 +98,41 @@ export class Station {
       let vectorToNode = [adjacentNode.latitude - this.latitude, adjacentNode.longitude - this.longitude];
 
       let angle: number = Station.calculateAngleBetweenVectors(upVector, vectorToNode);
-      edgesByAngle[angle] = edge;
+      this._edgesByAngle[angle] = edge;
     });
-    let angles: string[] = Object.keys(edgesByAngle).sort(((a, b) => {
-      return parseFloat(a)-parseFloat(b);
-    }));
+
+    let angles: string[] = Object.keys(this._edgesByAngle).sort((a, b) => parseFloat(b) - parseFloat(a));
 
     // Compare each edge with each other and note down the ordering
     for (let i = 0; i < angles.length; i++) {
       for (let j = i + 1; j < angles.length; j++) {
-        let edge1 = edgesByAngle[angles[i]];
-        let edge2 = edgesByAngle[angles[j]];
-        let counterClockwiseOrder = j - i;
-        let clockwiseOrder = angles.length - counterClockwiseOrder;
-        this._clockwiseOrdering.push([edge1, edge2, clockwiseOrder]);
-        this._clockwiseOrdering.push([edge2, edge1, counterClockwiseOrder]);
-        this._counterClockwiseOrdering.push([edge1, edge2, counterClockwiseOrder]);
-        this._counterClockwiseOrdering.push([edge2, edge1, clockwiseOrder])
+        let edge1 = this._edgesByAngle[angles[i]];
+        let edge2 = this._edgesByAngle[angles[j]];
+        let clockwiseOrder = j - i;
+        let counterClockwiseOrder = angles.length - clockwiseOrder;
+
+        let inBetweenEdges = this.getInBetweenEdges(i, j, angles);
+        let inBetweenEdgesCounter = this.getInBetweenEdges(j, i, angles);
+
+        this._clockwiseOrdering.push([edge1, edge2, clockwiseOrder, inBetweenEdges]);
+        this._clockwiseOrdering.push([edge2, edge1, counterClockwiseOrder, inBetweenEdgesCounter]);
+        this._counterClockwiseOrdering.push([edge1, edge2, counterClockwiseOrder, inBetweenEdgesCounter]);
+        this._counterClockwiseOrdering.push([edge2, edge1, clockwiseOrder, inBetweenEdges])
       }
     }
+  }
+
+  private getInBetweenEdges(start: number, end: number, angles: string[]) {
+    let inBetweenEdges = [];
+
+    let index = start + 1;
+    if (index == angles.length) index = 0;
+    while (index != end) {
+      inBetweenEdges.push(this.edgesByAngle[angles[index]]);
+      index += 1;
+      if (index >= angles.length) index = 0;
+    }
+    return inBetweenEdges;
   }
 
   private static calculateAngleBetweenVectors(p1: number[], p2: number[]) {
@@ -235,8 +255,8 @@ export class InputGraph {
     return [minX, minY];
   }
 
-  getDimensions(){
-    
+  getDimensions() {
+
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
