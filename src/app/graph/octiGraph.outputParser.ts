@@ -1,0 +1,187 @@
+import {InputEdge} from "../graphs/graph.classes";
+import {GridNode, OctiEdge, OctiGraph, OctiNode} from "./octiGraph.classes";
+
+export function parseOctiGraphForOutput(octiGraph: OctiGraph) {
+  return new OctiGraphOutput(octiGraph.width, octiGraph.height, parseGridNodeForOutput(octiGraph.gridNodes));
+}
+
+function parseGridNodeForOutput(gridNodes: GridNode[][]): GridNodeOutput[][] {
+  return gridNodes.map(gridNodesArray =>
+    gridNodesArray.map(gridNode =>
+      new GridNodeOutput(gridNode.id, gridNode.x, gridNode.y, parseOctiNodeForOutput(gridNode.octiNodes), gridNode.routedEdges)
+    )
+  );
+}
+
+function parseOctiNodeForOutput(octiNodes: OctiNode[]): OctiNodeOutput[] {
+  return octiNodes.map(node => new OctiNodeOutput(node.id, parseOctiEdgeForOutput(node.edges)));
+}
+
+function parseOctiEdgeForOutput(edges: OctiEdge[]) {
+  return edges.map(edge => new OctiEdgeOutput(edge.nodeA.id, edge.nodeB.id, edge.weight, edge.used));
+}
+
+export class OctiGraphOutput {
+  private _width: number;
+  private _height: number;
+  private _gridnodes: GridNodeOutput[][] = [];
+
+  constructor(width: number, height: number, gridnodes: GridNodeOutput[][]) {
+    this._width = width;
+    this._height = height;
+    this._gridnodes = gridnodes;
+  }
+
+  get width(): number {
+    return this._width;
+  }
+
+  set width(value: number) {
+    this._width = value;
+  }
+
+  get height(): number {
+    return this._height;
+  }
+
+  set height(value: number) {
+    this._height = value;
+  }
+
+  get gridnodes(): GridNodeOutput[][] {
+    return this._gridnodes;
+  }
+
+  set gridnodes(value: GridNodeOutput[][]) {
+    this._gridnodes = value;
+  }
+}
+
+export class GridNodeOutput {
+  private _id: number;
+  private _x: number;
+  private _y: number;
+  private _octiNodes: OctiNodeOutput[] = [];
+  private _routedEdges: Array<[InputEdge, number]>;
+
+  constructor(id: number, x: number, y: number, octiNodes: OctiNodeOutput[], routedEdges: Array<[InputEdge, number]>) {
+    this._id = id;
+    this._x = x;
+    this._y = y;
+    this._octiNodes = octiNodes;
+    this._routedEdges = routedEdges;
+  }
+
+  get id(): number {
+    return this._id;
+  }
+
+  set id(value: number) {
+    this._id = value;
+  }
+
+  get x(): number {
+    return this._x;
+  }
+
+  set x(value: number) {
+    this._x = value;
+  }
+
+  get y(): number {
+    return this._y;
+  }
+
+  set y(value: number) {
+    this._y = value;
+  }
+
+  get octiNodes(): OctiNodeOutput[] {
+    return this._octiNodes;
+  }
+
+  set octiNodes(value: OctiNodeOutput[]) {
+    this._octiNodes = value;
+  }
+
+  get routedEdges(): Array<[InputEdge, number]> {
+    return this._routedEdges;
+  }
+
+  set routedEdges(value: Array<[InputEdge, number]>) {
+    this._routedEdges = value;
+  }
+}
+
+export class OctiNodeOutput {
+  private _id: number;
+  private _edges: OctiEdgeOutput[] = [];
+
+  constructor(id: number, edges: OctiEdgeOutput[]) {
+    this._id = id;
+    this._edges = edges;
+  }
+
+  get id(): number {
+    return this._id;
+  }
+
+  set id(value: number) {
+    this._id = value;
+  }
+
+  get edges(): OctiEdgeOutput[] {
+    return this._edges;
+  }
+
+  set edges(value: OctiEdgeOutput[]) {
+    this._edges = value;
+  }
+}
+
+export class OctiEdgeOutput {
+  private _nodeA: number;
+  private _nodeB: number;
+  private _weight: number;
+  private _used: boolean;
+
+
+  constructor(nodeA: number, nodeB: number, weight: number, used: boolean) {
+    this._nodeA = nodeA;
+    this._nodeB = nodeB;
+    this._weight = weight;
+    this._used = used;
+  }
+
+  get nodeA(): number {
+    return this._nodeA;
+  }
+
+  set nodeA(value: number) {
+    this._nodeA = value;
+  }
+
+  get nodeB(): number {
+    return this._nodeB;
+  }
+
+  set nodeB(value: number) {
+    this._nodeB = value;
+  }
+
+  get weight(): number {
+    return this._weight;
+  }
+
+  set weight(value: number) {
+    this._weight = value;
+  }
+
+  get used(): boolean {
+    return this._used;
+  }
+
+  set used(value: boolean) {
+    this._used = value;
+  }
+}
