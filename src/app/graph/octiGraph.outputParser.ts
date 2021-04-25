@@ -1,5 +1,6 @@
 import {InputEdge} from "../graphs/graph.classes";
 import {GridNode, OctiEdge, OctiGraph, OctiNode} from "./octiGraph.classes";
+import {Type} from "class-transformer";
 
 export function parseOctiGraphForOutput(octiGraph: OctiGraph) {
   return new OctiGraphOutput(octiGraph.width, octiGraph.height, parseGridNodeForOutput(octiGraph.gridNodes));
@@ -21,10 +22,10 @@ function parseOctiEdgeForOutput(edges: OctiEdge[]) {
   return edges.map(edge => new OctiEdgeOutput(edge.nodeA.id, edge.nodeB.id, edge.weight, edge.used));
 }
 
-export function parsePathsForOutput(data: Map<InputEdge, OctiNode[]>){
+export function parsePathsForOutput(data: Map<InputEdge, OctiNode[]>) {
   let result = new Map<InputEdge, OctiNodeOutput[]>();
   data.forEach((value: OctiNode[], key: InputEdge) => {
-      result.set(key, parseOctiNodeForOutput(value));
+    result.set(key, parseOctiNodeForOutput(value));
   });
   return result
 }
@@ -32,7 +33,7 @@ export function parsePathsForOutput(data: Map<InputEdge, OctiNode[]>){
 export class OctiGraphOutput {
   private _width: number;
   private _height: number;
-  private _gridnodes: GridNodeOutput[][] = [];
+  @Type(() => GridNodeOutput) private _gridnodes: GridNodeOutput[][] = [];
 
   constructor(width: number, height: number, gridnodes: GridNodeOutput[][]) {
     this._width = width;
@@ -63,13 +64,22 @@ export class OctiGraphOutput {
   set gridnodes(value: GridNodeOutput[][]) {
     this._gridnodes = value;
   }
+
+  getGridNodeById(gridID: number): GridNodeOutput|undefined {
+    for (let i = 0; i < this._gridnodes.length; i++) {
+      for (let j = 0; j < this._gridnodes[0].length; j++) {
+          if (this._gridnodes[i][j].id == gridID) return this._gridnodes[i][j];
+      }
+    }
+    return undefined
+  }
 }
 
 export class GridNodeOutput {
   private _id: number;
   private _x: number;
   private _y: number;
-  private _octiNodes: OctiNodeOutput[] = [];
+  @Type(() => OctiNodeOutput) private _octiNodes: OctiNodeOutput[] = [];
   private _routedEdges: Array<[InputEdge, number]>;
 
   constructor(id: number, x: number, y: number, octiNodes: OctiNodeOutput[], routedEdges: Array<[InputEdge, number]>) {
@@ -123,7 +133,7 @@ export class GridNodeOutput {
 
 export class OctiNodeOutput {
   private _id: number;
-  private _edges: OctiEdgeOutput[] = [];
+  @Type(() => OctiEdgeOutput) private _edges: OctiEdgeOutput[] = [];
 
   constructor(id: number, edges: OctiEdgeOutput[]) {
     this._id = id;
@@ -152,7 +162,6 @@ export class OctiEdgeOutput {
   private _nodeB: number;
   private _weight: number;
   private _used: boolean;
-
 
   constructor(nodeA: number, nodeB: number, weight: number, used: boolean) {
     this._nodeA = nodeA;
