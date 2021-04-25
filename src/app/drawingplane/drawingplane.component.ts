@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Constants, OctiNode} from "../graph/octiGraph.classes";
 import {GridNodeOutput, OctiGraphOutput} from "../graph/octiGraph.outputParser";
 import * as d3 from 'd3';
-import {InputEdge} from "../graphs/graph.classes";
+import {InputEdge, Station} from "../graphs/graph.classes";
 import {plainToClass} from "class-transformer";
 
 @Component({
