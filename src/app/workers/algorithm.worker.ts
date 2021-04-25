@@ -5,16 +5,17 @@ import * as dijkstra from "../octi-algorithm/dijkstra.algorithm";
 import {InputEdge, InputGraph, Station} from "../graphs/graph.classes";
 import {plainToClass} from 'class-transformer'
 import {Constants, GridNode, OctiGraph, OctiNode} from "../graph/octiGraph.classes";
-import {parseOctiGraphForOutput} from "../graph/octiGraph.outputParser";
+import {parseOctiGraphForOutput, parsePathsForOutput} from "../graph/octiGraph.outputParser";
 
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
   let inputGraph = plainToClass(InputGraph, data);
   let algorithm = new AlgorithmWorker(inputGraph);
   let algoData = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
-  let plainData = parseOctiGraphForOutput(algoData);
+  let plainGraphData = parseOctiGraphForOutput(algoData[0] as OctiGraph);
+  let plainPathData = parsePathsForOutput(algoData[1] as Map<InputEdge, OctiNode[]>);
   console.log("[algorithm-worker] finished");
-  postMessage(plainData);
+  postMessage([plainGraphData, plainPathData]);
 });
 
 
@@ -102,7 +103,7 @@ class AlgorithmWorker {
       path.forEach(node => node.setWeightOfGridNodeToInfinity());
     });
     console.log("Found paths:", foundPaths);
-    return this._octiGraph;
+    return [this._octiGraph, foundPaths];
   }
 
   private getCandidateNodes(settledStations: Map<Station, GridNode>, station1: Station, station2: Station): GridNode[][] {

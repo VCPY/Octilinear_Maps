@@ -21,6 +21,14 @@ function parseOctiEdgeForOutput(edges: OctiEdge[]) {
   return edges.map(edge => new OctiEdgeOutput(edge.nodeA.id, edge.nodeB.id, edge.weight, edge.used));
 }
 
+export function parsePathsForOutput(data: Map<InputEdge, OctiNode[]>){
+  let result = new Map<InputEdge, OctiNodeOutput[]>();
+  data.forEach((value: OctiNode[], key: InputEdge) => {
+      result.set(key, parseOctiNodeForOutput(value));
+  });
+  return result
+}
+
 export class OctiGraphOutput {
   private _width: number;
   private _height: number;
