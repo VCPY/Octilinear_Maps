@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Constants, OctiNode} from "../graph/octiGraph.classes";
 import {GridNodeOutput, OctiGraphOutput} from "../graph/octiGraph.outputParser";
 import * as d3 from 'd3';
-import {InputEdge, Station} from "../graphs/graph.classes";
+import {InputEdge} from "../graphs/graph.classes";
 import {plainToClass} from "class-transformer";
 
 @Component({
@@ -30,7 +30,6 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   callback(graph: Object, paths: Map<InputEdge, OctiNode[]>) {
-
     if (graph != undefined && paths != undefined) {
       this.drawPaths(paths, plainToClass(OctiGraphOutput, graph));
     }
@@ -42,14 +41,38 @@ export class DrawingplaneComponent implements OnInit {
       value = plainToClass(OctiNode, value);
       key = plainToClass(InputEdge, key);
 
-      let firstPointID = ("" + value[0].id).slice(0, -1) + "0";
-      let lastPointID = ("" + value[value.length - 1].id).slice(0, -1) + "0";
-      let firstPoint = graph.getGridNodeById(parseFloat(firstPointID)) as GridNodeOutput;
-      let lastPoint = graph.getGridNodeById(parseFloat(lastPointID)) as GridNodeOutput;
+      let firstPointID = DrawingplaneComponent.getGridID(value[0].id);
+      let lastPointID = DrawingplaneComponent.getGridID(value[value.length - 1].id);
+      let firstPoint = graph.getGridNodeById(firstPointID) as GridNodeOutput;
+      let lastPoint = graph.getGridNodeById(lastPointID) as GridNodeOutput;
       stations.add(firstPoint);
       stations.add(lastPoint);
+      this.drawLines(value, graph);
     });
     this.drawStations(stations)
+  }
+
+  private drawLines(paths: OctiNode[], graph: OctiGraphOutput) {
+    let lines: Array<[GridNodeOutput, GridNodeOutput]> = [];
+    for (let i = 0; i < paths.length - 1; i++) {
+      let one = DrawingplaneComponent.getGridID(paths[i].id);
+      let two = DrawingplaneComponent.getGridID(paths[i + 1].id);
+      if (one == two) continue;
+
+      let oneNode = graph.getGridNodeById(one) as GridNodeOutput;
+      let twoNode = graph.getGridNodeById(two) as GridNodeOutput;
+      lines.push([oneNode, twoNode]);
+    }
+
+    this.svg.selectAll(".line")
+      .data(lines)
+      .enter()
+      .append("line")
+      .style("stroke", "black")
+      .attr("x1", (node: GridNodeOutput[]) => this.planeXPosition(node[0]))
+      .attr("y1", (node: GridNodeOutput[]) => this.planeYPosition(node[0]))
+      .attr("x2", (node: GridNodeOutput[]) => this.planeXPosition(node[1]))
+      .attr("y2", (node: GridNodeOutput[]) => this.planeYPosition(node[1]));
   }
 
   private drawStations(nodes: Set<GridNodeOutput>) {
@@ -58,14 +81,26 @@ export class DrawingplaneComponent implements OnInit {
       .data(nodes)
       .enter()
       .append('circle')
-      .attr('cx', (node:GridNodeOutput) => {
+      .attr('cx', (node: GridNodeOutput) => {
         return (node.x * 20) + this.planeXOffset;
       })
-      .attr('cy', (node:GridNodeOutput) => {
+      .attr('cy', (node: GridNodeOutput) => {
         return (node.y * 20) + this.planeYOffset;
       })
       .attr('r', 10)
       .style('fill', 'black');
+  }
+
+  private planeXPosition(node: GridNodeOutput) {
+    return (node.x * 20) + this.planeXOffset;
+  }
+
+  private planeYPosition(node: GridNodeOutput) {
+    return (node.y * 20) + this.planeYOffset;
+  }
+
+  private static getGridID(id: number): number {
+    return parseFloat(("" + id).slice(0, -1) + "0");
   }
 
   /*private drawGraph(graph: GridNodeOutput[][]) {
