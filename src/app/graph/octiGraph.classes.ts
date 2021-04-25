@@ -19,6 +19,29 @@ export class Constants {
 
   static readonly COST_MOVE = 0.5;
   static readonly COST_HOP = 1; //TODO: set it with the correct value
+  static octiGraph: { internalGraph: any, internalPaths: any, aListener: any, graph: any, paths: any, registerListener: (path: any) => void } = {
+    internalGraph: undefined,
+    internalPaths: undefined,
+    aListener: function (graph: any, paths: any) {
+    },
+    set graph(val) {
+      this.internalGraph = val;
+      this.aListener(this.internalGraph, this.internalPaths);
+    },
+    get graph() {
+      return this.internalGraph;
+    },
+    set paths(val) {
+      this.internalPaths = val;
+      this.aListener(this.internalGraph, this.internalPaths);
+    },
+    get paths() {
+      return this.internalGraph;
+    },
+    registerListener: function (listener: any) {
+      this.aListener = listener;
+    }
+  }
 }
 
 export class OctiGraph {
