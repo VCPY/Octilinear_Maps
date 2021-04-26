@@ -32,6 +32,14 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
     
     Q = Q.filter(n => n != u);
 
+    // no no node with non infinty lenght remaining
+    if (u.dist == Infinity) {
+      if (found > 0) return createPath(tmpNode, toSinks);
+
+      // fail if we haven't reached any of the to nodes
+      else break;
+    }
+
     if (toSinks.includes(u)) {
       found++;
       if (toSinks.length == found)
