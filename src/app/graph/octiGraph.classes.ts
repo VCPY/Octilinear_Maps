@@ -373,6 +373,8 @@ export class GridNode {
 
   private _routedEdges: Array<[InputEdge, number]> = [];
 
+  private _station: Station|undefined = undefined;
+
   constructor(id: number, x: number, y: number) {
     this._id = id;
     this._x = x;
@@ -435,6 +437,14 @@ export class GridNode {
 
   set y(value: number) {
     this._y = value;
+  }
+
+  get station(): Station | undefined {
+    return this._station;
+  }
+
+  set station(value: Station | undefined) {
+    this._station = value;
   }
 
   reopenEdges() {
