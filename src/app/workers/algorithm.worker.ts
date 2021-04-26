@@ -83,7 +83,9 @@ class AlgorithmWorker {
       foundPaths.set(edge, path);
 
       settledStations.set(station1, path[0].gridNode);
+      path[0].gridNode.station = station1;
       settledStations.set(station2, path[path.length - 1].gridNode);
+      path[path.length - 1].gridNode.station = station2;
 
       this.resetSinkCost(from);
       this.resetSinkCost(to);

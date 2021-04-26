@@ -1,4 +1,4 @@
-import {InputEdge} from "../graphs/graph.classes";
+import {InputEdge, Station} from "../graphs/graph.classes";
 import {GridNode, OctiEdge, OctiGraph, OctiNode} from "./octiGraph.classes";
 import {Type} from "class-transformer";
 
@@ -9,7 +9,7 @@ export function parseOctiGraphForOutput(octiGraph: OctiGraph) {
 function parseGridNodeForOutput(gridNodes: GridNode[][]): GridNodeOutput[][] {
   return gridNodes.map(gridNodesArray =>
     gridNodesArray.map(gridNode =>
-      new GridNodeOutput(gridNode.id, gridNode.x, gridNode.y, parseOctiNodeForOutput(gridNode.octiNodes), gridNode.routedEdges)
+      new GridNodeOutput(gridNode.id, gridNode.x, gridNode.y, parseOctiNodeForOutput(gridNode.octiNodes), gridNode.routedEdges, gridNode.station)
     )
   );
 }
@@ -65,10 +65,10 @@ export class OctiGraphOutput {
     this._gridnodes = value;
   }
 
-  getGridNodeById(gridID: number): GridNodeOutput|undefined {
+  getGridNodeById(gridID: number): GridNodeOutput | undefined {
     for (let i = 0; i < this._gridnodes.length; i++) {
       for (let j = 0; j < this._gridnodes[0].length; j++) {
-          if (this._gridnodes[i][j].id == gridID) return this._gridnodes[i][j];
+        if (this._gridnodes[i][j].id == gridID) return this._gridnodes[i][j];
       }
     }
     return undefined
@@ -81,13 +81,25 @@ export class GridNodeOutput {
   private _y: number;
   @Type(() => OctiNodeOutput) private _octiNodes: OctiNodeOutput[] = [];
   private _routedEdges: Array<[InputEdge, number]>;
+  @Type(()=>Station)
+  private _station: Station | undefined = undefined;
 
-  constructor(id: number, x: number, y: number, octiNodes: OctiNodeOutput[], routedEdges: Array<[InputEdge, number]>) {
+  constructor(id: number, x: number, y: number, octiNodes: OctiNodeOutput[], routedEdges: Array<[InputEdge, number]>, station: Station|undefined) {
     this._id = id;
     this._x = x;
     this._y = y;
     this._octiNodes = octiNodes;
     this._routedEdges = routedEdges;
+    this._station = station;
+  }
+
+
+  get station(): Station | undefined {
+    return this._station;
+  }
+
+  set station(value: Station | undefined) {
+    this._station = value;
   }
 
   get id(): number {
