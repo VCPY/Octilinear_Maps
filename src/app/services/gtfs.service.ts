@@ -19,6 +19,7 @@ export class GtfsService {
     this.worker = new Worker('../workers/gtfs.worker', { type: 'module', name: "gtfs-worker"  });
     this.worker.onmessage = ({ data }) => {
       this.subject.next(data);
+      this.subject.complete();
     };
   }
 

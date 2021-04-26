@@ -10,6 +10,7 @@ addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
   let inputGraph = plainToClass(InputGraph, data);
   new AlgorithmWorker(inputGraph);
+  console.log("[algorithm-worker] finished");
   postMessage(inputGraph);
 });
 
@@ -23,7 +24,7 @@ class AlgorithmWorker {
   private readonly _graphOffset;
 
   constructor(inputGraph: InputGraph) {
-    this.D = 0.5;
+    this.D = algo.calculateAverageNodeDistance(inputGraph)
     this.r = 1;
     this._inputGraph = inputGraph;
 
@@ -108,8 +109,8 @@ class AlgorithmWorker {
     }
 
     // convert geo to grid coordinates
-    const centerX = (station.longitude - this._graphOffset[0]) / this.D;
-    const centerY = (station.latitude - this._graphOffset[1]) / this.D;
+    const centerX = Math.round((station.longitude - this._graphOffset[0]) / this.D);
+    const centerY = Math.round((station.latitude - this._graphOffset[1]) / this.D);
 
     const ret = [];
     for (let i = -this.r; i <= this.r; i++) {
