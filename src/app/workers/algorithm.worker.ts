@@ -121,11 +121,13 @@ class AlgorithmWorker {
         if (this._octiGraph.hasNode(centerX + i, centerY + j)
           && distance <= this.r) {
           const node = this._octiGraph.getNode(centerX + i, centerY + j);
-          ret.push(node);
+          if (!Array.from(settledStations.values()).includes(node)) {
+            ret.push(node);
 
-          //set penalty on all sink edges
-          const penalty = distance / this.D * (Constants.COST_MOVE + Constants.COST_HOP);
-          node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
+            //set penalty on all sink edges
+            const penalty = distance / this.D * (Constants.COST_MOVE + Constants.COST_HOP);
+            node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
+          }
         }
       }
     }
