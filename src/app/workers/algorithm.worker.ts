@@ -24,7 +24,7 @@ class AlgorithmWorker {
   private readonly _graphOffset;
 
   constructor(inputGraph: InputGraph) {
-    this.D = algo.calculateAverageNodeDistance(inputGraph)
+    this.D = algo.calculateAverageNodeDistance(inputGraph);
     this.r = 1;
     this._inputGraph = inputGraph;
 
@@ -34,7 +34,7 @@ class AlgorithmWorker {
     // create octi graph
     let inputSize = inputGraph.getDimensions();
     this._graphOffset = inputGraph.getMinCoordinates();
-    this._octiGraph = new OctiGraph(inputSize[0] / this.D, inputSize[1] / this.D);
+    this._octiGraph = new OctiGraph(Math.ceil(inputSize[0] * this.D), Math.ceil(inputSize[1] * this.D));
     console.log("Octigraph: ", this._octiGraph);
 
     this.performAlgorithm(algo.orderEdges(this._inputGraph));
