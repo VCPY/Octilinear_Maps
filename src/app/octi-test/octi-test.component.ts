@@ -23,7 +23,17 @@ export class OctiTestComponent implements OnInit {
     if (useDummy)
       inputGraph = this.gtfsService.createDummyGraph();
     else
-      inputGraph = await this.gtfsService.fetchAndParse().toPromise();
+    {
+      let stored = localStorage.getItem("inputGraph");
+      if (stored === null) {
+        inputGraph = await this.gtfsService.fetchAndParse().toPromise();
+        localStorage.setItem("inputGraph", JSON.stringify(inputGraph));
+      }
+      else {
+        console.log("Got inputGraph from local storage");
+        inputGraph = JSON.parse(stored);
+      }
+    }
 
     this.algorithmService.perform(inputGraph);
   }
