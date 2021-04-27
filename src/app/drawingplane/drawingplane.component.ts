@@ -82,21 +82,21 @@ export class DrawingplaneComponent implements OnInit {
       .enter()
       .append('circle')
       .attr('cx', (node: GridNodeOutput) => {
-        return (node.x * 20) + this.planeXOffset;
+        return this.planeXPosition(node);
       })
       .attr('cy', (node: GridNodeOutput) => {
-        return (node.y * 20) + this.planeYOffset;
+        return this.planeYPosition(node);
       })
       .attr('r', 10)
       .style('fill', 'black');
   }
 
   private planeXPosition(node: GridNodeOutput) {
-    return (node.x * 20) + this.planeXOffset;
+    return (node.x * 50) + this.planeXOffset;
   }
 
   private planeYPosition(node: GridNodeOutput) {
-    return (node.y * 20) + this.planeYOffset;
+    return (node.y * 50) + this.planeYOffset;
   }
 
   private static getGridID(id: number): number {
