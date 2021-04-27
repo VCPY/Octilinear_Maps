@@ -24,7 +24,7 @@ class AlgorithmWorker {
   private readonly _graphOffset;
 
   constructor(inputGraph: InputGraph) {
-    this.D = algo.calculateAverageNodeDistance(inputGraph);
+    this.D = algo.calculateAverageNodeDistance(inputGraph) * 0.75;
     this.r = 1;
     this._inputGraph = inputGraph;
 
@@ -34,7 +34,7 @@ class AlgorithmWorker {
     // create octi graph
     let inputSize = inputGraph.getDimensions();
     this._graphOffset = inputGraph.getMinCoordinates();
-    this._octiGraph = new OctiGraph(Math.ceil(inputSize[0] * this.D), Math.ceil(inputSize[1] * this.D));
+    this._octiGraph = new OctiGraph(inputSize[0] / this.D, inputSize[1] / this.D);
     console.log("Octigraph: ", this._octiGraph);
 
     this.performAlgorithm(algo.orderEdges(this._inputGraph));
@@ -50,9 +50,9 @@ class AlgorithmWorker {
       const station1 = this._inputGraph.getNodeByID(edge.station1) as Station;
       const station2 = this._inputGraph.getNodeByID(edge.station2) as Station;
 
-      let from = this.getCandidateNodes(settledStations, station1);
-      let to = this.getCandidateNodes(settledStations, station2)
-        .filter(c => !from.includes(c)); //TODO: replace this with voronoi check
+      const allCandidates = this.getCandidateNodes(settledStations, station1, station2);
+      const from = allCandidates[0];
+      const to = allCandidates[1];
 
       // Check if an edge between the two stations has been routed before
       let path: OctiNode[] = [];
@@ -101,42 +101,84 @@ class AlgorithmWorker {
     console.log("Found paths:", foundPaths);
   }
 
-  private getCandidateNodes(settledStations: Map<Station, GridNode>, station: Station): GridNode[] {
-    if (settledStations.has(station)) {
-      let settledStation = settledStations.get(station) as GridNode;
-      settledStation.reopenEdges();
-      return [settledStation as GridNode];
-    }
-
+  private getCandidateNodes(settledStations: Map<Station, GridNode>, station1: Station, station2: Station): GridNode[][] {
     // convert geo to grid coordinates
-    const centerX = Math.round((station.longitude - this._graphOffset[0]) / this.D);
-    const centerY = Math.round((station.latitude - this._graphOffset[1]) / this.D);
+    const coordinates1 = this.getGrapCoordinates(station1);
+    const coordinates2 = this.getGrapCoordinates(station2);
 
-    const ret = [];
-    for (let i = -this.r; i <= this.r; i++) {
-      for (let j = -this.r; j <= this.r; j++) {
+    let ret1: GridNode[] = [];
+    let ret2: GridNode[]  = [];
+    for (let i = -this.r - 1; i <= this.r + 1; i++) {
+      for (let j = -this.r - 1; j <= this.r + 1; j++) {
+        // check around both stations
+        for (let center of [coordinates1, coordinates2]) {
+          const x = Math.round(center.x + i);
+          const y = Math.round(center.y + j);
 
-        //check for distance to center
-        const distance = Math.sqrt(i * i + j * j);
-        if (this._octiGraph.hasNode(centerX + i, centerY + j)
-          && distance <= this.r) {
-          const node = this._octiGraph.getNode(centerX + i, centerY + j);
-          if (!Array.from(settledStations.values()).includes(node)) {
-            ret.push(node);
+          if (!this._octiGraph.hasNode(x, y)) break;
+          const node = this._octiGraph.getNode(x, y);
 
-            //set penalty on all sink edges
-            const penalty = distance / this.D * (Constants.COST_MOVE + Constants.COST_HOP);
-            node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
+          // avoid duplicates
+          if (ret1.includes(node) || ret2.includes(node)) break;
+          // ignore if this node is settled
+          if (Array.from(settledStations.values()).includes(node)) break;
+
+          // check distance to both stations, assign to lower
+          const distance1 = Math.sqrt((coordinates1.x - x) * (coordinates1.x - x) + (coordinates1.y - y) * (coordinates1.y - y));
+          const distance2 = Math.sqrt((coordinates2.x - x) * (coordinates2.x - x) + (coordinates2.y - y) * (coordinates2.y - y));
+          if (distance1 <= this.r || distance2 <= this.r) {
+            if (distance1 < distance2) {
+              //set penalty on all sink edges
+              const penalty = distance1 / this.D * (Constants.COST_MOVE + Constants.COST_HOP);
+              node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
+
+              ret1.push(node);
+            }
+            else {
+              //set penalty on all sink edges
+              const penalty = distance2 / this.D * (Constants.COST_MOVE + Constants.COST_HOP);
+              node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
+
+              ret2.push(node);
+            }
           }
         }
       }
     }
 
-    return ret;
+    if (settledStations.has(station1)) {
+      let settledStation = settledStations.get(station1) as GridNode;
+      settledStation.reopenEdges();
+      ret1 = [settledStation];
+    }
+
+    if (settledStations.has(station2)) {
+      let settledStation = settledStations.get(station2) as GridNode;
+      settledStation.reopenEdges();
+      ret2 = [settledStation];
+    }
+    // from, to
+    return [ret1, ret2];
   }
 
   private resetSinkCost(nodes: GridNode[]) {
     nodes.flatMap(node => node.getOctiNode(Constants.SINK).edges)
       .forEach(edge => edge.weight = Constants.SINK);
+  }
+
+  private getGrapCoordinates(station: Station): Vector2 {
+    return new Vector2(
+        (station.longitude - this._graphOffset[0]) / this.D,
+        (station.latitude - this._graphOffset[1]) / this.D);
+  }
+}
+
+class Vector2 {
+  public x: number;
+  public y: number;
+
+  constructor(x: number = 0, y: number = 0) {
+    this.x = x;
+    this.y = y;
   }
 }
