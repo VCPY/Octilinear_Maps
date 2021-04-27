@@ -16,15 +16,26 @@ export default class GraphInputParser {
   parseToInputGraph(): InputGraph {
     let inputGraph: InputGraph = new InputGraph();
     let stations: Station[] = [];
+    let stationIdMapper: Map<string, string> = new Map<string, string>();
+    let stationIdByName: Map<string, string> = new Map<string, string>();
     let stationsByID: { [id: string]: Station } = {};
     this.stops.forEach(stop => {
       let station = new Station();
       station.stationName = stop["stop_name"];
-      station.stopID = stop["stop_id"];
-      station.latitude = parseFloat(stop["stop_lat"]);
-      station.longitude = parseFloat(stop["stop_lon"]);
-      stations.push(station);
-      stationsByID[stop["stop_id"]] = station;
+
+      if (!stationIdByName.has(stop["stop_name"])) {
+        stationIdByName.set(stop["stop_name"], stop["stop_id"]);
+        station.stopID = stationIdByName.get(stop["stop_name"]) as string;
+        stationIdMapper.set(stop["stop_id"], stop["stop_id"]);
+
+        station.latitude = parseFloat(stop["stop_lat"]);
+        station.longitude = parseFloat(stop["stop_lon"]);
+        stations.push(station);
+        stationsByID[stop["stop_id"]] = station;
+      }
+      else {
+        stationIdMapper.set(stop["stop_id"], stationIdByName.get(stop["stop_name"]) as string);
+      }
     });
     inputGraph.nodes = stations;
 
@@ -76,8 +87,8 @@ export default class GraphInputParser {
         let id2 = stopSequence.get("" + i);
 
         let inputEdge = new InputEdge(routeName);
-        inputEdge.station1 = stationsByID[id1].stopID;
-        inputEdge.station2 = stationsByID[id2].stopID;
+        inputEdge.station1 = stationsByID[stationIdMapper.get(id1) as string].stopID;
+        inputEdge.station2 = stationsByID[stationIdMapper.get(id2) as string].stopID;
         edges.push(inputEdge);
       }
     });
