@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Constants, OctiNode} from "../graph/octiGraph.classes";
 import {GridNodeOutput, OctiGraphOutput} from "../graph/octiGraph.outputParser";
 import * as d3 from 'd3';
-import {InputEdge} from "../graphs/graph.classes";
+import {InputEdge, Station} from "../graphs/graph.classes";
 import {plainToClass} from "class-transformer";
 
 @Component({
@@ -76,11 +76,12 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   private drawStations(nodes: Set<GridNodeOutput>) {
-    this.svg.selectAll(".dot")
+    let circ = this.svg.selectAll(".dot")
       .append('g')
       .data(nodes)
-      .enter()
-      .append('circle')
+      .enter();
+
+    circ.append('circle')
       .attr('cx', (node: GridNodeOutput) => {
         return this.planeXPosition(node);
       })
@@ -89,6 +90,19 @@ export class DrawingplaneComponent implements OnInit {
       })
       .attr('r', 10)
       .style('fill', 'black');
+
+    circ.append("text")
+      .attr("dx", 12)
+      .attr("dy", ".35em")
+      .attr('x', (node: GridNodeOutput) => {
+        return this.planeXPosition(node);
+      })
+      .attr('y', (node: GridNodeOutput) => {
+        return this.planeYPosition(node);
+      })
+      .text((node: GridNodeOutput) => {
+        return (node.station as Station).stationName;
+      });
   }
 
   private planeXPosition(node: GridNodeOutput) {
