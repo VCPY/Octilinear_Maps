@@ -2,8 +2,7 @@ import {InputEdge, InputGraph, Station, StationStatus} from "../graphs/graph.cla
 import {compareByLineDegree, euclideanDistance} from "../graphs/graph.calculation";
 
 export function orderEdges(graph: InputGraph) {
-  // Set the line degree for each node and sort them by line degree
-  graph.calculateNodeLineDegrees();
+  // Sort edges by line degree
   graph.nodes.sort(compareByLineDegree);
 
   let orderedEdges: InputEdge[] = [];
