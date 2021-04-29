@@ -19,10 +19,18 @@ export class Station {
   private _clockwiseOrdering: CircularEdgeOrdering[] = [];
   private _counterClockwiseOrdering: CircularEdgeOrdering[] = [];
   private _edgesByAngle: { [id: string]: InputEdge } = {};
+  private _adjacentNodes: Set<Station> = new Set();
 
   constructor() {
   }
 
+  get adjacentNodes(): Set<Station> {
+    return this._adjacentNodes;
+  }
+
+  set adjacentNodes(value: Set<Station>) {
+    this._adjacentNodes = value;
+  }
 
   get latitude(): number {
     return this._latitude;
@@ -137,6 +145,17 @@ export class Station {
     return inBetweenEdges;
   }
 
+  replaceStation(before: string, after: Station) {
+    let nodeArray = Array.from(this.adjacentNodes);
+    for (let i = 0; i < this.adjacentNodes.size; i++) {
+      let node = nodeArray[i];
+      if (node.stopID == before) {
+        nodeArray[i] = after;
+        break;
+      }
+    }
+    this.adjacentNodes = new Set<Station>(nodeArray);
+  }
 }
 
 export class InputEdge {
@@ -361,7 +380,52 @@ export class InputGraph {
         }
       });
       node.calculateEdgeOrdering(adjacentEdges, adjacentNodes);
+      node.adjacentNodes = adjacentNodes;
     })
+  }
+
+  removeTwoDegreeNodes() {
+    for (let i = 0; i < this.nodes.length; i++) {
+      let node = this.nodes[i];
+      if (node.adjacentNodes.size == 2) {
+        let adjacentNodesArray = Array.from(node.adjacentNodes);
+        let foundFirstEdge = false;
+        for (let j = 0; j < this.edges.length; j++) {
+          let edge = this.edges[j];
+          if (edge.station2 == node.stopID) {
+            if (!foundFirstEdge) {
+              edge.station2 = edge.station1 == adjacentNodesArray[0].stopID ? adjacentNodesArray[1].stopID : adjacentNodesArray[0].stopID;
+              adjacentNodesArray[0].replaceStation(node.stopID, adjacentNodesArray[1]);
+              adjacentNodesArray[1].replaceStation(node.stopID, adjacentNodesArray[0]);
+              foundFirstEdge = true;
+            } else {
+              this.edges.splice(j, 1);
+              break;
+            }
+          } else if (edge.station1 == node.stopID) {
+            if (!foundFirstEdge) {
+              edge.station1 = edge.station2 == adjacentNodesArray[0].stopID?adjacentNodesArray[1].stopID:adjacentNodesArray[0].stopID;
+              adjacentNodesArray[0].replaceStation(node.stopID, adjacentNodesArray[1]);
+              adjacentNodesArray[1].replaceStation(node.stopID, adjacentNodesArray[0]);
+              foundFirstEdge = true;
+            } else {
+              this.edges.splice(j, 1);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  removeNodesWithoutEdges() {
+    for (let i = 0; i < this.nodes.length; i++) {
+      let node = this.nodes[i];
+      if (node.adjacentNodes.size == 0) {
+        this.nodes.splice(i, 1);
+        i--;
+      }
+    }
   }
 }
 
