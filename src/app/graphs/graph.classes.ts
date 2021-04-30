@@ -100,6 +100,7 @@ export class Station {
     // Edge ordering not needed if just one neighbour is present
     if (adjacentNodes.size == 1) return;
 
+    this._edgesByAngle = {};
     let upVector = [0, 1];
     edges.forEach(edge => {
       let adjacentId = (edge.station1 == this.stopID) ? edge.station2 : edge.station1;
@@ -379,8 +380,10 @@ export class InputGraph {
           adjacentNodes.add(this.getNodeByID(edge.station1) as Station)
         }
       });
-      node.calculateEdgeOrdering(adjacentEdges, adjacentNodes);
-      node.adjacentNodes = adjacentNodes;
+      if (adjacentNodes.size != 0 && adjacentEdges.size != 0) {
+        node.calculateEdgeOrdering(adjacentEdges, adjacentNodes);
+        node.adjacentNodes = adjacentNodes;
+      }
     })
   }
 
@@ -404,7 +407,7 @@ export class InputGraph {
             }
           } else if (edge.station1 == node.stopID) {
             if (!foundFirstEdge) {
-              edge.station1 = edge.station2 == adjacentNodesArray[0].stopID?adjacentNodesArray[1].stopID:adjacentNodesArray[0].stopID;
+              edge.station1 = edge.station2 == adjacentNodesArray[0].stopID ? adjacentNodesArray[1].stopID : adjacentNodesArray[0].stopID;
               adjacentNodesArray[0].replaceStation(node.stopID, adjacentNodesArray[1]);
               adjacentNodesArray[1].replaceStation(node.stopID, adjacentNodesArray[0]);
               foundFirstEdge = true;
