@@ -19,6 +19,29 @@ export class Constants {
 
   static readonly COST_MOVE = 0.5;
   static readonly COST_HOP = 1; //TODO: set it with the correct value
+  static octiGraph: { internalGraph: any, internalPaths: any, aListener: any, graph: any, paths: any, registerListener: (path: any) => void } = {
+    internalGraph: undefined,
+    internalPaths: undefined,
+    aListener: function (graph: any, paths: any) {
+    },
+    set graph(val) {
+      this.internalGraph = val;
+      this.aListener(this.internalGraph, this.internalPaths);
+    },
+    get graph() {
+      return this.internalGraph;
+    },
+    set paths(val) {
+      this.internalPaths = val;
+      this.aListener(this.internalGraph, this.internalPaths);
+    },
+    get paths() {
+      return this.internalGraph;
+    },
+    registerListener: function (listener: any) {
+      this.aListener = listener;
+    }
+  }
 }
 
 export class OctiGraph {
@@ -350,6 +373,8 @@ export class GridNode {
 
   private _routedEdges: Array<[InputEdge, number]> = [];
 
+  private _station: Station|undefined = undefined;
+
   constructor(id: number, x: number, y: number) {
     this._id = id;
     this._x = x;
@@ -396,6 +421,30 @@ export class GridNode {
 
   get octiNodes(): OctiNode[] {
     return this._octiNodes;
+  }
+
+  get x(): number {
+    return this._x;
+  }
+
+  set x(value: number) {
+    this._x = value;
+  }
+
+  get y(): number {
+    return this._y;
+  }
+
+  set y(value: number) {
+    this._y = value;
+  }
+
+  get station(): Station | undefined {
+    return this._station;
+  }
+
+  set station(value: Station | undefined) {
+    this._station = value;
   }
 
   reopenEdges() {

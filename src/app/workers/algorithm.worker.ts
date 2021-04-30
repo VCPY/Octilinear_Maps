@@ -5,13 +5,17 @@ import * as dijkstra from "../octi-algorithm/dijkstra.algorithm";
 import {InputEdge, InputGraph, Station} from "../graphs/graph.classes";
 import {plainToClass} from 'class-transformer'
 import {Constants, GridNode, OctiGraph, OctiNode} from "../graph/octiGraph.classes";
+import {parseOctiGraphForOutput, parsePathsForOutput} from "../graph/octiGraph.outputParser";
 
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
   let inputGraph = plainToClass(InputGraph, data);
-  new AlgorithmWorker(inputGraph);
+  let algorithm = new AlgorithmWorker(inputGraph);
+  let algoData = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
+  let plainGraphData = parseOctiGraphForOutput(algoData[0] as OctiGraph);
+  let plainPathData = parsePathsForOutput(algoData[1] as Map<InputEdge, OctiNode[]>);
   console.log("[algorithm-worker] finished");
-  postMessage(inputGraph);
+  postMessage([plainGraphData, plainPathData]);
 });
 
 
@@ -37,10 +41,10 @@ class AlgorithmWorker {
     this._octiGraph = new OctiGraph(inputSize[0] / this.D, inputSize[1] / this.D);
     console.log("Octigraph: ", this._octiGraph);
 
-    this.performAlgorithm(algo.orderEdges(this._inputGraph));
+    //this.performAlgorithm(algo.orderEdges(this._inputGraph));
   }
 
-  private performAlgorithm(edgeOrdering: InputEdge[]) {
+  performAlgorithm(edgeOrdering: InputEdge[]) {
     const settledStations = new Map<Station, GridNode>();
     const foundPaths = new Map<InputEdge, OctiNode[]>();
 
@@ -80,7 +84,9 @@ class AlgorithmWorker {
       foundPaths.set(edge, path);
 
       settledStations.set(station1, path[0].gridNode);
+      path[0].gridNode.station = station1;
       settledStations.set(station2, path[path.length - 1].gridNode);
+      path[path.length - 1].gridNode.station = station2;
 
       this.resetSinkCost(from);
       this.resetSinkCost(to);
@@ -99,6 +105,7 @@ class AlgorithmWorker {
       path.forEach(node => node.setWeightOfGridNodeToInfinity());
     });
     console.log("Found paths:", foundPaths);
+    return [this._octiGraph, foundPaths];
   }
 
   private getCandidateNodes(settledStations: Map<Station, GridNode>, station1: Station, station2: Station): GridNode[][] {
