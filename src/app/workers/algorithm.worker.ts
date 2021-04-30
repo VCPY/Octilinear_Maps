@@ -36,6 +36,7 @@ class AlgorithmWorker {
     inputGraph.calculateEdgeOrderingAtNode();
     inputGraph.removeNodesWithoutEdges();
     inputGraph.removeTwoDegreeNodes();
+    inputGraph.calculateEdgeOrderingAtNode();
 
     // create octi graph
     let inputSize = inputGraph.getDimensions();
@@ -74,8 +75,10 @@ class AlgorithmWorker {
       });
       if (path.length == 0) {
         // Check the circular ordering and block edges if the station has been used before
-        if (from.length == 1) from[0].reserveEdges(edge, station1);
-        if (to.length == 1) to[0].reserveEdges(edge, station2);
+        if (from.length == 1 && Array.from(settledStations.values()).includes(from[0]))
+          from[0].reserveEdges(edge, station1);
+        if (to.length == 1 && Array.from(settledStations.values()).includes(to[0]))
+          to[0].reserveEdges(edge, station2);
 
         path = dijkstra.setToSet(this._octiGraph, from, to);
 
@@ -116,7 +119,7 @@ class AlgorithmWorker {
     const coordinates2 = this.getGrapCoordinates(station2);
 
     let ret1: GridNode[] = [];
-    let ret2: GridNode[]  = [];
+    let ret2: GridNode[] = [];
     for (let i = -this.r - 1; i <= this.r + 1; i++) {
       for (let j = -this.r - 1; j <= this.r + 1; j++) {
         // check around both stations
@@ -142,8 +145,7 @@ class AlgorithmWorker {
               node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
 
               ret1.push(node);
-            }
-            else {
+            } else {
               //set penalty on all sink edges
               const penalty = distance2 / this.D * (Constants.COST_MOVE + Constants.COST_HOP);
               node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
@@ -177,8 +179,8 @@ class AlgorithmWorker {
 
   private getGrapCoordinates(station: Station): Vector2 {
     return new Vector2(
-        (station.longitude - this._graphOffset[0]) / this.D,
-        (station.latitude - this._graphOffset[1]) / this.D);
+      (station.longitude - this._graphOffset[0]) / this.D,
+      (station.latitude - this._graphOffset[1]) / this.D);
   }
 }
 
