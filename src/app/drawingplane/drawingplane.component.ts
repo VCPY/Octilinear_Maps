@@ -24,7 +24,6 @@ export class DrawingplaneComponent implements OnInit {
     this.svg = d3.select("#drawingPlaneSVG").append("svg")
       .attr("width", "100%")
       .attr("height", 500)
-      .attr("paddingTop", 50)
       .append("g");
     Constants.octiGraph.registerListener(this.callback.bind(this));
   }
