@@ -11,7 +11,8 @@ addEventListener('message', ({data}) => {
       let inputParser = new GraphInputParser(result[0], result[1], result[2], result[3]);
       let inputGraph: InputGraph = inputParser.parseToInputGraph();
 
-      inputGraph.edges = inputGraph.edges.filter(e => e.line.startsWith("U"))
+      inputGraph.edges = inputGraph.edges.filter(e => e.line.startsWith("U"));
+      inputGraph.edges = inputGraph.edges.filter(e => !e.line.startsWith("U1E"));
 
       console.log("[gtfs-worker] finished");
       postMessage(inputGraph);
