@@ -16,14 +16,16 @@ export class DrawingplaneComponent implements OnInit {
   planeYOffset = 50;
   // @ts-ignore
   svg;
+  planeWidth = 3000;
+  planeHeight = 3000;
 
   constructor() {
   }
 
   ngOnInit(): void {
     this.svg = d3.select("#drawingPlaneSVG").append("svg")
-      .attr("width", "100%")
-      .attr("height", 500)
+      .attr("width", this.planeWidth)
+      .attr("height", this.planeHeight)
       .append("g");
     Constants.octiGraph.registerListener(this.callback.bind(this));
   }
@@ -100,7 +102,7 @@ export class DrawingplaneComponent implements OnInit {
         return this.planeYPosition(node);
       })
       .text((node: GridNodeOutput) => {
-        return (node.station as Station).stationName;
+        return node.stationName;
       });
   }
 
@@ -109,7 +111,7 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   private planeYPosition(node: GridNodeOutput) {
-    return (node.y * 50) + this.planeYOffset;
+    return this.planeHeight - ((node.y * 50) + this.planeYOffset);
   }
 
   private static getGridID(id: number): number {

@@ -79,27 +79,37 @@ export class GridNodeOutput {
   private _id: number;
   private _x: number;
   private _y: number;
+  private _stationID: string = "";
+  private _stationName: string = "";
   @Type(() => OctiNodeOutput) private _octiNodes: OctiNodeOutput[] = [];
   private _routedEdges: Array<[InputEdge, number]>;
-  @Type(()=>Station)
-  private _station: Station | undefined = undefined;
 
-  constructor(id: number, x: number, y: number, octiNodes: OctiNodeOutput[], routedEdges: Array<[InputEdge, number]>, station: Station|undefined) {
+  constructor(id: number, x: number, y: number, octiNodes: OctiNodeOutput[], routedEdges: Array<[InputEdge, number]>, station: Station | undefined) {
     this._id = id;
     this._x = x;
     this._y = y;
     this._octiNodes = octiNodes;
     this._routedEdges = routedEdges;
-    this._station = station;
+    if (station != undefined) {
+      this._stationID = (station as Station).stopID;
+      this._stationName = (station as Station).stationName;
+    }
   }
 
-
-  get station(): Station | undefined {
-    return this._station;
+  get stationID(): string {
+    return this._stationID;
   }
 
-  set station(value: Station | undefined) {
-    this._station = value;
+  set stationID(value: string) {
+    this._stationID = value;
+  }
+
+  get stationName(): string {
+    return this._stationName;
+  }
+
+  set stationName(value: string) {
+    this._stationName = value;
   }
 
   get id(): number {
