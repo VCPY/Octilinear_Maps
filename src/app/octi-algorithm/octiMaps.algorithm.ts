@@ -67,17 +67,20 @@ export function calculateAverageNodeDistance(graph: InputGraph): number {
   let sum: number = 0;
   let amount: number = 0;
   graph.edges.forEach(edge => {
-    let station1: Station = new Station();
-    let station2: Station = new Station();
-    graph.nodes.forEach(node => {
-      if (node.stopID == edge.station1) {
-        station1 = node;
-      } else if (node.stopID == edge.station2) {
-        station2 = node;
+    let station1: Station | undefined = undefined;
+    let station2: Station | undefined = undefined;
+    for (let i = 0; i < graph.nodes.length; i++) {
+      let node = graph.nodes[i];
+
+      if (node.stopID == edge.station1) station1 = node;
+      else if (node.stopID == edge.station2) station2 = node;
+
+      if (station1 && station2) {
+        sum += euclideanDistance(station1, station2);
+        amount++;
+        break;
       }
-    });
-    sum += euclideanDistance(station1, station2);
-    amount++;
+    }
   });
   return sum / amount
 }
