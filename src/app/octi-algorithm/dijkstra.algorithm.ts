@@ -1,6 +1,5 @@
-let Heap = require("heap")
 import {GridNode, OctiGraph, OctiNode, Constants, OctiEdge} from "../graph/octiGraph.classes";
-import PriorityQueue from "../../../node_modules/ts-priority-queue";
+import {BinaryHeap} from "./binaryHeap";
 
 /**
  * Calculates the set to set shortest path
@@ -21,16 +20,14 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
     .forEach(startNode => tmpNode.addEdge(new OctiEdge(tmpNode, startNode, 0)));
   tmpNode.dist = 0;
 
-  //const Q = new PriorityQueue<OctiNode>({ comparator: comparator, initialValues: [tmpNode, ...graph.allNodes]});
-  let Q = [tmpNode, ...graph.allNodes];
+  let Q = new BinaryHeap<OctiNode>(comparator);// [tmpNode, ...graph.allNodes];
+  [tmpNode, ...graph.allNodes].forEach(n => Q.push(n));
 
   let found = 0;
-  while (Q.length > 0) {
+  while (Q.size() > 0) {
     //TODO: replace with priority queue for better performance
-    
-    const u = min(Q);
-    
-    Q = Q.filter(n => n != u);
+
+    const u = Q.pop();
 
     // no no node with non infinty lenght remaining
     if (u.dist == Infinity) {
@@ -52,6 +49,8 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
       if (alt < v.dist) {
         v.dist = alt;
         v.prev = u;
+
+        Q.update(v);
       }
     });
   }
