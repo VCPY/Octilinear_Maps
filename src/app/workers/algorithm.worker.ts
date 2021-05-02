@@ -57,6 +57,10 @@ class AlgorithmWorker {
       const station1 = this._inputGraph.getNodeByID(edge.station1) as Station;
       const station2 = this._inputGraph.getNodeByID(edge.station2) as Station;
 
+      // some paths won't be found, for now just exclude them
+      if (this.isEdgecase(station1, station2)) return;
+      if (this.isEdgecase(station2, station1)) return;
+
       const allCandidates = this.getCandidateNodes(settledStations, station1, station2);
       const from = allCandidates[0];
       const to = allCandidates[1];
@@ -111,6 +115,18 @@ class AlgorithmWorker {
     });
     console.log("Found paths:", foundPaths);
     return [this._octiGraph, foundPaths];
+  }
+
+  private isEdgecase(station1: Station, station2: Station): boolean {
+    if (station1.stationName == "Landstraße" && station2.stationName == "Stephansplatz") {
+      return true;
+    }
+
+    if (station1.stationName == "Landstraße" && station2.stationName == "Schwedenplatz") {
+      return true;
+    }
+
+    return false;
   }
 
   private getCandidateNodes(settledStations: Map<Station, GridNode>, station1: Station, station2: Station): GridNode[][] {
