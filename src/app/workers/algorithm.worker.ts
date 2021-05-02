@@ -10,6 +10,8 @@ import {parseOctiGraphForOutput, parsePathsForOutput} from "../graph/octiGraph.o
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
   let inputGraph = plainToClass(InputGraph, data);
+  inputGraph.edges = inputGraph.edges.map(e => plainToClass(InputEdge, e));
+  inputGraph.nodes = inputGraph.nodes.map(n => plainToClass(Station, n));
   let algorithm = new AlgorithmWorker(inputGraph);
   let algoData = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
   let plainGraphData = parseOctiGraphForOutput(algoData[0] as OctiGraph);
@@ -42,7 +44,7 @@ class AlgorithmWorker {
     let inputSize = inputGraph.getDimensions();
     this._graphOffset = inputGraph.getMinCoordinates();
     this._octiGraph = new OctiGraph(inputSize[0] / this.D, inputSize[1] / this.D);
-    console.log("Octigraph: ", this._octiGraph);
+    //console.log("Octigraph: ", this._octiGraph);
 
     //this.performAlgorithm(algo.orderEdges(this._inputGraph));
   }
@@ -118,13 +120,7 @@ class AlgorithmWorker {
   }
 
   private isEdgecase(station1: Station, station2: Station): boolean {
-    if (station1.stationName == "Landstraße" && station2.stationName == "Stephansplatz") {
-      return true;
-    }
-
-    if (station1.stationName == "Landstraße" && station2.stationName == "Schwedenplatz") {
-      return true;
-    }
+    // might be needed again
 
     return false;
   }
