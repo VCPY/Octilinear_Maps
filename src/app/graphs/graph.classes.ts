@@ -101,6 +101,8 @@ export class Station {
     if (adjacentNodes.size == 1) return;
 
     this._edgesByAngle = {};
+    this._clockwiseOrdering = [];
+    this._counterClockwiseOrdering = [];
     let upVector = [0, 1];
     edges.forEach(edge => {
       let adjacentId = (edge.station1 == this.stopID) ? edge.station2 : edge.station1;
