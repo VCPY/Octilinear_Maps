@@ -12,7 +12,7 @@ addEventListener('message', ({data}) => {
       let inputGraph: InputGraph = inputParser.parseToInputGraph();
 
       inputGraph.edges = inputGraph.edges.filter(e => e.line.startsWith("U"));
-      inputGraph.edges = inputGraph.edges.filter(e => !e.line.startsWith("U1E"));
+      inputGraph.edges = inputGraph.edges.filter(e => !e.line.endsWith("E"));
 
       console.log("[gtfs-worker] finished");
       postMessage(inputGraph);
