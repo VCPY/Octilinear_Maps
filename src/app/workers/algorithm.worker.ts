@@ -28,6 +28,7 @@ class AlgorithmWorker {
   private readonly _inputGraph: InputGraph;
   private readonly _octiGraph: OctiGraph;
   private readonly _graphOffset;
+  private readonly _ignoreError = true;
 
   constructor(inputGraph: InputGraph) {
     this.D = algo.calculateAverageNodeDistance(inputGraph) * 0.75;
@@ -86,8 +87,17 @@ class AlgorithmWorker {
         if (to.length == 1 && Array.from(settledStations.values()).includes(to[0]))
           to[0].reserveEdges(edge, station2);
 
-        path = dijkstra.setToSet(this._octiGraph, from, to);
-
+        try {
+          path = dijkstra.setToSet(this._octiGraph, from, to);
+        }
+        catch (e) {
+          if (this._ignoreError) {
+            console.log(`No path found for edge: (${station1.stationName} - ${station2.stationName})`)
+            return;
+          }
+          else
+            throw new Error(`No path found for edge: (${station1.stationName} - ${station2.stationName})`);
+        }
         // Close edges to nodes which would break the circular ordering
         path[0].gridNode.closeInBetweenEdges(edge, station1, path[1]);
         path[path.length - 1].gridNode.closeInBetweenEdges(edge, station2, path[path.length - 2]);
