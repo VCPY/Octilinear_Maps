@@ -11,6 +11,10 @@ addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
   let inputGraph = plainToClass(InputGraph, data);
   inputGraph.edges = inputGraph.edges.map(e => plainToClass(InputEdge, e));
+  inputGraph.edges.forEach(edge => {
+    edge.station2 = plainToClass(Station, edge.station2);
+    edge.station1 = plainToClass(Station, edge.station1);
+  });
   inputGraph.nodes = inputGraph.nodes.map(n => plainToClass(Station, n));
   let algorithm = new AlgorithmWorker(inputGraph);
   let algoData = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
@@ -57,8 +61,8 @@ class AlgorithmWorker {
     // perform algorithm over all edges
     edgeOrdering.forEach(edge => {
 
-      const station1 = this._inputGraph.getNodeByID(edge.station1) as Station;
-      const station2 = this._inputGraph.getNodeByID(edge.station2) as Station;
+      const station1 = this._inputGraph.getNodeByID(edge.station1.stopID) as Station;
+      const station2 = this._inputGraph.getNodeByID(edge.station2.stopID) as Station;
 
       // some paths won't be found, for now just exclude them
       if (this.isEdgecase(station1, station2)) return;
@@ -71,11 +75,11 @@ class AlgorithmWorker {
       // Check if an edge between the two stations has been routed before
       let path: OctiNode[] = [];
       foundPaths.forEach((value: OctiNode[], key: InputEdge) => {
-        if (edge.station2 == key.station2 && edge.station1 == key.station1) {
+        if (edge.station2.stopID == key.station2.stopID && edge.station1.stopID == key.station1.stopID) {
           path = value;
           return
         }
-        if (edge.station2 == key.station1 && edge.station1 == key.station2) {
+        if (edge.station2.stopID == key.station1.stopID && edge.station1.stopID == key.station2.stopID) {
           path = value.reverse();
           return;
         }

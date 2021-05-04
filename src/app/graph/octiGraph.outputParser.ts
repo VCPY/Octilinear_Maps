@@ -22,10 +22,16 @@ function parseOctiEdgeForOutput(edges: OctiEdge[]) {
   return edges.map(edge => new OctiEdgeOutput(edge.nodeA.id, edge.nodeB.id, edge.weight, edge.used));
 }
 
+function parseInputEdgeForOutput(edge: InputEdge): OutputEdge {
+  let output = new OutputEdge(edge.station1.stopID, edge.station2.stopID, edge.station1.stationName, edge.station2.stationName, edge.line);
+  output.addInBetweenStations(edge.inBetweenStations);
+  return output;
+}
+
 export function parsePathsForOutput(data: Map<InputEdge, OctiNode[]>) {
-  let result = new Map<InputEdge, OctiNodeOutput[]>();
+  let result = new Map<OutputEdge, OctiNodeOutput[]>();
   data.forEach((value: OctiNode[], key: InputEdge) => {
-    result.set(key, parseOctiNodeForOutput(value));
+    result.set(parseInputEdgeForOutput(key), parseOctiNodeForOutput(value));
   });
   return result
 }
@@ -82,14 +88,21 @@ export class GridNodeOutput {
   private _stationID: string = "";
   private _stationName: string = "";
   @Type(() => OctiNodeOutput) private _octiNodes: OctiNodeOutput[] = [];
-  private _routedEdges: Array<[InputEdge, number]>;
+  private _routedEdges: Array<[OutputEdge, number]> = [];
 
   constructor(id: number, x: number, y: number, octiNodes: OctiNodeOutput[], routedEdges: Array<[InputEdge, number]>, station: Station | undefined) {
     this._id = id;
     this._x = x;
     this._y = y;
     this._octiNodes = octiNodes;
-    this._routedEdges = routedEdges;
+
+    if (routedEdges != undefined) {
+      routedEdges.forEach(value => {
+        let helper = parseInputEdgeForOutput(value[0]);
+        this._routedEdges.push([helper, value[1]]);
+      });
+    }
+
     if (station != undefined) {
       this._stationID = (station as Station).stopID;
       this._stationName = (station as Station).stationName;
@@ -144,11 +157,11 @@ export class GridNodeOutput {
     this._octiNodes = value;
   }
 
-  get routedEdges(): Array<[InputEdge, number]> {
+  get routedEdges(): Array<[OutputEdge, number]> {
     return this._routedEdges;
   }
 
-  set routedEdges(value: Array<[InputEdge, number]>) {
+  set routedEdges(value: Array<[OutputEdge, number]>) {
     this._routedEdges = value;
   }
 }
@@ -223,4 +236,27 @@ export class OctiEdgeOutput {
   set used(value: boolean) {
     this._used = value;
   }
+}
+
+export class OutputEdge {
+  private _station1ID: string = "";
+  private _station2ID: string = "";
+  private _station1Name: string = "";
+  private _station2Name: string = "";
+  private _line: string;
+  private _inBetweenStations: string[] = [];
+
+
+  constructor(station1ID: string, station2ID: string, station1Name: string, station2Name: string, line: string) {
+    this._station1ID = station1ID;
+    this._station2ID = station2ID;
+    this._station1Name = station1Name;
+    this._station2Name = station2Name;
+    this._line = line;
+  }
+
+  addInBetweenStations(stations: Station[]) {
+    this._inBetweenStations = stations.map(station => station.stationName)
+  }
+
 }

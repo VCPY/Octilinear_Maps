@@ -105,7 +105,7 @@ export class Station {
     this._counterClockwiseOrdering = [];
     let upVector = [0, 1];
     edges.forEach(edge => {
-      let adjacentId = (edge.station1 == this.stopID) ? edge.station2 : edge.station1;
+      let adjacentId = (edge.station1!.stopID == this.stopID) ? edge.station2!.stopID : edge.station1!.stopID;
 
       let adjacentNode = Array.from(adjacentNodes).find(obj => obj.stopID === adjacentId) as Station;
       let vectorToNode = [adjacentNode.latitude - this.latitude, adjacentNode.longitude - this.longitude];
@@ -162,29 +162,40 @@ export class Station {
 }
 
 export class InputEdge {
-  private _station1: string = "";
-  private _station2: string = "";
+  private _station1: Station;
+  private _station2: Station;
   private _line: string;
+  private _inBetweenStations: Station[] = [];
 
-  constructor(line: string) {
+  constructor(line: string, station1: Station, station2: Station) {
     this._line = line;
+    this._station1 = station1;
+    this._station2 = station2;
   }
 
 
-  get station1(): string {
+  get station1(): Station {
     return this._station1;
   }
 
-  set station1(value: string) {
+  set station1(value: Station) {
     this._station1 = value;
   }
 
-  get station2(): string {
+  get station2(): Station {
     return this._station2;
   }
 
-  set station2(value: string) {
+  set station2(value: Station) {
     this._station2 = value;
+  }
+
+  get inBetweenStations(): Station[] {
+    return this._inBetweenStations;
+  }
+
+  set inBetweenStations(value: Station[]) {
+    this._inBetweenStations = value;
   }
 
   get line(): string {
@@ -196,9 +207,9 @@ export class InputEdge {
   }
 
   equalsByStation(other: InputEdge) {
-    if (this.station2 == other.station2 && this.station1 == other.station1) {
+    if (this.station2.stopID == other.station2.stopID && this.station1.stopID == other.station1.stopID) {
       return true;
-    } else if (this.station1 == other.station2 && this.station2 == other.station1) {
+    } else if (this.station1.stopID == other.station2.stopID && this.station2.stopID == other.station1.stopID) {
       return true;
     }
     return false;
@@ -316,8 +327,8 @@ export class InputGraph {
 
   calculateNodeLineDegrees() {
     this.edges.forEach(edge => {
-      let station1 = edge.station1;
-      let station2 = edge.station2;
+      let station1 = edge.station1.stopID;
+      let station2 = edge.station2.stopID;
 
       let station = this.nodes.find(x => x.stopID == station1);
       if (station !== undefined) {
@@ -350,7 +361,7 @@ export class InputGraph {
   getIncidentEdges(nodeID: string): InputEdge[] {
     let result: InputEdge[] = [];
     this.edges.forEach(edge => {
-      if (edge.station2 === nodeID || edge.station1 === nodeID) {
+      if (edge.station2.stopID === nodeID || edge.station1.stopID === nodeID) {
         result.push(edge);
       }
     });
@@ -360,10 +371,10 @@ export class InputGraph {
   getAdjacentNodes(nodeID: string) {
     let nodeIDs: string[] = [];
     this.edges.forEach(edge => {
-      if (edge.station2 === nodeID) {
-        nodeIDs.push(edge.station1);
-      } else if (edge.station1 === nodeID) {
-        nodeIDs.push(edge.station2);
+      if (edge.station2.stopID === nodeID) {
+        nodeIDs.push(edge.station1.stopID);
+      } else if (edge.station1.stopID === nodeID) {
+        nodeIDs.push(edge.station2.stopID);
       }
     });
     return this.nodes.filter(node => nodeIDs.indexOf(node.stopID) != -1);
@@ -374,12 +385,12 @@ export class InputGraph {
       let adjacentEdges = new Set<InputEdge>();
       let adjacentNodes = new Set<Station>();
       this.edges.forEach(edge => {
-        if (edge.station1 == node.stopID) {
+        if (edge.station1.stopID == node.stopID) {
           adjacentEdges.add(edge);
-          adjacentNodes.add(this.getNodeByID(edge.station2) as Station)
-        } else if (edge.station2 == node.stopID) {
+          adjacentNodes.add(this.getNodeByID(edge.station2.stopID) as Station)
+        } else if (edge.station2.stopID == node.stopID) {
           adjacentEdges.add(edge);
-          adjacentNodes.add(this.getNodeByID(edge.station1) as Station)
+          adjacentNodes.add(this.getNodeByID(edge.station1.stopID) as Station)
         }
       });
       if (adjacentNodes.size != 0 && adjacentEdges.size != 0) {
@@ -397,9 +408,10 @@ export class InputGraph {
         let foundFirstEdge = false;
         for (let j = 0; j < this.edges.length; j++) {
           let edge = this.edges[j];
-          if (edge.station2 == node.stopID) {
+          if (edge.station2.stopID == node.stopID) {
             if (!foundFirstEdge) {
-              edge.station2 = edge.station1 == adjacentNodesArray[0].stopID ? adjacentNodesArray[1].stopID : adjacentNodesArray[0].stopID;
+              edge.inBetweenStations.push(edge.station2);
+              edge.station2 = edge.station1.stopID == adjacentNodesArray[0].stopID ? adjacentNodesArray[1] : adjacentNodesArray[0];
               adjacentNodesArray[0].replaceStation(node.stopID, adjacentNodesArray[1]);
               adjacentNodesArray[1].replaceStation(node.stopID, adjacentNodesArray[0]);
               foundFirstEdge = true;
@@ -407,9 +419,10 @@ export class InputGraph {
               this.edges.splice(j, 1);
               break;
             }
-          } else if (edge.station1 == node.stopID) {
+          } else if (edge.station1.stopID == node.stopID) {
             if (!foundFirstEdge) {
-              edge.station1 = edge.station2 == adjacentNodesArray[0].stopID ? adjacentNodesArray[1].stopID : adjacentNodesArray[0].stopID;
+              edge.inBetweenStations.push(edge.station2);
+              edge.station1 = edge.station2.stopID == adjacentNodesArray[0].stopID ? adjacentNodesArray[1] : adjacentNodesArray[0];
               adjacentNodesArray[0].replaceStation(node.stopID, adjacentNodesArray[1]);
               adjacentNodesArray[1].replaceStation(node.stopID, adjacentNodesArray[0]);
               foundFirstEdge = true;
