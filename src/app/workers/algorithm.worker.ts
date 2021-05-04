@@ -82,10 +82,14 @@ class AlgorithmWorker {
       });
       if (path.length == 0) {
         // Check the circular ordering and block edges if the station has been used before
-        if (from.length == 1 && Array.from(settledStations.values()).includes(from[0]))
+        if (from.length == 1 && Array.from(settledStations.values()).includes(from[0])) {
           from[0].reserveEdges(edge, station1);
-        if (to.length == 1 && Array.from(settledStations.values()).includes(to[0]))
+          from[0].addLineBendPenalty();
+        }
+        if (to.length == 1 && Array.from(settledStations.values()).includes(to[0])) {
           to[0].reserveEdges(edge, station2);
+          to[0].addLineBendPenalty();
+        }
 
         try {
           path = dijkstra.setToSet(this._octiGraph, from, to);

@@ -391,7 +391,7 @@ export class GridNode {
     // iterate over all uniquie cobinations of nodes
     // and create each edge
     for (let i = 0; i < 8; i++) {
-      for (let j = i + 1; j < 9; j++) {
+      for (let j = i + 1; j < 8; j++) {
         const node1 = this._octiNodes[i];
         const node2 = this._octiNodes[j];
 
@@ -399,6 +399,16 @@ export class GridNode {
         node1.addEdge(newEdge);
         node2.addEdge(newEdge);
       }
+    }
+
+    // add sink edges separatly to ensure that the edge index on the sink node matches the direction
+    // of the port node
+    for (let i = 0; i < 8; i++) {
+      const node = this._octiNodes[i];
+      const sinkNode = this._octiNodes[Constants.SINK];
+      const newEdge = new OctiEdge(node, sinkNode, Constants.COST_SINK);
+      node.addEdge(newEdge);
+      sinkNode.addEdge(newEdge);
     }
   }
 
@@ -560,6 +570,27 @@ export class GridNode {
       this.checkEdgesByOrdering(clockwiseOrdering, routedEdge);
       let counterClockwiseOrdering = GridNode.findOrderingByEdges(edge, routedEdge[0], station.counterClockwiseOrdering) as CircularEdgeOrdering;
       this.checkEdgesByOrdering(counterClockwiseOrdering, routedEdge);
+    });
+  }
+
+  addLineBendPenalty() {
+    // assume that edges to sink node get added in order from 0 to 7
+    this.getOctiNode(Constants.SINK).edges.forEach((candidateSinkEdge, index) => {
+      // skip blocked edges
+      if (candidateSinkEdge.weight == Infinity) return;
+      if (this.routedEdges.map(routedEdge => routedEdge[1]).includes(index)) return;
+
+      let penaltySum = 0;
+
+      this.routedEdges.forEach((routedEdge) => {
+        const routedDirection = routedEdge[1];
+
+        // condition from the paper
+        if (routedDirection >= index) return;
+        penaltySum = this.calculateWeight(index, routedDirection);
+      });
+
+      candidateSinkEdge.weight += penaltySum;
     });
   }
 
