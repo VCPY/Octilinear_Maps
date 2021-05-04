@@ -89,7 +89,9 @@ export default class GraphInputParser {
         let inputEdge = new InputEdge(routeName);
         inputEdge.station1 = stationsByID[stationIdMapper.get(id1) as string].stopID;
         inputEdge.station2 = stationsByID[stationIdMapper.get(id2) as string].stopID;
-        edges.push(inputEdge);
+        if (inputEdge.station1 != inputEdge.station2) {
+          edges.push(inputEdge);
+        }
       }
     });
 
