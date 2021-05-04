@@ -14,6 +14,7 @@ export class DrawingplaneComponent implements OnInit {
 
   planeXOffset = 50;
   planeYOffset = 50;
+  gapFactor = 50;
   // @ts-ignore
   svg;
   planeWidth = 3000;
@@ -23,16 +24,20 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.svg = d3.select("#drawingPlaneSVG").append("svg")
-      .attr("width", this.planeWidth)
-      .attr("height", this.planeHeight)
-      .append("g");
     Constants.octiGraph.registerListener(this.callback.bind(this));
   }
 
   callback(graph: Object, paths: Map<InputEdge, OctiNode[]>) {
     if (graph != undefined && paths != undefined) {
-      this.drawPaths(paths, plainToClass(OctiGraphOutput, graph));
+      let octiGraph = plainToClass(OctiGraphOutput, graph) as OctiGraphOutput;
+      this.planeWidth = octiGraph.width*this.gapFactor + this.planeXOffset;
+      this.planeHeight = octiGraph.height*this.gapFactor + this.planeYOffset;
+
+      this.svg = d3.select("#drawingPlaneSVG").append("svg")
+        .attr("width", this.planeWidth)
+        .attr("height", this.planeHeight )
+        .append("g");
+      this.drawPaths(paths, octiGraph);
     }
   }
 
@@ -107,11 +112,11 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   private planeXPosition(node: GridNodeOutput) {
-    return (node.x * 50) + this.planeXOffset;
+    return (node.x * this.gapFactor) + this.planeXOffset;
   }
 
   private planeYPosition(node: GridNodeOutput) {
-    return this.planeHeight - ((node.y * 50) + this.planeYOffset);
+    return this.planeHeight - ((node.y * this.gapFactor) + this.planeYOffset);
   }
 
   private static getGridID(id: number): number {
