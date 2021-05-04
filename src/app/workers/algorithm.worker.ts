@@ -35,6 +35,7 @@ class AlgorithmWorker {
     this.r = 1;
     this._inputGraph = inputGraph;
 
+    inputGraph.mergeEqualEdges();
     inputGraph.calculateNodeLineDegrees();
     inputGraph.calculateEdgeOrderingAtNode();
     inputGraph.removeNodesWithoutEdges();

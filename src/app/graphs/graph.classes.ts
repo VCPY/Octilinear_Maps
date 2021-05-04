@@ -92,8 +92,8 @@ export class Station {
     return this._edgesByAngle;
   }
 
-  raiseLineDegreeByOne() {
-    this._lineDegree += 1
+  raiseLineDegreeBy(amount: number) {
+    this._lineDegree += amount
   }
 
   calculateEdgeOrdering(edges: Set<InputEdge>, adjacentNodes: Set<Station>) {
@@ -141,7 +141,7 @@ export class Station {
     let index = start + 1;
     if (index == angles.length) index = 0;
     while (index != end) {
-      inBetweenEdges.push(this.edgesByAngle[angles[index]]);
+      inBetweenEdges.push(this._edgesByAngle[angles[index]]);
       index += 1;
       if (index >= angles.length) index = 0;
     }
@@ -164,10 +164,10 @@ export class Station {
 export class InputEdge {
   private _station1: string = "";
   private _station2: string = "";
-  private _line: string;
+  private _line: string[] = [];
 
   constructor(line: string) {
-    this._line = line;
+    this._line.push(line);
   }
 
 
@@ -187,11 +187,15 @@ export class InputEdge {
     this._station2 = value;
   }
 
-  get line(): string {
+  getLineDegree() {
+    return this._line.length
+  }
+
+  get line(): string[] {
     return this._line;
   }
 
-  set line(value: string) {
+  set line(value: string[]) {
     this._line = value;
   }
 
@@ -204,6 +208,9 @@ export class InputEdge {
     return false;
   }
 
+  addLine(line: string[]) {
+      this._line.push(...line)
+  }
 }
 
 export class Line {
@@ -321,11 +328,11 @@ export class InputGraph {
 
       let station = this.nodes.find(x => x.stopID == station1);
       if (station !== undefined) {
-        station.raiseLineDegreeByOne();
+        station.raiseLineDegreeBy(edge.getLineDegree());
       }
       station = this.nodes.find(x => x.stopID == station2);
       if (station !== undefined) {
-        station.raiseLineDegreeByOne()
+        station.raiseLineDegreeBy(edge.getLineDegree())
       }
     });
   }
@@ -431,6 +438,29 @@ export class InputGraph {
         i--;
       }
     }
+  }
+
+  mergeEqualEdges() {
+    let result: InputEdge[] = [];
+    for (let i = 0; i < this._edges.length; i++) {
+      let edge = this._edges[i];
+      let equalEdge = this.containsEdge(result, edge);
+      if (equalEdge != undefined) {
+        equalEdge.addLine(edge.line)
+      } else {
+        result.push(edge);
+      }
+    }
+    this._edges = result;
+  }
+
+  private containsEdge(array: InputEdge[], edge: InputEdge) {
+    for (let i = 0; i < array.length; i++) {
+      if (array[i].equalsByStation(edge)) {
+        return array[i]
+      }
+    }
+    return undefined;
   }
 }
 
