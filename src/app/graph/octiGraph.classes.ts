@@ -589,11 +589,11 @@ export class GridNode {
         const routedDirection = routedEdge[1];
 
         // condition from the paper
-        //if (routedDirection >= index) return;
+        if (routedDirection >= index) return;
         penaltySum = this.calculateWeight(index, routedDirection);
       });
 
-      candidateSinkEdge.weight += penaltySum;
+      candidateSinkEdge.weight = penaltySum;
     });
   }
 
