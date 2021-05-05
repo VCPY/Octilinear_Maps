@@ -379,7 +379,7 @@ export class GridNode {
 
   private _routedEdges: Array<[InputEdge, number]> = [];
 
-  private _station: Station|undefined = undefined;
+  private _station: Station | undefined = undefined;
 
   constructor(id: number, x: number, y: number) {
     this._id = id;
@@ -570,9 +570,9 @@ export class GridNode {
   reserveEdges(edge: InputEdge, station: Station) {
     this.routedEdges.forEach(routedEdge => {
       let clockwiseOrdering = GridNode.findOrderingByEdges(edge, routedEdge[0], station.clockwiseOrdering) as CircularEdgeOrdering;
-      this.checkEdgesByOrdering(clockwiseOrdering, routedEdge);
+      this.checkEdgesByOrdering(clockwiseOrdering, routedEdge, true);
       let counterClockwiseOrdering = GridNode.findOrderingByEdges(edge, routedEdge[0], station.counterClockwiseOrdering) as CircularEdgeOrdering;
-      this.checkEdgesByOrdering(counterClockwiseOrdering, routedEdge);
+      this.checkEdgesByOrdering(counterClockwiseOrdering, routedEdge, false);
     });
   }
 
@@ -597,15 +597,24 @@ export class GridNode {
     });
   }
 
-  private checkEdgesByOrdering(ordering: CircularEdgeOrdering, routedEdge: [InputEdge, number]) {
+  private checkEdgesByOrdering(ordering: CircularEdgeOrdering, routedEdge: [InputEdge, number], clockwise: boolean) {
     if (ordering.distance != 1) {
       // At least one edge should be routed in between
       let inBetweenEdgeDrawn: boolean = this.isAnyEdgeSet(ordering.inBetweenEdges);
       if (!inBetweenEdgeDrawn) {
-        if (routedEdge[0].equalsByStation(ordering.from))
-          this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] - 1) % 8, true);
-        else
-          this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] + 1) % 8, false)
+        if (routedEdge[0].equalsByStation(ordering.from)) {
+          if (clockwise) {
+            this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] + 1) % 8, true);
+          } else {
+            this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] - 1) % 8, false);
+          }
+        } else {
+          if (clockwise) {
+            this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] - 1) % 8, false);
+          } else {
+            this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] + 1) % 8, true);
+          }
+        }
       }
     }
   }
@@ -621,18 +630,18 @@ export class GridNode {
   private static determineIndexIntermediateEdges(amount: number, startValue: number, clockwise: boolean = false) {
     let valuesToReserve = [];
     let value = startValue;
-    if (value==-1) value=7;
+    if (value == -1) value = 7;
     if (!clockwise) {
       while (amount != 0) {
         valuesToReserve.push(value);
-        value = (value + 1) % 8;
+        value = (value - 1);
+        if (value == -1) value = 7;
         amount -= 1;
       }
     } else {
       while (amount != 0) {
         valuesToReserve.push(value);
-        value = (value - 1);
-        if (value == -1) value = 7;
+        value = (value + 1) % 8;
         amount -= 1;
       }
     }
