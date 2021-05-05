@@ -100,12 +100,10 @@ export class DrawingplaneComponent implements OnInit {
     circ.append("text")
       .attr("dx", 12)
       .attr("dy", ".35em")
-      .attr('x', (node: GridNodeOutput) => {
-        return this.planeXPosition(node);
+      .attr("transform", (node: GridNodeOutput) => {
+        return "translate(" + this.planeXPosition(node) + "," + this.planeYPosition(node) + ") rotate(-30)";
       })
-      .attr('y', (node: GridNodeOutput) => {
-        return this.planeYPosition(node);
-      })
+
       .text((node: GridNodeOutput) => {
         return node.stationName;
       });
