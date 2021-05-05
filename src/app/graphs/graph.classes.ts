@@ -406,27 +406,32 @@ export class InputGraph {
       if (node.adjacentNodes.size == 2) {
         let adjacentNodesArray = Array.from(node.adjacentNodes);
         let foundFirstEdge = false;
+        let newEdge: InputEdge;
         for (let j = 0; j < this.edges.length; j++) {
           let edge = this.edges[j];
           if (edge.station2.stopID == node.stopID) {
             if (!foundFirstEdge) {
+              newEdge = edge;
               edge.inBetweenStations.push(edge.station2);
               edge.station2 = edge.station1.stopID == adjacentNodesArray[0].stopID ? adjacentNodesArray[1] : adjacentNodesArray[0];
               adjacentNodesArray[0].replaceStation(node.stopID, adjacentNodesArray[1]);
               adjacentNodesArray[1].replaceStation(node.stopID, adjacentNodesArray[0]);
               foundFirstEdge = true;
             } else {
+              newEdge!.inBetweenStations.push(...this.edges[j].inBetweenStations);
               this.edges.splice(j, 1);
               break;
             }
           } else if (edge.station1.stopID == node.stopID) {
             if (!foundFirstEdge) {
+              newEdge = edge;
               edge.inBetweenStations.push(edge.station2);
               edge.station1 = edge.station2.stopID == adjacentNodesArray[0].stopID ? adjacentNodesArray[1] : adjacentNodesArray[0];
               adjacentNodesArray[0].replaceStation(node.stopID, adjacentNodesArray[1]);
               adjacentNodesArray[1].replaceStation(node.stopID, adjacentNodesArray[0]);
               foundFirstEdge = true;
             } else {
+              newEdge!.inBetweenStations.push(...this.edges[j].inBetweenStations);
               this.edges.splice(j, 1);
               break;
             }
