@@ -54,7 +54,7 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   private drawLines(edge: InputEdge, pathArray: OctiNode[], graph: OctiGraphOutput) {
-    let lines: Point[] = [];
+    let lines: IntermediateStation[] = [];
     for (let i = 0; i < pathArray.length - 1; i++) {
       let one = DrawingplaneComponent.getGridID(pathArray[i].id);
       let two = DrawingplaneComponent.getGridID(pathArray[i + 1].id);
@@ -62,8 +62,8 @@ export class DrawingplaneComponent implements OnInit {
 
       let oneNode = graph.getGridNodeById(one) as GridNodeOutput;
       let twoNode = graph.getGridNodeById(two) as GridNodeOutput;
-      lines.push(new Point(oneNode.x, oneNode.y));
-      lines.push(new Point(twoNode.x, twoNode.y));
+      lines.push(new IntermediateStation(oneNode.x, oneNode.y));
+      lines.push(new IntermediateStation(twoNode.x, twoNode.y));
     }
 
     let self = this;
@@ -88,24 +88,36 @@ export class DrawingplaneComponent implements OnInit {
     let pathNode = path.node();
     let pathLength = pathNode.getTotalLength();
     let step = pathLength / (edge.inBetweenStations.length + 1);
-    let intermediatePoints: SVGPoint[] = [];
+    let intermediatePoints: Array<[SVGPoint, string]> = [];
     for (let i = 1; i <= edge.inBetweenStations.length; i++) {
-      intermediatePoints.push(pathNode.getPointAtLength(step * i));
+      // @ts-ignore
+      intermediatePoints.push([pathNode.getPointAtLength(step * i), edge.inBetweenStations[i-1]]);
     }
     this.drawIntermediateStations(intermediatePoints);
   }
 
-  private drawIntermediateStations(nodes: SVGPoint[]){
-    this.svg.selectAll(".interDot")
+  private drawIntermediateStations(nodes: Array<[SVGPoint, string]>){
+    let circ = this.svg.selectAll(".interDot")
       .append('g')
       .data(nodes)
-      .enter()
-      .append('circle')
-      .attr('cx', (p: SVGPoint) => p.x)
-      .attr('cy', (p: SVGPoint) => p.y)
+      .enter();
+
+      circ.append('circle')
+      .attr('cx', (p: [SVGPoint, string]) => p[0].x)
+      .attr('cy', (p: [SVGPoint, string]) => p[0].y)
       .attr('r', 5)
       .style('fill', 'white')
       .style('stroke', 'black');
+
+      // Use if the intermediate stations should be labeled
+    /*circ.append("text")
+      .attr("dx", 12)
+      .attr("dy", ".35em")
+      .attr('x', (p: [SVGPoint, string]) => p[0].x)
+      .attr('y', (p: [SVGPoint, string]) => p[0].y)
+      .text((p:  [SVGPoint, string]) => {
+        return p[1];
+      });*/
   }
 
   private drawMainStations(nodes: Set<GridNodeOutput>) {
@@ -134,7 +146,7 @@ export class DrawingplaneComponent implements OnInit {
     return (node.x * 50) + this.planeXOffset;
   }
 
-  private planeXPosition2(node: Point) {
+  private planeXPosition2(node: IntermediateStation) {
     return (node.x * 50) + this.planeXOffset;
   }
 
@@ -142,7 +154,7 @@ export class DrawingplaneComponent implements OnInit {
     return this.planeHeight - ((node.y * 50) + this.planeYOffset);
   }
 
-  private planeYPosition2(node: Point) {
+  private planeYPosition2(node: IntermediateStation) {
     return (node.y * 50) + this.planeXOffset;
   }
 
@@ -151,7 +163,7 @@ export class DrawingplaneComponent implements OnInit {
   }
 }
 
-class Point {
+class IntermediateStation {
   x: number = -1;
   y: number = -1;
 
