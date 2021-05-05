@@ -603,9 +603,9 @@ export class GridNode {
       let inBetweenEdgeDrawn: boolean = this.isAnyEdgeSet(ordering.inBetweenEdges);
       if (!inBetweenEdgeDrawn) {
         if (routedEdge[0].equalsByStation(ordering.from))
-          this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] - 1) % 9, true);
+          this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] - 1) % 8, true);
         else
-          this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] + 1) % 9, false)
+          this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] + 1) % 8, false)
       }
     }
   }
@@ -615,25 +615,24 @@ export class GridNode {
    */
   private closeIntermediateEdges(amount: number, startIndex: number, clockwise: boolean = false) {
     let values = GridNode.determineIndexIntermediateEdges(amount, startIndex, clockwise);
-    values.forEach(value => this.getOctiNode(value - 1).setWeightOfEdgesToInfinity())
+    values.forEach(value => this.getOctiNode(value).setWeightOfEdgesToInfinity())
   }
 
   private static determineIndexIntermediateEdges(amount: number, startValue: number, clockwise: boolean = false) {
     let valuesToReserve = [];
     let value = startValue;
-    if (value == 0) value = 1;
+    if (value==-1) value=7;
     if (!clockwise) {
       while (amount != 0) {
         valuesToReserve.push(value);
-        value = (value + 1) % 9;
-        if (value == 0) value = 1;
+        value = (value + 1) % 8;
         amount -= 1;
       }
     } else {
       while (amount != 0) {
         valuesToReserve.push(value);
         value = (value - 1);
-        if (value == 0) value = 8;
+        if (value == -1) value = 7;
         amount -= 1;
       }
     }
