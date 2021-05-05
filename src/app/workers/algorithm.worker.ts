@@ -172,14 +172,14 @@ class AlgorithmWorker {
           if (distance1 <= this.r || distance2 <= this.r) {
             if (distance1 < distance2) {
               //set penalty on all sink edges
-              const penalty = distance1 / this.D * (Constants.COST_MOVE + Constants.COST_HOP);
-              node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
+              const penalty = distance1 * (Constants.COST_MOVE + Constants.COST_HOP);
+              node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight += penalty);
 
               ret1.push(node);
             } else {
               //set penalty on all sink edges
-              const penalty = distance2 / this.D * (Constants.COST_MOVE + Constants.COST_HOP);
-              node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight = penalty);
+              const penalty = distance2 * (Constants.COST_MOVE + Constants.COST_HOP);
+              node.getOctiNode(Constants.SINK).edges.forEach(edge => edge.weight += penalty);
 
               ret2.push(node);
             }
