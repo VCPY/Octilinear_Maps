@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { InputGraph } from '../graphs/graph.classes';
-import { GtfsService } from '../services/gtfs.service';
-import { AlgorithmService } from '../services/algorithm.service';
+import {Component, OnInit} from '@angular/core';
+import {InputGraph} from '../graphs/graph.classes';
+import {GtfsService} from '../services/gtfs.service';
+import {AlgorithmService} from '../services/algorithm.service';
 
 @Component({
   selector: 'app-octi-test',

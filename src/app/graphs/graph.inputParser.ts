@@ -85,11 +85,11 @@ export default class GraphInputParser {
       for (let i = 2; i < stopSequence.size + 1; i++) {
         let id1 = stopSequence.get("" + (i - 1));
         let id2 = stopSequence.get("" + i);
+        let station1 = stationsByID[stationIdMapper.get(id1) as string];
+        let station2 = stationsByID[stationIdMapper.get(id2) as string];
 
-        let inputEdge = new InputEdge(routeName);
-        inputEdge.station1 = stationsByID[stationIdMapper.get(id1) as string].stopID;
-        inputEdge.station2 = stationsByID[stationIdMapper.get(id2) as string].stopID;
-        if (inputEdge.station1 != inputEdge.station2) {
+        let inputEdge = new InputEdge(routeName, station1, station2);
+        if (inputEdge.station1.stopID != inputEdge.station2.stopID) {
           edges.push(inputEdge);
         }
       }

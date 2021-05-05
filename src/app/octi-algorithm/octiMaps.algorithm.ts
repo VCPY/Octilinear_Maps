@@ -34,7 +34,7 @@ export function orderEdges(graph: InputGraph) {
           // Adjacent node has not been processed yet, find edges leading to the node
           for (let i = 0; i < incidentEdges.length; i++) {
             let edge = incidentEdges[i];
-            if (edge.station1 == adjacentNode.stopID || edge.station2 == adjacentNode.stopID) {
+            if (edge.station1.stopID == adjacentNode.stopID || edge.station2.stopID == adjacentNode.stopID) {
               // Found an edge leading to the adjacent node, remove the processed edge
               sortedEdges.push(edge);
               incidentEdges.splice(i, 1);
@@ -71,8 +71,8 @@ export function calculateAverageNodeDistance(graph: InputGraph): number {
     for (let i = 0; i < graph.nodes.length; i++) {
       let node = graph.nodes[i];
 
-      if (node.stopID == edge.station1) station1 = node;
-      else if (node.stopID == edge.station2) station2 = node;
+      if (node.stopID == edge.station1.stopID) station1 = node;
+      else if (node.stopID == edge.station2.stopID) station2 = node;
 
       if (station1 && station2) {
         sum += euclideanDistance(station1, station2);
