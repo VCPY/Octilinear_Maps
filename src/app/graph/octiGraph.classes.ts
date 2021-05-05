@@ -184,6 +184,7 @@ export class OctiGraph {
 
 export class OctiNode {
   private _id: number;
+  private _direction: number;
 
   /**
    * Edges to neighbouring OctiNodes (sink and port nodes)
@@ -199,9 +200,10 @@ export class OctiNode {
   private _dist: number = 0;
   private _prev: OctiNode = this;
 
-  constructor(gridNode: GridNode, id: number) {
+  constructor(gridNode: GridNode, id: number, direction: number = 0) {
     this._gridNode = gridNode;
     this._id = id;
+    this._direction = direction;
   }
 
   addEdge(edge: OctiEdge) {
@@ -210,6 +212,10 @@ export class OctiNode {
 
   get id(): number {
     return this._id;
+  }
+
+  get direction(): number {
+    return this._direction;
   }
 
   get dist(): number {
@@ -384,7 +390,7 @@ export class GridNode {
 
     // create all octi nodes
     for (let i = 0; i < 9; i++) {
-      this._octiNodes[i] = new OctiNode(this, this._id + 1 + i);
+      this._octiNodes[i] = new OctiNode(this, this._id + 1 + i, i);
     }
 
     // all OctiNodes of the same GridNode are fully connected
@@ -513,7 +519,7 @@ export class GridNode {
 
     this._routedEdges.forEach(routedEdge => {
       let routedEdgeIndex = routedEdge[1];
-      let octiIndex = parseFloat(("" + octiNode.id).slice(-1));
+      let octiIndex = octiNode.direction;
       let clockwiseOrderings = station.clockwiseOrdering;
       let orderingEntry = GridNode.findOrderingByEdges(routedEdge[0], edge, clockwiseOrderings) as CircularEdgeOrdering;
       let counterClockwiseOrderings = station.counterClockwiseOrdering;
@@ -527,19 +533,16 @@ export class GridNode {
       if (counterOrderingEntry.distance == 1) this.closeEdgesBetweenIndices(toIndex, fromIndex);
     });
 
-    let index = parseFloat(("" + octiNode.id).slice(-1));
-    this._routedEdges.push([edge, index]);
+    this._routedEdges.push([edge, octiNode.direction]);
   }
 
   closeEdgesBetweenIndices(from: number, to: number) {
     let value = from + 1;
-    value = value % 9;
-    if (value == 0) value = 1;
+    value = value % 8;
     while (value != to) {
-      this.octiNodes[value - 1].closeEdges();
+      this.octiNodes[value].closeEdges();
       value += 1;
-      value = value % 9;
-      if (value == 0) value = 1
+      value = value % 8;
     }
   }
 
@@ -586,7 +589,7 @@ export class GridNode {
         const routedDirection = routedEdge[1];
 
         // condition from the paper
-        if (routedDirection >= index) return;
+        //if (routedDirection >= index) return;
         penaltySum = this.calculateWeight(index, routedDirection);
       });
 
