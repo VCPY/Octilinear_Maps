@@ -73,55 +73,48 @@ class AlgorithmWorker {
       const from = allCandidates[0];
       const to = allCandidates[1];
 
-      // Check if an edge between the two stations has been routed before
-      let path: OctiNode[] = [];
-      foundPaths.forEach((value: OctiNode[], key: InputEdge) => {
-        if (edge.station2.stopID == key.station2.stopID && edge.station1.stopID == key.station1.stopID) {
-          path = value;
-          return
-        }
-        if (edge.station2.stopID == key.station1.stopID && edge.station1.stopID == key.station2.stopID) {
-          path = value.reverse();
+      // Check the circular ordering and block edges if the station has been used before
+      if (from.length == 1 && Array.from(settledStations.values()).includes(from[0])) {
+        from[0].reserveEdges(edge, station1);
+        from[0].addLineBendPenalty();
+      }
+      if (to.length == 1 && Array.from(settledStations.values()).includes(to[0])) {
+        to[0].reserveEdges(edge, station2);
+        to[0].addLineBendPenalty();
+      }
+
+      let path = [];
+      try {
+        path = dijkstra.setToSet(this._octiGraph, from, to);
+        //path = AlgorithmWorker.cleanPath(path)
+      }
+      catch (e) {
+        if (this._ignoreError) {
+          console.log(`No path found for edge: (${station1.stationName} - ${station2.stationName})`)
           return;
         }
-      });
-      if (path.length == 0) {
-        // Check the circular ordering and block edges if the station has been used before
-        if (from.length == 1 && Array.from(settledStations.values()).includes(from[0])) {
-          from[0].reserveEdges(edge, station1);
-          from[0].addLineBendPenalty();
-        }
-        if (to.length == 1 && Array.from(settledStations.values()).includes(to[0])) {
-          to[0].reserveEdges(edge, station2);
-          to[0].addLineBendPenalty();
-        }
-
-        try {
-          path = dijkstra.setToSet(this._octiGraph, from, to);
-          path = AlgorithmWorker.cleanPath(path)
-        }
-        catch (e) {
-          if (this._ignoreError) {
-            console.log(`No path found for edge: (${station1.stationName} - ${station2.stationName})`)
-            return;
-          }
-          else
-            throw new Error(`No path found for edge: (${station1.stationName} - ${station2.stationName})`);
-        }
-        // Close edges to nodes which would break the circular ordering
-        path[0].gridNode.closeInBetweenEdges(edge, station1, path[1]);
-        path[path.length - 1].gridNode.closeInBetweenEdges(edge, station2, path[path.length - 2]);
+        else
+          throw new Error(`No path found for edge: (${station1.stationName} - ${station2.stationName})`);
       }
       foundPaths.set(edge, path);
 
+      // save the settled stations
       settledStations.set(station1, path[0].gridNode);
       path[0].gridNode.station = station1;
       settledStations.set(station2, path[path.length - 1].gridNode);
       path[path.length - 1].gridNode.station = station2;
 
-      this.resetSinkCost(from);
-      this.resetSinkCost(to);
+      //this.resetSinkCost(from);
+      //this.resetSinkCost(to);
 
+      // Prevent paths from crossing (4.3)
+      path.map(node => node.gridNode).forEach(node => node.closeSinkEdge());
+      path.map(node => node.gridNode).forEach(node => node.closeBendEdges());
+
+      /* To prevent crossingpaths at diagonal grid edges,
+      we close for each diagonal grid edge used in the
+      previously found path all crossing diagonal grid
+      edges by setting their cost to ∞.*/
       for (let i = 0; i < path.length - 1; i++) {
         let one: OctiNode = path[i];
         let two: OctiNode = path[i + 1];
@@ -132,8 +125,13 @@ class AlgorithmWorker {
         }
       }
 
-      //to update grid weights (4.3)
-      path.forEach(node => node.setWeightOfGridNodeToInfinity());
+      /* To preserve the circular edge ordering at nodes,
+      we update the costs of adjacent sink edges for the grid node
+      used for s, and the grid node used for t.*/
+      // Close edges to nodes which would break the circular ordering
+      path[0].gridNode.closeInBetweenEdges(edge, station1, path[1]);
+      path[path.length - 1].gridNode.closeInBetweenEdges(edge, station2, path[path.length - 2]);
+
     });
     console.log("Found paths:", foundPaths);
     return [this._octiGraph, foundPaths];
@@ -191,13 +189,13 @@ class AlgorithmWorker {
 
     if (settledStations.has(station1)) {
       let settledStation = settledStations.get(station1) as GridNode;
-      settledStation.reopenEdges();
+      settledStation.reopenSinkEdges();
       ret1 = [settledStation];
     }
 
     if (settledStations.has(station2)) {
       let settledStation = settledStations.get(station2) as GridNode;
-      settledStation.reopenEdges();
+      settledStation.reopenSinkEdges();
       ret2 = [settledStation];
     }
     // from, to

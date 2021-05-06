@@ -242,14 +242,11 @@ export class OctiNode {
     return this._gridNode;
   }
 
-  setWeightOfGridNodeToInfinity(): void {
-    this.gridNode.setAllWeightsToInfinity();
-  }
-
   setWeightOfEdgesToInfinity(): void {
     this._edges.forEach(edge => edge.setWeightToInfinity())
   }
 
+  /* by an edge connecting with other node*/
   setWeightToInfinity(otherNode: OctiNode): void {
     this._edges.forEach(edge => {
       if (edge.nodeB == this && edge.nodeA == otherNode) {
@@ -463,10 +460,23 @@ export class GridNode {
     this._station = value;
   }
 
-  reopenEdges() {
-    this._octiNodes.forEach(node => {
-      node.resetWeights();
-    })
+  closeSinkEdge() {
+    this.getOctiNode(Constants.SINK).setWeightOfEdgesToInfinity();
+  }
+
+  closeBendEdges() {
+    for (let i = 0; i < 8; i++) {
+      const portNode = this.getOctiNode(i);
+
+      /* the first seven edges are the bend edges*/
+      for (let i = 0; i < 7; i++) {
+        portNode.edges[i].setWeightToInfinity();
+      }
+    }
+  }
+
+  reopenSinkEdges() {
+    this.getOctiNode(Constants.SINK).resetWeights();
   }
 
   /**
@@ -540,7 +550,7 @@ export class GridNode {
     let value = from + 1;
     value = value % 8;
     while (value != to) {
-      this.octiNodes[value].closeEdges();
+      this.octiNodes[value].edges[7].setWeightToInfinity();
       value += 1;
       value = value % 8;
     }
@@ -557,10 +567,6 @@ export class GridNode {
         return ordering;
     }
     return undefined
-  }
-
-  setAllWeightsToInfinity() {
-    this.octiNodes.forEach(node => node.setWeightOfEdgesToInfinity());
   }
 
   /**
@@ -624,7 +630,8 @@ export class GridNode {
    */
   private closeIntermediateEdges(amount: number, startIndex: number, clockwise: boolean = false) {
     let values = GridNode.determineIndexIntermediateEdges(amount, startIndex, clockwise);
-    values.forEach(value => this.getOctiNode(value).setWeightOfEdgesToInfinity())
+    // for port nodes the edge with index 7 is the sink edge
+    values.forEach(value => this.getOctiNode(value).edges[7].setWeightToInfinity())
   }
 
   private static determineIndexIntermediateEdges(amount: number, startValue: number, clockwise: boolean = false) {
