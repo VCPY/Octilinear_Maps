@@ -98,6 +98,7 @@ class AlgorithmWorker {
 
         try {
           path = dijkstra.setToSet(this._octiGraph, from, to);
+          path = AlgorithmWorker.cleanPath(path)
         }
         catch (e) {
           if (this._ignoreError) {
@@ -213,6 +214,25 @@ class AlgorithmWorker {
       (station.longitude - this._graphOffset[0]) / this.D,
       (station.latitude - this._graphOffset[1]) / this.D);
   }
+
+  private static cleanPath(path: OctiNode[]): OctiNode[] {
+    let startGridNodeID = path[0].gridNode.id;
+    for (let i = 2; i < path.length; i++) {
+      let node = path[i];
+      if (node.gridNode.id == startGridNodeID) path.splice(--i, 1);
+      else break;
+    }
+
+    let endGridNodeId = path[path.length - 1].gridNode.id;
+    for (let i = path.length - 3; i > 0; i--) {
+      let node = path[i];
+      if (node.gridNode.id == endGridNodeId) path.splice(i + 1, 1);
+      else break;
+    }
+
+    return path;
+  }
+
 }
 
 class Vector2 {
