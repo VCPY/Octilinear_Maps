@@ -9,6 +9,7 @@ import {GridNode} from "../octiGraph/gridNode";
 import {OutputGraph} from "./outputGraph";
 import {OctiEdge} from "../octiGraph/octiEdge";
 import {OutputOctiEdge} from "./outputOctiEdge";
+import {RoutedEdge} from "../octiGraph/routedEdge";
 
 export function parseOctiGraphForOutput(octiGraph: OctiGraph) {
     return new OutputGraph(octiGraph.width, octiGraph.height, parseGridNodeForOutput(octiGraph.gridNodes));
@@ -53,7 +54,7 @@ export class OutputNode {
     @Type(() => OutputOctiNode) private _octiNodes: OutputOctiNode[] = [];
     private _routedEdges: Array<[OutputEdge, number]> = [];
 
-    constructor(id: number, x: number, y: number, octiNodes: OutputOctiNode[], routedEdges: Array<[InputEdge, number]>, station: Station | undefined) {
+    constructor(id: number, x: number, y: number, octiNodes: OutputOctiNode[], routedEdges: RoutedEdge[], station: Station | undefined) {
         this._id = id;
         this._x = x;
         this._y = y;
@@ -61,8 +62,8 @@ export class OutputNode {
 
         if (routedEdges != undefined) {
             routedEdges.forEach(value => {
-                let helper = parseInputEdgeForOutput(value[0]);
-                this._routedEdges.push([helper, value[1]]);
+                let helper = parseInputEdgeForOutput(value.edge);
+                this._routedEdges.push([helper, value.direction]);
             });
         }
 

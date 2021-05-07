@@ -1,12 +1,11 @@
 import {OctiNode} from "./octiNode";
 import {OctiEdge} from "./octiEdge";
 import {Constants} from "./constants";
-import {CircularEdgeOrdering} from "../inputGraph/circularOrdering";
 import {Station} from "../inputGraph/station";
+import {RoutedEdge} from "./routedEdge";
 import {InputEdge} from "../inputGraph/inputEdge";
 
 export class GridNode {
-
     private _id: number;
 
     /**
@@ -26,7 +25,7 @@ export class GridNode {
      */
     private _octiNodes: OctiNode[];
 
-    private _routedEdges: Array<[InputEdge, number]> = [];
+    private _routedEdges: RoutedEdge[] = [];
 
     private _station: Station | undefined = undefined;
 
@@ -72,16 +71,16 @@ export class GridNode {
         return this._id;
     }
 
-    get routedEdges(): Array<[InputEdge, number]> {
-        return this._routedEdges;
-    }
-
     getCoordinates() {
         return [this._x, this._y]
     }
 
     getOctiNode(index: number): OctiNode {
         return this._octiNodes[index];
+    }
+
+    get routedEdges(): RoutedEdge[] {
+        return this._routedEdges;
     }
 
     get octiNodes(): OctiNode[] {
@@ -178,29 +177,52 @@ export class GridNode {
         return Math.abs(angle);
     }
 
+    saveRouting(other: Station, direction: number, edge: InputEdge) {
+        this._routedEdges.push(new RoutedEdge(other, direction, edge));
+    }
+
     /**
-     * Closes sink edges between routedEdges and edge where no other edges are allowed.
+     * Closes sink edges so that the path from station can only enter according to
+     * the circular ordering. And also closes sink edges to reserve space for unrouted
+     * edges.
+     * (4.3)
      */
-    closeInBetweenEdges(edge: InputEdge, station: Station, octiNode: OctiNode) {
-        if (station.clockwiseOrdering.length == 0) return;
+    blockCircularForOrdering(stationToRoute: Station) {
 
-        this._routedEdges.forEach(routedEdge => {
-            let routedEdgeIndex = routedEdge[1];
-            let octiIndex = octiNode.direction;
-            let clockwiseOrderings = station.clockwiseOrdering;
-            let orderingEntry = GridNode.findOrderingByEdges(routedEdge[0], edge, clockwiseOrderings) as CircularEdgeOrdering;
-            let counterClockwiseOrderings = station.counterClockwiseOrdering;
-            let counterOrderingEntry = GridNode.findOrderingByEdges(routedEdge[0], edge, counterClockwiseOrderings) as CircularEdgeOrdering;
+        if (stationToRoute.adjacentNodes.size <= 2) return;
+        if (this._station == undefined) return;
 
-            let fromIndex = orderingEntry.from.equalsByStation(routedEdge[0]) ? routedEdgeIndex : octiIndex;
-            let toIndex = orderingEntry.from.equalsByStation(routedEdge[0]) ? octiIndex : routedEdgeIndex;
+        const orderingCount = this._station.edgeOrdering.length;
+        const toRouteIndex = this._station.edgeOrdering.findIndex(s => s == stationToRoute);
+        let prevInOrdering = 0;
+        let nextInOrdering = 0;
 
-            // Close sink edges between Input Edges without other intermediate edges.
-            if (orderingEntry.distance == 1) this.closeEdgesBetweenIndices(fromIndex, toIndex);
-            if (counterOrderingEntry.distance == 1) this.closeEdgesBetweenIndices(toIndex, fromIndex);
-        });
+        // if we skip a station that means it is unrouted so we reserve space for it
+        let skipped = 0;
+        for (let i = toRouteIndex + 1; i < toRouteIndex + orderingCount; i++) {
+            const candidate = this._station.edgeOrdering[i % orderingCount];
 
-        this._routedEdges.push([edge, octiNode.direction]);
+            const routed = this._routedEdges.find(edge => edge.to == candidate);
+            if (routed != undefined) {
+                nextInOrdering = routed.direction - skipped;
+                return;
+            }
+            skipped++;
+        }
+
+        skipped = 0;
+        for (let i = toRouteIndex - 1; i > toRouteIndex - orderingCount; i--) {
+            const candidate = this._station.edgeOrdering[(i + 8) % orderingCount];
+
+            const routed = this._routedEdges.find(edge => edge.to == candidate);
+            if (routed != undefined) {
+                prevInOrdering = routed.direction + skipped;
+                return;
+            }
+            skipped++;
+        }
+
+        this.closeEdgesBetweenIndices(nextInOrdering, prevInOrdering);
     }
 
     closeEdgesBetweenIndices(from: number, to: number) {
@@ -213,116 +235,24 @@ export class GridNode {
         }
     }
 
-    private static findOrderingByEdges(edge1: InputEdge, edge2: InputEdge, orderings: CircularEdgeOrdering[]): CircularEdgeOrdering | undefined {
-        for (let i = 0; i < orderings.length; i++) {
-            let ordering = orderings[i];
-            let orderEdge1 = ordering.from;
-            let orderEdge2 = ordering.to;
-            if (orderEdge1.equalsByStation(edge1) && orderEdge2.equalsByStation(edge2))
-                return ordering;
-            else if (orderEdge2.equalsByStation(edge1) && orderEdge1.equalsByStation(edge2))
-                return ordering;
-        }
-        return undefined
-    }
-
-    /**
-     * Checks the position of already set edges and compares them with the new edge. Reserves in between edges
-     * if the ordering is accordingly.
-     */
-    reserveEdges(edge: InputEdge, station: Station) {
-        this.routedEdges.forEach(routedEdge => {
-            let clockwiseOrdering = GridNode.findOrderingByEdges(edge, routedEdge[0], station.clockwiseOrdering) as CircularEdgeOrdering;
-            this.checkEdgesByOrdering(clockwiseOrdering, routedEdge, true);
-            let counterClockwiseOrdering = GridNode.findOrderingByEdges(edge, routedEdge[0], station.counterClockwiseOrdering) as CircularEdgeOrdering;
-            this.checkEdgesByOrdering(counterClockwiseOrdering, routedEdge, false);
-        });
-    }
-
     addLineBendPenalty() {
         // assume that edges to sink node get added in order from 0 to 7
-        this.getOctiNode(Constants.SINK).edges.forEach((candidateSinkEdge, index) => {
-            // skip blocked edges
-            if (candidateSinkEdge.weight == Infinity) return;
-            if (this.routedEdges.map(routedEdge => routedEdge[1]).includes(index)) return;
+        this.getOctiNode(Constants.SINK).edges
+            .forEach((candidateSinkEdge, index) => {
+                // skip blocked edges
+                if (candidateSinkEdge.weight == Infinity) return;
+                if (this._routedEdges.map(_routedEdge => _routedEdge.direction).includes(index)) return;
 
-            let penaltySum = 0;
+                let penaltySum = 0;
 
-            this.routedEdges.forEach((routedEdge) => {
-                const routedDirection = routedEdge[1];
+                this._routedEdges.forEach((routedEdge) => {
+                    // condition from the paper
+                    if (routedEdge.direction >= index) return;
+                    penaltySum = this.calculateWeight(index, routedEdge.direction);
+                });
 
-                // condition from the paper
-                if (routedDirection >= index) return;
-                penaltySum = this.calculateWeight(index, routedDirection);
-            });
-
-            candidateSinkEdge.weight = penaltySum;
+                candidateSinkEdge.weight = penaltySum;
         });
     }
-
-    private checkEdgesByOrdering(ordering: CircularEdgeOrdering, routedEdge: [InputEdge, number], clockwise: boolean) {
-        if (ordering.distance != 1) {
-            // At least one edge should be routed in between
-            let inBetweenEdgeDrawn: boolean = this.isAnyEdgeSet(ordering.inBetweenEdges);
-            if (!inBetweenEdgeDrawn) {
-                if (routedEdge[0].equalsByStation(ordering.from)) {
-                    if (clockwise) {
-                        this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] + 1) % 8, true);
-                    } else {
-                        this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] - 1) % 8, false);
-                    }
-                } else {
-                    if (clockwise) {
-                        this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] - 1) % 8, false);
-                    } else {
-                        this.closeIntermediateEdges(ordering.distance - 1, (routedEdge[1] + 1) % 8, true);
-                    }
-                }
-            }
-        }
-    }
-
-    /*
-     * Finds the sink edges between two edges and blocks the necessary amount
-     */
-    private closeIntermediateEdges(amount: number, startIndex: number, clockwise: boolean = false) {
-        let values = GridNode.determineIndexIntermediateEdges(amount, startIndex, clockwise);
-        // for port nodes the edge with index 7 is the sink edge
-        values.forEach(value => this.getOctiNode(value).edges[7].setWeightToInfinity())
-    }
-
-    private static determineIndexIntermediateEdges(amount: number, startValue: number, clockwise: boolean = false) {
-        let valuesToReserve = [];
-        let value = startValue;
-        if (value == -1) value = 7;
-        if (!clockwise) {
-            while (amount != 0) {
-                valuesToReserve.push(value);
-                value = (value - 1);
-                if (value == -1) value = 7;
-                amount -= 1;
-            }
-        } else {
-            while (amount != 0) {
-                valuesToReserve.push(value);
-                value = (value + 1) % 8;
-                amount -= 1;
-            }
-        }
-        return valuesToReserve;
-    }
-
-    /**
-     * Checks if any of the edges in edges has been routed on the map
-     */
-    private isAnyEdgeSet(edges: InputEdge[]) {
-        for (let i = 0; i < edges.length; i++) {
-            let edge = edges[i];
-            for (let j = 0; j < this.routedEdges.length; j++) {
-                let routeEdge = this.routedEdges[j][0];
-                if (edge.equalsByStation(routeEdge)) return true;
-            }
-        }
-        return false;
-    }
 }
+

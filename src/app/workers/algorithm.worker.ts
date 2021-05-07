@@ -1,5 +1,4 @@
 /// <reference lib="webworker" />
-
 import * as algo from "../octiAlgorithm/octiMaps.algorithm";
 import * as dijkstra from "../octiAlgorithm/dijkstra.algorithm";
 import {plainToClass} from 'class-transformer'
@@ -11,7 +10,6 @@ import {Station} from "../inputGraph/station";
 import {InputEdge} from "../inputGraph/inputEdge";
 import {InputGraph} from "../inputGraph/inputGraph";
 import {parseOctiGraphForOutput, parsePathsForOutput} from "../outputGraph/outputNode";
-import set = Reflect.set;
 
 function extractInputgraph(data: any): InputGraph{
   // convert from plain js object to typescript object and set correct references
@@ -97,12 +95,12 @@ class AlgorithmWorker {
 
       if (this.isSettled(from, settledStations)) {
         // Block sink edges to ensure this routing won't block a future routing
-        from[0].reserveEdges(edge, station1);
+        from[0].blockCircularForOrdering(station2);
         from[0].addLineBendPenalty();
       }
       if (this.isSettled(to, settledStations)) {
         // Block sink edges to ensure this routing won't block a future routing
-        to[0].reserveEdges(edge, station2);
+        to[0].blockCircularForOrdering(station1);
         to[0].addLineBendPenalty();
       }
 
@@ -121,6 +119,10 @@ class AlgorithmWorker {
       path[0].gridNode.station = station1;
       settledStations.set(station2, path[path.length - 1].gridNode);
       path[path.length - 1].gridNode.station = station2;
+
+      // sotre routing in grid  nodes
+      path[0].gridNode.saveRouting(station2, path[1].direction, edge);
+      path[path.length - 1].gridNode.saveRouting(station1, path[path.length - 2].direction, edge);
 
       // Prevent paths from crossing (4.3)
       path.map(node => node.gridNode)
@@ -142,16 +144,8 @@ class AlgorithmWorker {
           this._octiGraph.closeDiagonalEdge(octiEdge)
         }
       }
-
-      /* To preserve the circular edge ordering at nodes,
-      we update the costs of adjacent sink edges for the grid node
-      used for s, and the grid node used for t.*/
-      // Close edges to nodes which would break the circular ordering
-      path[0].gridNode.closeInBetweenEdges(edge, station1, path[1]);
-      path[path.length - 1].gridNode.closeInBetweenEdges(edge, station2, path[path.length - 2]);
-
     });
-    console.log("Found paths:", foundPaths);
+
     return [this._octiGraph, foundPaths];
   }
 
