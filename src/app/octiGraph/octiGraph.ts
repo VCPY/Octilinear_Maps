@@ -137,7 +137,8 @@ export class OctiGraph {
         octiNodeA = diagonalNodeA.getOctiNode(7);
         octiNodeB = diagonalNodeB.getOctiNode(3);
       }
-      octiNodeA.setWeightToInfinity(octiNodeB);
+      //octiNodeA.close..;
+      //TODO: what edges should we close here?
     }
   }
 }

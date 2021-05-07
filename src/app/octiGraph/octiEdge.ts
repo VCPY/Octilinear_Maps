@@ -7,7 +7,7 @@ import {OctiNode} from "./octiNode";
  *   NodeA has a lower ID than NodeB
  */
 export class OctiEdge {
-  private _originalWeight: number;
+  private readonly _originalWeight: number;
 
   constructor(node1: OctiNode, node2: OctiNode, weight: number = 0) {
     if (node1.id < node2.id) {
@@ -42,7 +42,6 @@ export class OctiEdge {
 
   set weight(value: number) {
     this._weight = value;
-    this._originalWeight = this._weight;
   }
 
   private _used: boolean = false;
@@ -62,19 +61,7 @@ export class OctiEdge {
   }
 
   resetWeight() {
-    this._weight = this._originalWeight
-  }
-
-  setWeightToInfinity() {
-    if (this.weight != Infinity) {
-      this._originalWeight = this.weight;
-    }
-    this._weight = Infinity;
-  }
-
-  closeEdge() {
-    this._used = true;
-    this._originalWeight = Infinity;
-    this._weight = Infinity;
+    if (!this.used)
+      this._weight = this._originalWeight
   }
 }

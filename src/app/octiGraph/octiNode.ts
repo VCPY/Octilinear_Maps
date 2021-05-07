@@ -63,31 +63,8 @@ export class OctiNode {
     this._edges.push(edge);
   }
 
-  setWeightOfEdgesToInfinity(): void {
-    this._edges.forEach(edge => edge.setWeightToInfinity())
-  }
-
-  /* by an edge connecting with other node*/
-  setWeightToInfinity(otherNode: OctiNode): void {
-    this._edges.forEach(edge => {
-      if (edge.nodeB == this && edge.nodeA == otherNode) {
-        edge.closeEdge();
-        return
-      } else if (edge.nodeB == otherNode && edge.nodeA == this) {
-        edge.closeEdge();
-        return;
-      }
-    })
-  }
-
-  closeEdges() {
-    this._edges.forEach(edge => edge.closeEdge())
-  }
-
-  resetWeights() {
-    this._edges.forEach(edge => {
-      if (!edge.used) edge.resetWeight()
-    })
+  closeAllEdges() {
+    this._edges.forEach(e => e.weight = Infinity);
   }
 
   getEdge(neighborNode: OctiNode): OctiEdge | undefined {

@@ -111,7 +111,7 @@ export class GridNode {
   }
 
   closeSinkEdge() {
-    this.getOctiNode(Constants.SINK).setWeightOfEdgesToInfinity();
+    this.getOctiNode(Constants.SINK).closeAllEdges();
   }
 
   closeBendEdges() {
@@ -120,13 +120,15 @@ export class GridNode {
 
       /* the first seven edges are the bend edges*/
       for (let i = 0; i < 7; i++) {
-        portNode.edges[i].setWeightToInfinity();
+        portNode.edges[i].weight = Infinity;
       }
     }
   }
 
   reopenSinkEdges() {
-    this.getOctiNode(Constants.SINK).resetWeights();
+    this.getOctiNode(Constants.SINK).edges
+      .filter(e => !e.used)
+      .forEach(e => e.weight = Constants.SINK);
   }
 
   saveRouting(other: Station, direction: number, edge: InputEdge) {
@@ -139,10 +141,10 @@ export class GridNode {
    * edges.
    * (4.3)
    */
-  blockCircularForOrdering(stationToRoute: Station) {
+  blockForCircularOrdering(stationToRoute: Station) {
 
-    if (stationToRoute.adjacentNodes.size <= 2) return;
     if (this._station == undefined) return;
+    if (this._station.adjacentNodes.size <= 2) return;
 
     const orderingCount = this._station.edgeOrdering.length;
     const toRouteIndex = this._station.edgeOrdering.findIndex(s => s == stationToRoute);
@@ -156,20 +158,20 @@ export class GridNode {
 
       const routed = this._routedEdges.find(edge => edge.to == candidate);
       if (routed != undefined) {
-        nextInOrdering = routed.direction - skipped;
-        return;
+        nextInOrdering = Constants.fixIndex(routed.direction - skipped);
+        break;
       }
       skipped++;
     }
 
     skipped = 0;
     for (let i = toRouteIndex - 1; i > toRouteIndex - orderingCount; i--) {
-      const candidate = this._station.edgeOrdering[(i + 8) % orderingCount];
+      const candidate = this._station.edgeOrdering[(i + orderingCount) % orderingCount];
 
       const routed = this._routedEdges.find(edge => edge.to == candidate);
       if (routed != undefined) {
-        prevInOrdering = routed.direction + skipped;
-        return;
+        prevInOrdering = Constants.fixIndex(routed.direction + skipped);
+        break;
       }
       skipped++;
     }
@@ -178,29 +180,38 @@ export class GridNode {
   }
 
   closeEdgesBetweenIndices(from: number, to: number) {
-    let value = from + 1;
+    let value = from;
     value = value % 8;
     while (value != to) {
-      this.octiNodes[value].edges[7].setWeightToInfinity();
+      this.octiNodes[Constants.SINK].edges[value].weight = Infinity;
       value += 1;
-      value = value % 8;
+      value = Constants.fixIndex(value);
     }
+    this.octiNodes[Constants.SINK].edges[value].weight = Infinity;
   }
 
+  /*
+  * rior to routing an edge ei, we calculate the line bend penalty between
+  * every routed edge ej, j < i and ei for each of the possible placements
+  * of ei on adjacent sink edges.
+  * The sum of the line bend penalties on each adjacent sink edge is then
+  * used as the cost for this sink edge
+  * */
   addLineBendPenalty() {
     // assume that edges to sink node get added in order from 0 to 7
     this.getOctiNode(Constants.SINK).edges
+      // possible placements for ei
       .forEach((candidateSinkEdge, index) => {
         // skip blocked edges
         if (candidateSinkEdge.weight == Infinity) return;
-        if (this._routedEdges.map(_routedEdge => _routedEdge.direction).includes(index)) return;
+        //if (this._routedEdges.map(_routedEdge => _routedEdge.direction).includes(index)) return;
 
         let penaltySum = 0;
 
         this._routedEdges.forEach((routedEdge) => {
           // condition from the paper
-          if (routedEdge.direction >= index) return;
-          penaltySum = this.calculateWeight(index, routedEdge.direction);
+          //if (routedEdge.direction >= index) return;
+          penaltySum += this.calculateWeight(index, routedEdge.direction);
         });
 
         candidateSinkEdge.weight = penaltySum;
@@ -254,4 +265,3 @@ export class GridNode {
     return Math.abs(angle);
   }
 }
-

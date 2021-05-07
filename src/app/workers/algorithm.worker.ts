@@ -95,12 +95,12 @@ class AlgorithmWorker {
 
       if (this.isSettled(from, settledStations)) {
         // Block sink edges to ensure this routing won't block a future routing
-        from[0].blockCircularForOrdering(station2);
+        from[0].blockForCircularOrdering(station2);
         from[0].addLineBendPenalty();
       }
       if (this.isSettled(to, settledStations)) {
         // Block sink edges to ensure this routing won't block a future routing
-        to[0].blockCircularForOrdering(station1);
+        to[0].blockForCircularOrdering(station1);
         to[0].addLineBendPenalty();
       }
 
@@ -130,7 +130,7 @@ class AlgorithmWorker {
           node.closeBendEdges();
         });
 
-      /* To prevent crossingpaths at diagonal grid edges,
+      /* To prevent crossing paths at diagonal grid edges,
       we close for each diagonal grid edge used in the
       previously found path all crossing diagonal grid
       edges by setting their cost to ∞.*/
@@ -140,6 +140,7 @@ class AlgorithmWorker {
         let octiEdge = one.getEdge(two);
         if (octiEdge != undefined) {
           octiEdge.used = true;
+          octiEdge.weight = Infinity;
           this._octiGraph.closeDiagonalEdge(octiEdge)
         }
       }

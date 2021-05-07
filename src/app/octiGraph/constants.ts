@@ -40,4 +40,9 @@ export class Constants {
       this.aListener = listener;
     }
   }
+
+  static fixIndex(index: number) {
+    if (index < 0) index += 8;
+    return index % 8;
+  }
 }
