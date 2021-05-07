@@ -11,16 +11,28 @@ import {Station} from "../inputGraph/station";
 import {InputEdge} from "../inputGraph/inputEdge";
 import {InputGraph} from "../inputGraph/inputGraph";
 import {parseOctiGraphForOutput, parsePathsForOutput} from "../outputGraph/outputNode";
+import set = Reflect.set;
+
+function extractInputgraph(data: any): InputGraph{
+  // convert from plain js object to typescript object and set correct references
+  let inputGraph: InputGraph = plainToClass(InputGraph, data);
+  inputGraph.nodes = inputGraph.nodes.map(n => plainToClass(Station, n));
+  inputGraph.edges = inputGraph.edges.map(e => plainToClass(InputEdge, e));
+  inputGraph.edges.forEach(edge => {
+    const id1 = (edge.station1 as any)._stopID;
+    const id2 = (edge.station2 as any)._stopID;
+
+    edge.station2 = inputGraph.getNodeByID(id1) as Station;
+    edge.station1 = inputGraph.getNodeByID(id2) as Station;
+  });
+
+  return inputGraph;
+}
 
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
-  let inputGraph = plainToClass(InputGraph, data);
-  inputGraph.edges = inputGraph.edges.map(e => plainToClass(InputEdge, e));
-  inputGraph.edges.forEach(edge => {
-    edge.station2 = plainToClass(Station, edge.station2);
-    edge.station1 = plainToClass(Station, edge.station1);
-  });
-  inputGraph.nodes = inputGraph.nodes.map(n => plainToClass(Station, n));
+
+  let inputGraph = extractInputgraph(data);
   let algorithm = new AlgorithmWorker(inputGraph);
   let algoData = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
   let plainGraphData = parseOctiGraphForOutput(algoData[0] as OctiGraph);
@@ -29,10 +41,13 @@ addEventListener('message', ({data}) => {
   postMessage([plainGraphData, plainPathData]);
 });
 
-
 class AlgorithmWorker {
 
   private readonly D: number;
+
+  /*
+  Radius in which nodes around a station are considered
+   */
   private readonly r: number;
   private readonly _inputGraph: InputGraph;
   private readonly _octiGraph: OctiGraph;
@@ -40,26 +55,27 @@ class AlgorithmWorker {
   private readonly _ignoreError = true;
 
   constructor(inputGraph: InputGraph) {
-    this.D = algo.calculateAverageNodeDistance(inputGraph) * 0.75;
-    this.r = 1;
-    this._inputGraph = inputGraph;
-
+    // prepare the input graph
     inputGraph.mergeEqualEdges();
     inputGraph.calculateNodeLineDegrees();
     inputGraph.calculateEdgeOrderingAtNode();
     inputGraph.removeNodesWithoutEdges();
+
+    this.D = algo.calculateAverageNodeDistance(inputGraph) * 0.75;
+
     inputGraph.removeTwoDegreeNodes();
     inputGraph.calculateEdgeOrderingAtNode();
+
+    this.r = 1;
+    this._inputGraph = inputGraph;
 
     // create octi graph
     let inputSize = inputGraph.getDimensions();
     this._graphOffset = inputGraph.getMinCoordinates();
     this._octiGraph = new OctiGraph(inputSize[0] / this.D, inputSize[1] / this.D);
-    //console.log("Octigraph: ", this._octiGraph);
-
-    //this.performAlgorithm(algo.orderEdges(this._inputGraph));
   }
 
+  /* Runs the algorithm with an edge ordering */
   performAlgorithm(edgeOrdering: InputEdge[]) {
     const settledStations = new Map<Station, GridNode>();
     const foundPaths = new Map<InputEdge, OctiNode[]>();
@@ -67,8 +83,8 @@ class AlgorithmWorker {
     // perform algorithm over all edges
     edgeOrdering.forEach(edge => {
 
-      const station1 = this._inputGraph.getNodeByID(edge.station1.stopID) as Station;
-      const station2 = this._inputGraph.getNodeByID(edge.station2.stopID) as Station;
+      const station1 = edge.station1;
+      const station2 = edge.station2;
 
       // some paths won't be found, for now just exclude them
       if (this.isEdgecase(station1, station2)) return;
@@ -78,29 +94,26 @@ class AlgorithmWorker {
       const from = allCandidates[0];
       const to = allCandidates[1];
 
-      // Check the circular ordering and block edges if the station has been used before
-      if (from.length == 1 && Array.from(settledStations.values()).includes(from[0])) {
+
+      if (this.isSettled(from, settledStations)) {
+        // Block sink edges to ensure this routing won't block a future routing
         from[0].reserveEdges(edge, station1);
         from[0].addLineBendPenalty();
       }
-      if (to.length == 1 && Array.from(settledStations.values()).includes(to[0])) {
+      if (this.isSettled(to, settledStations)) {
+        // Block sink edges to ensure this routing won't block a future routing
         to[0].reserveEdges(edge, station2);
         to[0].addLineBendPenalty();
       }
 
-      let path = [];
-      try {
-        path = dijkstra.setToSet(this._octiGraph, from, to);
-        //path = AlgorithmWorker.cleanPath(path)
+      let path = dijkstra.setToSet(this._octiGraph, from, to);
+      if (path.length == 0 && this._ignoreError) {
+        console.log(`No path found for edge: (${station1.stationName} - ${station2.stationName})`)
+        return;
       }
-      catch (e) {
-        if (this._ignoreError) {
-          console.log(`No path found for edge: (${station1.stationName} - ${station2.stationName})`)
-          return;
-        }
-        else
-          throw new Error(`No path found for edge: (${station1.stationName} - ${station2.stationName})`);
-      }
+      else if (path.length == 0)
+        throw new Error(`No path found for edge: (${station1.stationName} - ${station2.stationName})`);
+
       foundPaths.set(edge, path);
 
       // save the settled stations
@@ -109,12 +122,12 @@ class AlgorithmWorker {
       settledStations.set(station2, path[path.length - 1].gridNode);
       path[path.length - 1].gridNode.station = station2;
 
-      //this.resetSinkCost(from);
-      //this.resetSinkCost(to);
-
       // Prevent paths from crossing (4.3)
-      path.map(node => node.gridNode).forEach(node => node.closeSinkEdge());
-      path.map(node => node.gridNode).forEach(node => node.closeBendEdges());
+      path.map(node => node.gridNode)
+          .forEach(node => {
+            node.closeSinkEdge();
+            node.closeBendEdges();
+          });
 
       /* To prevent crossingpaths at diagonal grid edges,
       we close for each diagonal grid edge used in the
@@ -140,6 +153,11 @@ class AlgorithmWorker {
     });
     console.log("Found paths:", foundPaths);
     return [this._octiGraph, foundPaths];
+  }
+
+  private isSettled(from: GridNode[], settledStations: Map<Station, GridNode>): boolean {
+    if (from.length != 1) return false;
+    return Array.from(settledStations.values()).includes(from[0]);
   }
 
   private isEdgecase(station1: Station, station2: Station): boolean {
@@ -207,35 +225,11 @@ class AlgorithmWorker {
     return [ret1, ret2];
   }
 
-  private resetSinkCost(nodes: GridNode[]) {
-    nodes.flatMap(node => node.getOctiNode(Constants.SINK).edges)
-      .forEach(edge => edge.weight = Constants.SINK);
-  }
-
   private getGrapCoordinates(station: Station): Vector2 {
     return new Vector2(
       (station.longitude - this._graphOffset[0]) / this.D,
       (station.latitude - this._graphOffset[1]) / this.D);
   }
-
-  private static cleanPath(path: OctiNode[]): OctiNode[] {
-    let startGridNodeID = path[0].gridNode.id;
-    for (let i = 2; i < path.length; i++) {
-      let node = path[i];
-      if (node.gridNode.id == startGridNodeID) path.splice(--i, 1);
-      else break;
-    }
-
-    let endGridNodeId = path[path.length - 1].gridNode.id;
-    for (let i = path.length - 3; i > 0; i--) {
-      let node = path[i];
-      if (node.gridNode.id == endGridNodeId) path.splice(i + 1, 1);
-      else break;
-    }
-
-    return path;
-  }
-
 }
 
 class Vector2 {

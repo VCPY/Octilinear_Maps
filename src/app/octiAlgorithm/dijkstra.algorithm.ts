@@ -59,7 +59,7 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
     });
   }
 
-  throw new Error("No path found");
+  return [];
 }
 
 function comparator(a: OctiNode, b: OctiNode): number {
