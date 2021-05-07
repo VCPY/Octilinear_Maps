@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
-import {InputGraph} from "../graphs/graph.classes";
 import GraphInputParser from "../graphs/graph.inputParser";
+import {InputGraph} from "../inputGraph/inputGraph";
 
 addEventListener('message', ({data}) => {
   console.log("[gtfs-worker] started");

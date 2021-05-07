@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {InputGraph} from '../graphs/graph.classes';
 import {GtfsService} from '../services/gtfs.service';
 import {AlgorithmService} from '../services/algorithm.service';
+import {InputGraph} from "../inputGraph/inputGraph";
 
 @Component({
   selector: 'app-octi-test',
@@ -14,7 +14,7 @@ export class OctiTestComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.octiTest(true);
+    this.octiTest(false);
   }
 
   private async octiTest(useDummy: boolean)

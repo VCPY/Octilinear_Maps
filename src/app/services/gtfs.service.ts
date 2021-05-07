@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import {InputEdge, InputGraph, Station} from "../graphs/graph.classes";
+import {Station} from "../inputGraph/station";
+import {InputEdge} from "../inputGraph/inputEdge";
+import {InputGraph} from "../inputGraph/inputGraph";
 
 @Injectable({
   providedIn: 'root'

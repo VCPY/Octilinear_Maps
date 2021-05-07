@@ -1,5 +1,9 @@
-import {GridNode, OctiGraph, OctiNode, Constants, OctiEdge} from "../graph/octiGraph.classes";
 import {BinaryHeap} from "./binaryHeap";
+import {Constants} from "../octiGraph/constants";
+import {OctiGraph} from "../octiGraph/octiGraph";
+import {OctiNode} from "../octiGraph/octiNode";
+import {OctiEdge} from "../octiGraph/octiEdge";
+import {GridNode} from "../octiGraph/gridNode";
 
 /**
  * Calculates the set to set shortest path

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { InputGraph } from '../graphs/graph.classes';
-import {Constants} from "../graph/octiGraph.classes";
+import {Constants} from "../octiGraph/constants";
+import {InputGraph} from "../inputGraph/inputGraph";
 
 @Injectable({
   providedIn: 'root'

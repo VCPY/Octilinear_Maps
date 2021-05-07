@@ -1,4 +1,18 @@
-import {getLargerTrip, InputEdge, InputGraph, Station, Trip} from './graph.classes'
+import {Station} from "../inputGraph/station";
+import {InputEdge} from "../inputGraph/inputEdge";
+import {InputGraph} from "../inputGraph/inputGraph";
+import {Trip} from "../inputGraph/trip";
+
+function getLargerTrip(trip1: Trip, trip2: Trip): Trip {
+  let sequences1 = trip1.stops.size;
+  let sequences2 = trip2.stops.size;
+
+  if (sequences2 > sequences1) {
+    return trip2;
+  } else {
+    return trip1;
+  }
+}
 
 export default class GraphInputParser {
   routes: any[];

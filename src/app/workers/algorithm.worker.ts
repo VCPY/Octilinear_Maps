@@ -1,11 +1,16 @@
 /// <reference lib="webworker" />
 
-import * as algo from "../octi-algorithm/octiMaps.algorithm";
-import * as dijkstra from "../octi-algorithm/dijkstra.algorithm";
-import {InputEdge, InputGraph, Station} from "../graphs/graph.classes";
+import * as algo from "../octiAlgorithm/octiMaps.algorithm";
+import * as dijkstra from "../octiAlgorithm/dijkstra.algorithm";
 import {plainToClass} from 'class-transformer'
-import {Constants, GridNode, OctiGraph, OctiNode} from "../graph/octiGraph.classes";
-import {parseOctiGraphForOutput, parsePathsForOutput} from "../graph/octiGraph.outputParser";
+import {Constants} from "../octiGraph/constants";
+import {OctiGraph} from "../octiGraph/octiGraph";
+import {OctiNode} from "../octiGraph/octiNode";
+import {GridNode} from "../octiGraph/gridNode";
+import {Station} from "../inputGraph/station";
+import {InputEdge} from "../inputGraph/inputEdge";
+import {InputGraph} from "../inputGraph/inputGraph";
+import {parseOctiGraphForOutput, parsePathsForOutput} from "../outputGraph/outputNode";
 
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
