@@ -1,5 +1,5 @@
 export enum StationStatus {
-    unprocessed,
-    dangling,
-    processed
+  unprocessed,
+  dangling,
+  processed
 }

@@ -11,7 +11,7 @@ import {InputEdge} from "../inputGraph/inputEdge";
 import {InputGraph} from "../inputGraph/inputGraph";
 import {parseOctiGraphForOutput, parsePathsForOutput} from "../outputGraph/outputNode";
 
-function extractInputgraph(data: any): InputGraph{
+function extractInputgraph(data: any): InputGraph {
   // convert from plain js object to typescript object and set correct references
   let inputGraph: InputGraph = plainToClass(InputGraph, data);
   inputGraph.nodes = inputGraph.nodes.map(n => plainToClass(Station, n));
@@ -108,8 +108,7 @@ class AlgorithmWorker {
       if (path.length == 0 && this._ignoreError) {
         console.log(`No path found for edge: (${station1.stationName} - ${station2.stationName})`)
         return;
-      }
-      else if (path.length == 0)
+      } else if (path.length == 0)
         throw new Error(`No path found for edge: (${station1.stationName} - ${station2.stationName})`);
 
       foundPaths.set(edge, path);
@@ -126,10 +125,10 @@ class AlgorithmWorker {
 
       // Prevent paths from crossing (4.3)
       path.map(node => node.gridNode)
-          .forEach(node => {
-            node.closeSinkEdge();
-            node.closeBendEdges();
-          });
+        .forEach(node => {
+          node.closeSinkEdge();
+          node.closeBendEdges();
+        });
 
       /* To prevent crossingpaths at diagonal grid edges,
       we close for each diagonal grid edge used in the

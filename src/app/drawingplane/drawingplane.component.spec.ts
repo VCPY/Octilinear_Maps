@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { DrawingplaneComponent } from './drawingplane.component';
+import {DrawingplaneComponent} from './drawingplane.component';
 
 describe('DrawingplaneComponent', () => {
   let component: DrawingplaneComponent;
@@ -8,9 +8,9 @@ describe('DrawingplaneComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DrawingplaneComponent ]
+      declarations: [DrawingplaneComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

@@ -10,26 +10,24 @@ import {InputGraph} from "../inputGraph/inputGraph";
 })
 export class OctiTestComponent implements OnInit {
 
-  constructor(private gtfsService: GtfsService, private algorithmService: AlgorithmService) { }
+  constructor(private gtfsService: GtfsService, private algorithmService: AlgorithmService) {
+  }
 
   ngOnInit(): void {
 
     this.octiTest(false);
   }
 
-  private async octiTest(useDummy: boolean)
-  {
+  private async octiTest(useDummy: boolean) {
     let inputGraph: InputGraph;
     if (useDummy)
       inputGraph = this.gtfsService.createDummyGraph();
-    else
-    {
+    else {
       let stored = localStorage.getItem("inputGraph");
       if (stored === null) {
         inputGraph = await this.gtfsService.fetchAndParse().toPromise();
         localStorage.setItem("inputGraph", JSON.stringify(inputGraph));
-      }
-      else {
+      } else {
         console.log("Got inputGraph from local storage");
         inputGraph = JSON.parse(stored);
       }

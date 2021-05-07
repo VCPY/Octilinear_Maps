@@ -2,15 +2,13 @@ import {Type} from "class-transformer";
 import {OutputNode} from "./outputNode";
 
 export class OutputGraph {
-  private _width: number;
-  private _height: number;
-  @Type(() => OutputNode) private _gridnodes: OutputNode[][] = [];
-
   constructor(width: number, height: number, gridnodes: OutputNode[][]) {
     this._width = width;
     this._height = height;
     this._gridnodes = gridnodes;
   }
+
+  private _width: number;
 
   get width(): number {
     return this._width;
@@ -20,6 +18,8 @@ export class OutputGraph {
     this._width = value;
   }
 
+  private _height: number;
+
   get height(): number {
     return this._height;
   }
@@ -27,6 +27,8 @@ export class OutputGraph {
   set height(value: number) {
     this._height = value;
   }
+
+  @Type(() => OutputNode) private _gridnodes: OutputNode[][] = [];
 
   get gridnodes(): OutputNode[][] {
     return this._gridnodes;

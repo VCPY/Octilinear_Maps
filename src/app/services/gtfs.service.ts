@@ -9,17 +9,16 @@ import {InputGraph} from "../inputGraph/inputGraph";
 })
 export class GtfsService {
 
+  worker: Worker;
   private subject = new Subject<InputGraph>();
 
-  worker: Worker;
-
-  constructor() { 
+  constructor() {
     if (typeof Worker !== 'undefined') {
       // worker not supported
     }
-    
-    this.worker = new Worker('../workers/gtfs.worker', { type: 'module', name: "gtfs-worker"  });
-    this.worker.onmessage = ({ data }) => {
+
+    this.worker = new Worker('../workers/gtfs.worker', {type: 'module', name: "gtfs-worker"});
+    this.worker.onmessage = ({data}) => {
       this.subject.next(data);
       this.subject.complete();
     };
@@ -41,11 +40,11 @@ export class GtfsService {
     nodes.push(st1B);
     let st1C = this.createStation("1C", "1CID", "2", "1");
     nodes.push(st1C);
-    let st1D=this.createStation("1D", "1DID", "2", "-2");
+    let st1D = this.createStation("1D", "1DID", "2", "-2");
     nodes.push(st1D);
     let st2 = this.createStation("2", "2ID", "-2.5", "-2");
     nodes.push(st2);
-    let st3 =this.createStation("3", "3ID", "-0.5", "3");
+    let st3 = this.createStation("3", "3ID", "-0.5", "3");
     nodes.push(st3);
     let st4A = this.createStation("4A", "4AID", "-2.5", "-4");
     nodes.push(st4A);

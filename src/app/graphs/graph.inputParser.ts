@@ -46,8 +46,7 @@ export default class GraphInputParser {
         station.longitude = parseFloat(stop["stop_lon"]);
         stations.push(station);
         stationsByID[stop["stop_id"]] = station;
-      }
-      else {
+      } else {
         stationIdMapper.set(stop["stop_id"], stationIdByName.get(stop["stop_name"]) as string);
       }
     });

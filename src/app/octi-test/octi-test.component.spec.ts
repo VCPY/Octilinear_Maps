@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { OctiTestComponent } from './octi-test.component';
+import {OctiTestComponent} from './octi-test.component';
 
 describe('OctiTestComponent', () => {
   let component: OctiTestComponent;
@@ -8,9 +8,9 @@ describe('OctiTestComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OctiTestComponent ]
+      declarations: [OctiTestComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

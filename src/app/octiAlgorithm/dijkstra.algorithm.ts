@@ -16,7 +16,7 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
     node.dist = Infinity;
     node.prev = node;
   });
-  
+
   // create a temporary node and add an each to each starting sink node
   const tmpNode = new OctiNode(from[0], -1);
   from
@@ -67,10 +67,10 @@ function comparator(a: OctiNode, b: OctiNode): number {
 }
 
 function createPath(tmpNode: OctiNode, toNodes: OctiNode[]): OctiNode[] {
-  
+
   const to = min(toNodes);
   const ret = [to];
-  
+
   let u = to;
   // prev is self if not set;
   while (u.prev != tmpNode && u.prev != u) {

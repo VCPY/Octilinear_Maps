@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { GtfsService } from './gtfs.service';
+import {GtfsService} from './gtfs.service';
 
 describe('GtfsService', () => {
   let service: GtfsService;

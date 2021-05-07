@@ -1,45 +1,48 @@
 export class OutputOctiEdge {
-    private _nodeA: number;
-    private _nodeB: number;
-    private _weight: number;
-    private _used: boolean;
+  constructor(nodeA: number, nodeB: number, weight: number, used: boolean) {
+    this._nodeA = nodeA;
+    this._nodeB = nodeB;
+    this._weight = weight;
+    this._used = used;
+  }
 
-    constructor(nodeA: number, nodeB: number, weight: number, used: boolean) {
-        this._nodeA = nodeA;
-        this._nodeB = nodeB;
-        this._weight = weight;
-        this._used = used;
-    }
+  private _nodeA: number;
 
-    get nodeA(): number {
-        return this._nodeA;
-    }
+  get nodeA(): number {
+    return this._nodeA;
+  }
 
-    set nodeA(value: number) {
-        this._nodeA = value;
-    }
+  set nodeA(value: number) {
+    this._nodeA = value;
+  }
 
-    get nodeB(): number {
-        return this._nodeB;
-    }
+  private _nodeB: number;
 
-    set nodeB(value: number) {
-        this._nodeB = value;
-    }
+  get nodeB(): number {
+    return this._nodeB;
+  }
 
-    get weight(): number {
-        return this._weight;
-    }
+  set nodeB(value: number) {
+    this._nodeB = value;
+  }
 
-    set weight(value: number) {
-        this._weight = value;
-    }
+  private _weight: number;
 
-    get used(): boolean {
-        return this._used;
-    }
+  get weight(): number {
+    return this._weight;
+  }
 
-    set used(value: boolean) {
-        this._used = value;
-    }
+  set weight(value: number) {
+    this._weight = value;
+  }
+
+  private _used: boolean;
+
+  get used(): boolean {
+    return this._used;
+  }
+
+  set used(value: boolean) {
+    this._used = value;
+  }
 }

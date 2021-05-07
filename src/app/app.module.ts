@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { OctiTestComponent } from './octi-test/octi-test.component';
-import { DrawingplaneComponent } from './drawingplane/drawingplane.component';
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
+import {OctiTestComponent} from './octi-test/octi-test.component';
+import {DrawingplaneComponent} from './drawingplane/drawingplane.component';
 
 @NgModule({
   declarations: [
@@ -19,4 +19,5 @@ import { DrawingplaneComponent } from './drawingplane/drawingplane.component';
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

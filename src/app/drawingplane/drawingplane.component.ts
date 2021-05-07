@@ -25,6 +25,10 @@ export class DrawingplaneComponent implements OnInit {
   constructor() {
   }
 
+  private static getGridID(id: number): number {
+    return parseFloat(("" + id).slice(0, -1) + "0");
+  }
+
   ngOnInit(): void {
     Constants.octiGraph.registerListener(this.callback.bind(this));
   }
@@ -32,12 +36,12 @@ export class DrawingplaneComponent implements OnInit {
   callback(graph: Object, paths: Map<InputEdge, OctiNode[]>) {
     if (graph != undefined && paths != undefined) {
       let octiGraph = plainToClass(OutputGraph, graph) as OutputGraph;
-      this.planeWidth = octiGraph.width*this.gapFactor + this.planeXOffset;
-      this.planeHeight = octiGraph.height*this.gapFactor + this.planeYOffset;
+      this.planeWidth = octiGraph.width * this.gapFactor + this.planeXOffset;
+      this.planeHeight = octiGraph.height * this.gapFactor + this.planeYOffset;
 
       this.svg = d3.select("#drawingPlaneSVG").append("svg")
         .attr("width", this.planeWidth)
-        .attr("height", this.planeHeight )
+        .attr("height", this.planeHeight)
         .append("g");
       this.drawPaths(paths, octiGraph);
     }
@@ -98,25 +102,25 @@ export class DrawingplaneComponent implements OnInit {
     let intermediatePoints: Array<[SVGPoint, string]> = [];
     for (let i = 1; i <= edge.inBetweenStations.length; i++) {
       // @ts-ignore
-      intermediatePoints.push([pathNode.getPointAtLength(step * i), edge.inBetweenStations[i-1]]);
+      intermediatePoints.push([pathNode.getPointAtLength(step * i), edge.inBetweenStations[i - 1]]);
     }
     this.drawIntermediateStations(intermediatePoints);
   }
 
-  private drawIntermediateStations(nodes: Array<[SVGPoint, string]>){
+  private drawIntermediateStations(nodes: Array<[SVGPoint, string]>) {
     let circ = this.svg.selectAll(".interDot")
       .append('g')
       .data(nodes)
       .enter();
 
-      circ.append('circle')
+    circ.append('circle')
       .attr('cx', (p: [SVGPoint, string]) => p[0].x)
       .attr('cy', (p: [SVGPoint, string]) => p[0].y)
       .attr('r', 5)
       .style('fill', 'white')
       .style('stroke', 'black');
 
-      // Use if the intermediate stations should be labeled
+    // Use if the intermediate stations should be labeled
     /*circ.append("text")
       .attr("dx", 12)
       .attr("dy", ".35em")
@@ -165,10 +169,6 @@ export class DrawingplaneComponent implements OnInit {
 
   private planeYPosition2(node: IntermediateStation) {
     return (node.y * 50) + this.planeXOffset;
-  }
-
-  private static getGridID(id: number): number {
-    return parseFloat(("" + id).slice(0, -1) + "0");
   }
 }
 
