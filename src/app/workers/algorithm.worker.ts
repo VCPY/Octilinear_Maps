@@ -62,7 +62,6 @@ class AlgorithmWorker {
     this.D = algo.calculateAverageNodeDistance(inputGraph) * 0.75;
 
     inputGraph.removeTwoDegreeNodes();
-    inputGraph.calculateEdgeOrderingAtNode();
 
     this.r = 1;
     this._inputGraph = inputGraph;

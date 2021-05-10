@@ -110,6 +110,14 @@ export class Station {
         break;
       }
     }
+
+    for (let i = 0; i < this._edgeOrdering.length; i++) {
+      if (this._edgeOrdering[i].stopID == before) {
+        this._edgeOrdering[i] = after;
+        break;
+      }
+    }
+
     this.adjacentNodes = new Set<Station>(nodeArray);
   }
 }
