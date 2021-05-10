@@ -138,8 +138,13 @@ export class OctiGraph {
         octiNodeA = diagonalNodeA.getOctiNode(7);
         octiNodeB = diagonalNodeB.getOctiNode(3);
       }
-      //octiNodeA.close..;
-      //TODO: what edges should we close here?
+
+      const diagonal = octiNodeA.getEdge(octiNodeB) as OctiEdge;
+
+      if (Constants.ALLOW_CROSSING)
+        diagonal.weight = Constants.COST_CROSSING;
+      else
+        diagonal.weight = Infinity;
     }
   }
 }

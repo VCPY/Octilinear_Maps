@@ -126,7 +126,7 @@ class AlgorithmWorker {
       path.map(node => node.gridNode)
         .forEach(node => {
           node.closeSinkEdge();
-          node.closeBendEdges();
+          node.closeBendEdges(Constants.ALLOW_CROSSING ? Constants.COST_CROSSING : Infinity);
         });
 
       /* To prevent crossing paths at diagonal grid edges,

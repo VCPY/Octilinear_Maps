@@ -114,13 +114,13 @@ export class GridNode {
     this.getOctiNode(Constants.SINK).closeAllEdges();
   }
 
-  closeBendEdges() {
+  closeBendEdges(weight = Infinity) {
     for (let i = 0; i < 8; i++) {
       const portNode = this.getOctiNode(i);
 
       /* the first seven edges are the bend edges*/
       for (let i = 0; i < 7; i++) {
-        portNode.edges[i].weight = Infinity;
+        portNode.edges[i].weight = weight;
       }
     }
   }
