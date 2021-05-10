@@ -63,6 +63,10 @@ class AlgorithmWorker {
 
     inputGraph.removeTwoDegreeNodes();
 
+    // I think it is more accurate to keep the same ordering as before merging 2-deg nodes,
+    // but it looks better when we recalculate it.
+    inputGraph.calculateEdgeOrderingAtNode();
+
     this.r = 1;
     this._inputGraph = inputGraph;
 
