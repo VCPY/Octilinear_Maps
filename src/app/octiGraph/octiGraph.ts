@@ -49,7 +49,8 @@ export class OctiGraph {
           const otherGridNode = this._gridNodes[otherX][otherY];
           const otherPortNode = otherGridNode.getOctiNode(dir.portIndex + 4 % 8); // other direction
 
-          const newEdge = new OctiEdge(portNode, otherPortNode, Constants.COST_HOP);
+          const isDiagonal = Math.abs(dir.x) + Math.abs(dir.y) == 2;
+          const newEdge = new OctiEdge(portNode, otherPortNode, isDiagonal ? Constants.COST_HOP_DIAGONAL : Constants.COST_HOP);
           portNode.addEdge(newEdge);
           otherPortNode.addEdge(newEdge);
         }

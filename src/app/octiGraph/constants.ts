@@ -16,7 +16,8 @@ export class Constants {
   static readonly SINK = 8;
 
   static readonly COST_MOVE = 0.5;
-  static readonly COST_HOP = 1; //TODO: set it with the correct value
+  static readonly COST_HOP = 6;
+  static readonly COST_HOP_DIAGONAL = 9;
   static octiGraph: { internalGraph: any, internalPaths: any, aListener: any, graph: any, paths: any, registerListener: (path: any) => void } = {
     internalGraph: undefined,
     internalPaths: undefined,
