@@ -1,3 +1,6 @@
 <div>
     <div id="drawingPlaneSVG"></div>
+    <div *ngIf="!hideSpinner" style="justify-content: center; display:flex; align-items: center; width: 100%; height: 100vh">
+        <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
 </div>

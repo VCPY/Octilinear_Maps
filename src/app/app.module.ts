@@ -12,6 +12,7 @@ import {MatRadioModule} from "@angular/material/radio";
 import {MatToolbar, MatToolbarModule} from "@angular/material/toolbar";
 import {MatButtonModule} from "@angular/material/button";
 import {FormsModule} from "@angular/forms";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import {FormsModule} from "@angular/forms";
     MatRadioModule,
     MatToolbarModule,
     MatButtonModule,
-    FormsModule
+    FormsModule,
+    MatProgressSpinnerModule
   ],
   providers: [{
     provide: MatDialogRef,
