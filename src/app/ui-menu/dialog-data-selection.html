@@ -1,27 +1,37 @@
-<mat-toolbar color="primary">
-    <span>Select Data</span>
-</mat-toolbar>
-<div>
-
+<div *ngIf="this.firstPage">
+    <mat-toolbar color="primary">
+        <span>Select Data</span>
+    </mat-toolbar>
     <div>
-        <h2>Prepared Data</h2>
-        <mat-radio-group aria-label="Select an option" [(ngModel)]="this.preparedDataSelection" style="display: flex; flex-flow: column; margin-bottom: 2em">
-            <mat-radio-button value="Vienna">Vienna (Metro, Bus, Tram)</mat-radio-button>
-            <mat-radio-button value="2">Another City</mat-radio-button>
-        </mat-radio-group>
+        <div>
+            <h2>Prepared Data</h2>
+            <mat-radio-group aria-label="Select an option" [(ngModel)]="this.preparedDataSelection"
+                             style="display: flex; flex-flow: column; margin-bottom: 2em">
+                <mat-radio-button value="Vienna">Vienna (Metro, Bus, Tram)</mat-radio-button>
+                <mat-radio-button value="2">Another City</mat-radio-button>
+            </mat-radio-group>
 
-
-        <div class="selectButtonDiv">
-            <button mat-raised-button (click)="selectPreparedData()">Select</button>
+            <div class="selectButtonDiv">
+                <button mat-raised-button (click)="selectPreparedData()">Select</button>
+            </div>
+        </div>
+        <hr>
+        <div>
+            <h2>Upload Data</h2>
+            <div>TODO: add disclaimer about content</div>
+            <input #folderInput type="file" webkitdirectory mozdirectory (change)="saveFiles(folderInput.files)"/>
+            <div class="selectButtonDiv">
+                <button mat-raised-button (click)="sendUploadedFiles()">Select</button>
+            </div>
         </div>
     </div>
-    <hr>
-    <div>
-        <h2>Upload Data</h2>
-        <div>TODO: add disclaimer about content</div>
-        <input #folderInput type="file" webkitdirectory mozdirectory (change)="saveFiles(folderInput.files)"/>
-        <div class="selectButtonDiv">
-            <button mat-raised-button (click)="sendUploadedFiles()">Select</button>
-        </div>
+</div>
+<div *ngIf="!firstPage">
+    <mat-toolbar color="primary">
+        <span>Select Filters</span>
+    </mat-toolbar>
+    <div>TODO: Add Filter options</div>
+    <div class="selectButtonDiv">
+        <button mat-raised-button (click)="sendData()">Select</button>
     </div>
 </div>

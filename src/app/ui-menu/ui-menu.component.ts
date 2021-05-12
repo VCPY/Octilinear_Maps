@@ -96,8 +96,9 @@ export class UiMenuComponent implements OnInit {
 })
 export class DialogDataSelection {
 
-  uploadedFiles: FileList | null = null;
+  uploadedFiles: FileList | undefined = undefined;
   preparedDataSelection = undefined
+  firstPage: boolean = true
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
@@ -105,7 +106,9 @@ export class DialogDataSelection {
   }
 
   saveFiles(files: FileList | null) {
-    this.uploadedFiles = files
+    if (files) {
+      this.uploadedFiles = files
+    }
   }
 
   sendUploadedFiles() {
@@ -134,7 +137,7 @@ export class DialogDataSelection {
         alert("One of the following files is missing: 'stop_times.txt', 'stops.txt', 'trips.txt', 'routes.txt'")
         return
       }
-      this.dialogRef.close({data: this.uploadedFiles})
+      this.switchPage()
     } else {
       alert("Please select a directory")
       return
@@ -146,6 +149,19 @@ export class DialogDataSelection {
       alert("Please select a dataset")
       return
     }
-    this.dialogRef.close({selection: this.preparedDataSelection})
+    this.switchPage()
+  }
+
+  switchPage() {
+    this.firstPage = !this.firstPage
+  }
+
+  sendData() {
+    if (this.uploadedFiles) {
+      this.dialogRef.close({data: this.uploadedFiles})
+    }
+    else if (this.preparedDataSelection) {
+      this.dialogRef.close({selection: this.preparedDataSelection})
+    }
   }
 }
