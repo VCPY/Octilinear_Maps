@@ -20,6 +20,7 @@ export class DrawingplaneComponent implements OnInit {
   svg;
   planeWidth = 3000;
   planeHeight = 3000;
+  hideSpinner: boolean = false;
 
   constructor(private algorithmService: AlgorithmService) {
   }
@@ -45,6 +46,7 @@ export class DrawingplaneComponent implements OnInit {
       this.drawLines(path);
     });
     this.drawMainStations(outputGraph.stations);
+    this.hideSpinner= true;
   }
 
   private drawLines(edge: OutputEdge) {

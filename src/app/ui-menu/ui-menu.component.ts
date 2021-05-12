@@ -1,8 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import GraphInputParser from "../graphs/graph.inputParser";
-import {InputGraph} from "../inputGraph/inputGraph";
-import {FileType, parseGTFSToObjectArray} from "../workers/gtfs.worker";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {FileType, parseDataToInputGraph, parseGTFSToObjectArray} from "../graphs/graph.inputParser";
+import {AlgorithmService} from "../services/algorithm.service";
 
 @Component({
   selector: 'app-ui-menu',
@@ -17,7 +16,7 @@ export class UiMenuComponent implements OnInit {
   trips: string | undefined = undefined
   routes: string | undefined = undefined
 
-  constructor(public dialog: MatDialog) {
+  constructor(public dialog: MatDialog, private algorithmService: AlgorithmService) {
   }
 
   ngOnInit(): void {
@@ -30,7 +29,7 @@ export class UiMenuComponent implements OnInit {
       data: ""
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       let self = this
       let data = result["data"]
       let promises: any = []
@@ -38,8 +37,7 @@ export class UiMenuComponent implements OnInit {
         let keys = Object.keys(data)
         keys.forEach((key) => {
           let file = data[key]
-          let fileName = file.name
-          switch (fileName) {
+          switch (file.name) {
             case "trips.txt":
               promises.push(file.text()
                 .then((text: string) => {

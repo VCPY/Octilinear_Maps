@@ -3,6 +3,7 @@ import {Observable, Subject} from 'rxjs';
 import {Station} from "../inputGraph/station";
 import {InputEdge} from "../inputGraph/inputEdge";
 import {InputGraph} from "../inputGraph/inputGraph";
+import {parseDataToInputGraph} from "../graphs/graph.inputParser";
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,8 @@ export class GtfsService {
 
     this.worker = new Worker('../workers/gtfs.worker', {type: 'module', name: "gtfs-worker"});
     this.worker.onmessage = ({data}) => {
-      this.subject.next(data);
+      let inputGraph = parseDataToInputGraph(data)
+      this.subject.next(inputGraph);
       this.subject.complete();
     };
   }
