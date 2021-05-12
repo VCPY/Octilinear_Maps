@@ -66,9 +66,11 @@ export class UiMenuComponent implements OnInit {
           }
         })
         Promise.all(promises).then((result: any[]) => {
-          //TODO: work with the data
-          //let inputParser = new GraphInputParser(this.trips, this.stops, this.routes, this.stopTimes);
-          //let inputGraph: InputGraph = inputParser.parseToInputGraph();
+          let inputGraph = parseDataToInputGraph([parseGTFSToObjectArray(self.trips!, FileType.TRIPS),
+            parseGTFSToObjectArray(self.stops!, FileType.STOPS),
+            parseGTFSToObjectArray(self.routes!, FileType.ROUTES),
+            parseGTFSToObjectArray(self.stopTimes!, FileType.STOPTIMES)])
+          this.algorithmService.perform(inputGraph);
         })
       }
       data = result["selection"]
