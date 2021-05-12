@@ -49,7 +49,7 @@ async function fetchData(url: string, type: FileType) {
   return result;
 }
 
-function parseGTFSToObjectArray(lines: string, type: FileType) {
+export function parseGTFSToObjectArray(lines: string, type: FileType) {
   const linesArray = lines.split("\r\n");
   let keysString: string = linesArray.shift() || "";
   keysString = keysString.replace(/['"]+/g, '');
@@ -75,7 +75,7 @@ function parseGTFSToObjectArray(lines: string, type: FileType) {
   return result;
 }
 
-enum FileType {
+export enum FileType {
   STOPS,
   TRIPS,
   ROUTES,
