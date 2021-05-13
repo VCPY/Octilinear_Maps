@@ -7,16 +7,9 @@ export function parseDataToInputGraph(data: any[]) {
   console.log("Creating InputGraph from gtfs data");
   let inputParser = new GraphInputParser(data[0], data[1], data[2], data[3]);
   let inputGraph: InputGraph = inputParser.parseToInputGraph();
-  inputGraph = filter(inputGraph)
-
   return inputGraph
 }
 
-function filter(inputGraph: InputGraph) {
-  inputGraph.edges = inputGraph.edges.filter(e => e.line[0].startsWith("U"));
-  inputGraph.edges = inputGraph.edges.filter(e => !e.line[0].endsWith("E"));
-  return inputGraph
-}
 
 function getLargerTrip(trip1: Trip, trip2: Trip): Trip {
   let sequences1 = trip1.stops.size;

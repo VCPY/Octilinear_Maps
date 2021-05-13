@@ -13,6 +13,7 @@ import {parseOctiGraphForOutput, parsePathsForOutput} from "../outputGraph/outpu
 
 export class WorkerVariables {
   static allowCrossing = false
+  static exactString = []
 }
 
 function extractInputgraph(data: any): InputGraph {
@@ -31,12 +32,20 @@ function extractInputgraph(data: any): InputGraph {
   return inputGraph;
 }
 
+function filterInputGraph(inputGraph: InputGraph) {
+  //TODO: add other filters
+  inputGraph.edges = inputGraph.edges.filter(e => e.line[0] in WorkerVariables.exactString)
+
+  return inputGraph
+}
+
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
   let graphData = data["graph"]
-  let allowCrossing = data["allowCrossing"]
-  WorkerVariables.allowCrossing = allowCrossing
+  WorkerVariables.exactString = data["exactString"];
+  WorkerVariables.allowCrossing = data["allowCrossing"]
   let inputGraph = extractInputgraph(graphData);
+  inputGraph = filterInputGraph(inputGraph)
   let algorithm = new AlgorithmWorker(inputGraph);
   let algoData = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
   let plainGraphData = parseOctiGraphForOutput(algoData[0] as OctiGraph);
