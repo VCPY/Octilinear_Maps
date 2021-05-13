@@ -18,7 +18,7 @@ export class UiMenuComponent implements OnInit {
   stopTimes: string | undefined = undefined
   trips: string | undefined = undefined
   routes: string | undefined = undefined
-  inputGraph: InputGraph|undefined = undefined
+  inputGraph: InputGraph | undefined = undefined
 
   constructor(public dialog: MatDialog, private algorithmService: AlgorithmService) {
   }
@@ -76,7 +76,6 @@ export class DialogDataSelection {
   routes: string | undefined = undefined
   inputGraph: InputGraph | undefined = undefined
   displayedColumns: string[] = ["name", "visible"]
-  // @ts-ignore
   lines: FilterLine[] = []
   selection = new SelectionModel<FilterLine>(true, []);
 
@@ -143,41 +142,28 @@ export class DialogDataSelection {
         let file = this.uploadedFiles![key]
         switch (file.name) {
           case "trips.txt":
-            promises.push(file.text()
-              .then((text: string) => {
-                self.trips = text
-              }))
+            promises.push(file.text().then((text: string) => self.trips = text))
             break;
           case "stops.txt":
-            promises.push(file.text()
-              .then((text: string) => {
-                self.stops = text
-              }))
+            promises.push(file.text().then((text: string) => self.stops = text))
             break;
           case "routes.txt":
-            promises.push(file.text()
-              .then((text: string) => {
-                self.routes = text
-              }))
+            promises.push(file.text().then((text: string) => self.routes = text))
             break;
           case "stop_times.txt":
-            promises.push(file.text()
-              .then((text: string) => {
-                self.stopTimes = text
-              }))
+            promises.push(file.text().then((text: string) => self.stopTimes = text))
             break;
           default: //Ignore
         }
       })
-      Promise.all(promises).then(result => {
+      Promise.all(promises).then(_ => {
         this.inputGraph = parseDataToInputGraph([parseGTFSToObjectArray(self.trips!, FileType.TRIPS),
           parseGTFSToObjectArray(self.stops!, FileType.STOPS),
           parseGTFSToObjectArray(self.routes!, FileType.ROUTES),
           parseGTFSToObjectArray(self.stopTimes!, FileType.STOPTIMES)])
         let lines: string[] = []
         this.inputGraph.edges.forEach(edge => lines.push(...edge.line))
-        let linesSet = new Set(lines)
-        this.lines = Array.from(linesSet).map(line => {
+        this.lines = Array.from(new Set(lines)).map(line => {
           let obj = {name: line, visible: true}
           this.selection.select(obj)
           return obj

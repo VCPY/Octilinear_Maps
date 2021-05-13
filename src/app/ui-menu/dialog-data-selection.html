@@ -56,11 +56,12 @@
     <hr>
     <div>
         <div style="display: flex; flex-flow: column">
-            <mat-checkbox [(ngModel)]="allowCrossing" class="example-margin">Allow lines to cross each other</mat-checkbox>
+            <mat-checkbox [(ngModel)]="allowCrossing" class="example-margin">Allow lines to cross each other
+            </mat-checkbox>
             Warning: Some lines may not be positionable if crossing is not allowed.
         </div>
     </div>
     <div class="selectButtonDiv">
-        <button mat-raised-button (click)="sendData()" >Draw Graph</button>
+        <button mat-raised-button (click)="sendData()">Draw Graph</button>
     </div>
 </div>
