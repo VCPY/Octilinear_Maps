@@ -19,7 +19,6 @@ export class Constants {
   static readonly COST_HOP = 6;
   static readonly COST_HOP_DIAGONAL = 9;
   static readonly COST_CROSSING = 20;
-  static ALLOW_CROSSING = true;
 
   static fixIndex(index: number) {
     if (index < 0) index += 8;

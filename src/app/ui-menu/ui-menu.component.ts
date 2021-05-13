@@ -2,6 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {FileType, parseDataToInputGraph, parseGTFSToObjectArray} from "../graphs/graph.inputParser";
 import {AlgorithmService} from "../services/algorithm.service";
+import {Filters} from "../inputGraph/inputGraph.filter";
 
 @Component({
   selector: 'app-ui-menu',
@@ -99,6 +100,7 @@ export class DialogDataSelection {
   uploadedFiles: FileList | undefined = undefined;
   preparedDataSelection = undefined
   firstPage: boolean = true
+  allowCrossing: boolean = true;
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
@@ -157,10 +159,10 @@ export class DialogDataSelection {
   }
 
   sendData() {
+    Filters.setCrossing(this.allowCrossing)
     if (this.uploadedFiles) {
       this.dialogRef.close({data: this.uploadedFiles})
-    }
-    else if (this.preparedDataSelection) {
+    } else if (this.preparedDataSelection) {
       this.dialogRef.close({selection: this.preparedDataSelection})
     }
   }

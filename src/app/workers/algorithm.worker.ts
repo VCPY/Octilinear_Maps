@@ -14,6 +14,10 @@ import {OutputGraph} from "../outputGraph/outputGraph";
 import {OutputEdge} from "../outputGraph/outputEdge";
 import {OutputStation} from "../outputGraph/outputStation";
 
+export class WorkerVariables {
+  static allowCrossing = false
+}
+
 function extractInputgraph(data: any): InputGraph {
   // convert from plain js object to typescript object and set correct references
   let inputGraph: InputGraph = plainToClass(InputGraph, data);
@@ -32,7 +36,10 @@ function extractInputgraph(data: any): InputGraph {
 
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] preparing");
-  let inputGraph = extractInputgraph(data);
+  let graphData = data["graph"]
+  let allowCrossing = data["allowCrossing"]
+  WorkerVariables.allowCrossing = allowCrossing
+  let inputGraph = extractInputgraph(graphData);
   let algorithm = new AlgorithmWorker(inputGraph);
   console.log("[algorithm-worker] starting algorithm")
   const outputGraph = algorithm.performAlgorithm(algo.orderEdges(inputGraph));

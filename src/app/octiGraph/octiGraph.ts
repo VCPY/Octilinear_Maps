@@ -2,6 +2,7 @@ import {Constants} from "./constants";
 import {OctiNode} from "./octiNode";
 import {OctiEdge} from "./octiEdge";
 import {GridNode} from "./gridNode";
+import {WorkerVariables} from "../workers/algorithm.worker";
 
 export class OctiGraph {
 

@@ -3,6 +3,7 @@ import {InputGraph} from "../inputGraph/inputGraph";
 import {OutputGraph} from "../outputGraph/outputGraph";
 import {plainToClass} from "class-transformer";
 import {Observable, Subject} from "rxjs";
+import {Filters} from "../inputGraph/inputGraph.filter";
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,6 @@ export class AlgorithmService {
   }
 
   perform(inputGraph: InputGraph) {
-    this.worker.postMessage(inputGraph);
+    this.worker.postMessage({graph: inputGraph, allowCrossing: Filters.ALLOWCROSSING});
   }
 }
