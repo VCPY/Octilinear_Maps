@@ -2,6 +2,7 @@ import {Constants} from "./constants";
 import {OctiNode} from "./octiNode";
 import {OctiEdge} from "./octiEdge";
 import {GridNode} from "./gridNode";
+import {WorkerVariables} from "../workers/algorithm.worker";
 
 export class OctiGraph {
 
@@ -141,7 +142,7 @@ export class OctiGraph {
 
       const diagonal = octiNodeA.getEdge(octiNodeB) as OctiEdge;
 
-      if (Constants.ALLOW_CROSSING)
+      if (WorkerVariables.allowCrossing)
         diagonal.weight = Constants.COST_CROSSING;
       else
         diagonal.weight = Infinity;

@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Constants} from "../octiGraph/constants";
 import {InputGraph} from "../inputGraph/inputGraph";
+import {Filters} from "../inputGraph/inputGraph.filter";
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,6 @@ export class AlgorithmService {
   }
 
   perform(inputGraph: InputGraph) {
-    this.worker.postMessage(inputGraph);
+    this.worker.postMessage({graph: inputGraph, allowCrossing: Filters.ALLOWCROSSING});
   }
 }

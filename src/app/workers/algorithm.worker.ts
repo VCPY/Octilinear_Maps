@@ -11,6 +11,10 @@ import {InputEdge} from "../inputGraph/inputEdge";
 import {InputGraph} from "../inputGraph/inputGraph";
 import {parseOctiGraphForOutput, parsePathsForOutput} from "../outputGraph/outputNode";
 
+export class WorkerVariables {
+  static allowCrossing = false
+}
+
 function extractInputgraph(data: any): InputGraph {
   // convert from plain js object to typescript object and set correct references
   let inputGraph: InputGraph = plainToClass(InputGraph, data);
@@ -29,8 +33,10 @@ function extractInputgraph(data: any): InputGraph {
 
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
-
-  let inputGraph = extractInputgraph(data);
+  let graphData = data["graph"]
+  let allowCrossing = data["allowCrossing"]
+  WorkerVariables.allowCrossing = allowCrossing
+  let inputGraph = extractInputgraph(graphData);
   let algorithm = new AlgorithmWorker(inputGraph);
   let algoData = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
   let plainGraphData = parseOctiGraphForOutput(algoData[0] as OctiGraph);
@@ -130,7 +136,7 @@ class AlgorithmWorker {
       path.map(node => node.gridNode)
         .forEach(node => {
           node.closeSinkEdge();
-          node.closeBendEdges(Constants.ALLOW_CROSSING ? Constants.COST_CROSSING : Infinity);
+          node.closeBendEdges(WorkerVariables.allowCrossing ? Constants.COST_CROSSING : Infinity);
         });
 
       /* To prevent crossing paths at diagonal grid edges,
