@@ -16,6 +16,7 @@ import {OutputStation} from "../outputGraph/outputStation";
 
 export class WorkerVariables {
   static allowCrossing = false
+  static exactString = []
 }
 
 function extractInputgraph(data: any): InputGraph {
@@ -34,12 +35,20 @@ function extractInputgraph(data: any): InputGraph {
   return inputGraph;
 }
 
+function filterInputGraph(inputGraph: InputGraph) {
+  //TODO: add other filters
+  inputGraph.edges = inputGraph.edges.filter(e => e.line[0] in WorkerVariables.exactString)
+
+  return inputGraph
+}
+
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] preparing");
   let graphData = data["graph"]
-  let allowCrossing = data["allowCrossing"]
-  WorkerVariables.allowCrossing = allowCrossing
+  WorkerVariables.exactString = data["exactString"];
+  WorkerVariables.allowCrossing = data["allowCrossing"]
   let inputGraph = extractInputgraph(graphData);
+  inputGraph = filterInputGraph(inputGraph)
   let algorithm = new AlgorithmWorker(inputGraph);
   console.log("[algorithm-worker] starting algorithm")
   const outputGraph = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
