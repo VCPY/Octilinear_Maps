@@ -18,6 +18,7 @@ export class UiMenuComponent implements OnInit {
   stopTimes: string | undefined = undefined
   trips: string | undefined = undefined
   routes: string | undefined = undefined
+  inputGraph: InputGraph|undefined = undefined
 
   constructor(public dialog: MatDialog, private algorithmService: AlgorithmService) {
   }
@@ -36,19 +37,11 @@ export class UiMenuComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       let self = this
-      let data = result["data"]
+      let data = result["inputGraph"]
       if (data != undefined) {
-        this.routes = result["routes"]
-        this.trips = result["trips"]
-        this.stops = result["stops"]
-        this.stopTimes = result["stopTimes"]
+        this.inputGraph = data
         Filters.exactString.push(...result["lines"])
-
-        let inputGraph = parseDataToInputGraph([parseGTFSToObjectArray(self.trips!, FileType.TRIPS),
-          parseGTFSToObjectArray(self.stops!, FileType.STOPS),
-          parseGTFSToObjectArray(self.routes!, FileType.ROUTES),
-          parseGTFSToObjectArray(self.stopTimes!, FileType.STOPTIMES)])
-        this.algorithmService.perform(inputGraph);
+        this.algorithmService.perform(this.inputGraph!);
       }
       data = result["selection"]
       if (data != undefined) {
@@ -201,11 +194,7 @@ export class DialogDataSelection {
     if (this.uploadedFiles) {
       let acceptedLines = this.selection.selected.map(selection => selection.name)
       this.dialogRef.close({
-        data: this.uploadedFiles,
-        stops: this.stops,
-        stopTimes: this.stopTimes,
-        routes: this.routes,
-        trips: this.trips,
+        inputGraph: this.inputGraph,
         lines: acceptedLines
       })
     } else if (this.preparedDataSelection) {
