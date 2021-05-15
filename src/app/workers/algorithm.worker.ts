@@ -54,6 +54,7 @@ class AlgorithmWorker {
   private readonly _ignoreError = true;
   private readonly _settledStations = new Map<Station, GridNode>();
   private readonly _foundPaths = new Map<InputEdge, OctiNode[]>();
+  private readonly _cachedInputEdges = new Map<Station, InputEdge[]>();
 
   constructor(inputGraph: InputGraph) {
     // prepare the input graph
@@ -69,6 +70,13 @@ class AlgorithmWorker {
     // I think it is more accurate to keep the same ordering as before merging 2-deg nodes,
     // but it looks better when we recalculate it.
     inputGraph.calculateEdgeOrderingAtNode();
+
+    // cache the edges for each station to improve performance
+    inputGraph.nodes.forEach(station => this._cachedInputEdges.set(station, []));
+    inputGraph.edges.forEach(edge => {
+      this._cachedInputEdges.get(edge.station1)?.push(edge);
+      this._cachedInputEdges.get(edge.station2)?.push(edge);
+    });
 
     this.r = 1;
     this._inputGraph = inputGraph;
@@ -286,8 +294,7 @@ class AlgorithmWorker {
    * by reopening all edges and removing the stored paths
    */
   private removeAllRoutingsTo(station: Station) {
-    station.edgeOrdering.forEach(otherStation => {
-      const edge = this._inputGraph.getEdgeBetween(station, otherStation) as InputEdge;
+    this._cachedInputEdges.get(station)?.forEach(edge => {
       const path = this._foundPaths.get(edge);
       if (path == undefined) return;
 
@@ -336,10 +343,15 @@ class AlgorithmWorker {
       if (path.length == 0) return;
 
       costSum += path[path.length - 1].dist;
-      foundLocal.set(this._inputGraph.getEdgeBetween(station, otherStation) as InputEdge, path);
+      foundLocal.set(this.getEdgeBetween(station, otherStation) as InputEdge, path);
     });
 
     return {cost: costSum, found: foundLocal, x: 0, y: 0};
+  }
+
+  private getEdgeBetween(station: Station, otherStation: Station): InputEdge {
+    return this._cachedInputEdges.get(station)
+      ?.find(edge => edge.station1 == otherStation || edge.station2 == otherStation) as InputEdge;
   }
 
   /**
@@ -357,7 +369,7 @@ class AlgorithmWorker {
     const path = dijkstra.setToSet(this._octiGraph, [candidateGirdNode],[otherGridNode]);
     if (path.length == 0) return [];
 
-    const edge = this._inputGraph.getEdgeBetween(station, otherStation) as InputEdge;
+    const edge = this.getEdgeBetween(station, otherStation) as InputEdge;
     this.storePath(path, edge, station, otherStation);
 
     return path;
