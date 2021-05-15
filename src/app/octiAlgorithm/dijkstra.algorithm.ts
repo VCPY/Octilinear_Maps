@@ -14,6 +14,7 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
 
   graph.allNodes.forEach(node => {
     node.dist = Infinity;
+    node.priority = Infinity;
     node.prev = node;
   });
 
@@ -23,6 +24,7 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
     .map(startNode => startNode.getOctiNode(Constants.SINK))
     .forEach(startNode => tmpNode.addEdge(new OctiEdge(tmpNode, startNode, 0)));
   tmpNode.dist = 0;
+  tmpNode.priority = 0;
 
   let Q = new BinaryHeap<OctiNode>(comparator);// [tmpNode, ...graph.allNodes];
   [tmpNode, ...graph.allNodes].forEach(n => Q.push(n));
@@ -52,6 +54,7 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
       const alt = u.dist + edge.weight;
       if (alt < v.dist) {
         v.dist = alt;
+        v.priority = alt + heuristic(v, to);
         v.prev = u;
 
         Q.update(v);
@@ -62,8 +65,19 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
   return [];
 }
 
+function heuristic(from: OctiNode, to: GridNode[]): number {
+  return Constants.COST_HOP * Math.min(...to.map(toNode => dist(from.gridNode, toNode) - 1));
+}
+
+function dist(from: GridNode, to:GridNode): number {
+  const dx = Math.abs(from.x - to.x);
+  const dy = Math.abs(from.y - to.y);
+
+  return Math.max(dx, dy);
+}
+
 function comparator(a: OctiNode, b: OctiNode): number {
-  return b.dist - a.dist;
+  return b.priority - a.priority;
 }
 
 function createPath(tmpNode: OctiNode, toNodes: OctiNode[]): OctiNode[] {

@@ -49,6 +49,17 @@ export class OctiNode {
     this._dist = value;
   }
 
+  private _priority: number = 0;
+
+
+  get priority(): number {
+    return this._priority;
+  }
+
+  set priority(value: number) {
+    this._priority = value;
+  }
+
   private _prev: OctiNode = this;
 
   get prev(): OctiNode {
