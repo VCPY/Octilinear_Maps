@@ -87,7 +87,7 @@ export class OctiGraph {
     return this._gridNodes[x][y];
   }
 
-  closeDiagonalEdge(edge: OctiEdge) {
+  getDiagonal(edge: OctiEdge) {
     let nodeA = edge.nodeA;
     let nodeB = edge.nodeB;
     if (nodeA.gridNode == nodeB.gridNode) {
@@ -139,8 +139,14 @@ export class OctiGraph {
         octiNodeB = diagonalNodeB.getOctiNode(3);
       }
 
-      const diagonal = octiNodeA.getEdge(octiNodeB) as OctiEdge;
+      return octiNodeA.getEdge(octiNodeB) as OctiEdge;
+    }
+    return undefined;
+  }
 
+  closeDiagonalEdge(edge: OctiEdge) {
+    const diagonal = this.getDiagonal(edge);
+    if (diagonal != undefined) {
       if (Constants.ALLOW_CROSSING)
         diagonal.weight = Constants.COST_CROSSING;
       else

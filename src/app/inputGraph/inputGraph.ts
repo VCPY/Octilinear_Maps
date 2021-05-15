@@ -225,4 +225,8 @@ export class InputGraph {
     }
     return undefined;
   }
+
+  getEdgeBetween(station: Station, otherStation: Station): InputEdge | undefined {
+    return this.edges.find(e => e.contains(station) && e.contains(otherStation));
+  }
 }

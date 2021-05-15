@@ -128,11 +128,28 @@ export class GridNode {
   reopenSinkEdges() {
     this.getOctiNode(Constants.SINK).edges
       .filter(e => !e.used)
-      .forEach(e => e.weight = Constants.SINK);
+      .forEach(e => e.weight = Constants.COST_SINK);
+  }
+
+  reopenBendEdges() {
+    for (let i = 0; i < 8; i++) {
+      const portNode = this.getOctiNode(i);
+
+      /* the first seven edges are the bend edges*/
+      for (let i = 0; i < 7; i++) {
+          portNode.edges[i].resetWeight();
+      }
+    }
   }
 
   saveRouting(other: Station, direction: number, edge: InputEdge) {
     this._routedEdges.push(new RoutedEdge(other, direction, edge));
+  }
+
+  removeRouting(edge: InputEdge) {
+    this._routedEdges = this._routedEdges.filter(routedEdge => {
+      routedEdge.edge != edge;
+    });
   }
 
   /**
