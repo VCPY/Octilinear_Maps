@@ -30,27 +30,69 @@
     <mat-toolbar color="primary">
         <span>Select Filters</span>
     </mat-toolbar>
-    <div style="overflow-y: scroll; overflow-x: hidden; height: 30vh; width: 100%">
-        <table mat-table [dataSource]="lines" style="width: 100%" class="mat-elevation-z8">
+    <div style="display: flex; flex-flow: row">
+        <div style="overflow-y: scroll; overflow-x: hidden; height: 30vh; width: 100%">
+            <table mat-table [dataSource]="lines" style="width: 100%" class="mat-elevation-z8">
 
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef>Name</th>
-                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-            </ng-container>
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Name</th>
+                    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                </ng-container>
 
-            <ng-container matColumnDef="visible">
-                <th mat-header-cell *matHeaderCellDef>Visible</th>
-                <td mat-cell *matCellDef="let element">
-                    <mat-checkbox (click)="$event.stopPropagation()"
-                                  (change)="$event ? selection.toggle(element) : null"
-                                  [checked]="selection.isSelected(element)">
-                    </mat-checkbox>
-                </td>
-            </ng-container>
+                <ng-container matColumnDef="visible">
+                    <th mat-header-cell *matHeaderCellDef>Visible</th>
+                    <td mat-cell *matCellDef="let element">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                                      (change)="$event ? selection.toggle(element) : null"
+                                      [checked]="selection.isSelected(element)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+        <div style="margin-left:1em; margin-top:1em; ">
+            <div style="margin-top: 1em; margin-bottom: 1em">
+            Multiple strings can be separated by ","
+            </div>
+            <div *ngFor="let el of this.filterIDs"
+                 style="justify-content: center; align-items:center; display: flex; flex-flow: row;">
+                <div>
+                    <mat-form-field appearance="fill" id="{{'form' + el}}">
+                        <mat-select value="must not start" (selectionChange)="changeSelected($event.value, el)">
+                            <mat-option value="must not start">
+                                Must not start with
+                            </mat-option>
+                            <mat-option value="must not end">
+                                Must not end with
+                            </mat-option>
+                            <mat-option value="must start">
+                                Must start with
+                            </mat-option>
+                            <mat-option value="must end">
+                                Must end with
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div style="margin-left: 1em" >
+                    <input id="{{'input' + el}}" placeholder="Enter string" value="">
+                </div>
+                <button id="{{'button' + el}}"
+                        style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px"
+                        (click)="removeElementFromFilterList(el)">
+                    -
+                </button>
+            </div>
+            <div>
+                <button mat-mini-fab style="background-color: green" (click)="increaseChoice()">
+                    <mat-icon>+</mat-icon>
+                </button>
+            </div>
+
+        </div>
     </div>
     <div>TODO: Add Filter options</div>
     <hr>

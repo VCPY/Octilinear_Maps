@@ -25,6 +25,16 @@ export class AlgorithmService {
 
   perform(inputGraph: InputGraph) {
     //TODO: add other filters
-    this.worker.postMessage({graph: inputGraph, allowCrossing: Filters.ALLOWCROSSING, exactString: Filters.exactString});
+    //this.worker.postMessage({graph: inputGraph, allowCrossing: Filters.ALLOWCROSSING, exactString: Filters.exactString});
+    this.worker.postMessage({
+      graph: inputGraph,
+      allowCrossing: Filters.ALLOWCROSSING,
+      exactString: Filters.exactString,
+      startsWith: Filters.startsWith,
+      endsWith: Filters.endsWith,
+      notStartsWith: Filters.notStartsWith,
+      notEndsWith: Filters.notEndsWith
+    });
+
   }
 }

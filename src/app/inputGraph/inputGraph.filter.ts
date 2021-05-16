@@ -1,6 +1,8 @@
 export class Filters {
   static startsWith: string[] = []
+  static notStartsWith: string[] = []
   static endsWith: string[] = []
+  static notEndsWith: string[] = []
   static exactString: string[] = []
   static ALLOWCROSSING: boolean = true
 
