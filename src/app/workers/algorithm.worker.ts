@@ -124,6 +124,7 @@ class AlgorithmWorker {
       this.storePath(path, edge, station1, station2);
     });
 
+    console.log("Total time in dijkstra:", dijkstra.totalTime, "section time:", dijkstra.sectionTime);
     console.log("[algorithm-worker] starting local search");
 
     /* local search */
@@ -131,6 +132,8 @@ class AlgorithmWorker {
       this.performLocalSearch(station);
     });
 
+    dijkstra.resetTime();
+    console.log("Total time in dijkstra:", dijkstra.totalTime, "section time:", dijkstra.sectionTime);
     return [this._octiGraph, this._foundPaths];
   }
 

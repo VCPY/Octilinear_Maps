@@ -5,10 +5,20 @@ import {OctiNode} from "../octiGraph/octiNode";
 import {OctiEdge} from "../octiGraph/octiEdge";
 import {GridNode} from "../octiGraph/gridNode";
 
+/* Used for profiling dijkstra performance */
+export let totalTime = 0;
+export let sectionTime = 0;
+
+export function resetTime() {
+  totalTime = 0;
+  sectionTime = 0;
+}
+
 /**
  * Calculates the set to set shortest path
  */
 export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): OctiNode[] {
+  var start1 = performance.now();
 
   const toSinks = to.flatMap(toGridNode => toGridNode.getOctiNode(Constants.SINK));
 
@@ -26,25 +36,30 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
   tmpNode.dist = 0;
   tmpNode.priority = 0;
 
-
+  var start2 = performance.now();
   let Q = new BinaryHeap<OctiNode>(comparator);
   Q.push(tmpNode);
   let found = 0;
+  sectionTime += performance.now() - start2;
   while (Q.size() > 0) {
     const u = Q.pop();
 
     // no no node with non infinty lenght remaining
     if (u.dist == Infinity) {
-      if (found > 0) return createPath(tmpNode, toSinks);
-
+      if (found > 0) {
+        totalTime += performance.now() - start1;
+        return createPath(tmpNode, toSinks);
+      }
       // fail if we haven't reached any of the to nodes
       else break;
     }
 
     if (toSinks.includes(u)) {
       found++;
-      if (toSinks.length == found)
+      if (toSinks.length == found) {
+        totalTime += performance.now() - start1;
         return createPath(tmpNode, toSinks);
+      }
     }
 
     u.edges.forEach(edge => {
@@ -64,6 +79,7 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
     });
   }
 
+  totalTime += performance.now() - start1;
   return [];
 }
 
