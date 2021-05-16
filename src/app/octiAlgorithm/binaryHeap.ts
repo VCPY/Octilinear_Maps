@@ -38,6 +38,10 @@ export class BinaryHeap<T> {
     this.siftUp(n!);
   }
 
+  has(element: T) {
+    return this.indexMapping.has(element)
+  }
+
   size() {
     return this.content.length;
   }
@@ -88,7 +92,6 @@ export class BinaryHeap<T> {
       idx = childIdx;
     }
   }
-
 
   private swap(idx1: number, idx2: number) {
     const tmp = this.content[idx1];

@@ -26,13 +26,11 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
   tmpNode.dist = 0;
   tmpNode.priority = 0;
 
-  let Q = new BinaryHeap<OctiNode>(comparator);// [tmpNode, ...graph.allNodes];
-  [tmpNode, ...graph.allNodes].forEach(n => Q.push(n));
 
+  let Q = new BinaryHeap<OctiNode>(comparator);
+  Q.push(tmpNode);
   let found = 0;
   while (Q.size() > 0) {
-    //TODO: replace with priority queue for better performance
-
     const u = Q.pop();
 
     // no no node with non infinty lenght remaining
@@ -52,12 +50,16 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
     u.edges.forEach(edge => {
       const v = edge.getNeighbourOf(u);
       const alt = u.dist + edge.weight;
+
       if (alt < v.dist) {
         v.dist = alt;
         v.priority = alt + heuristic(v, to);
         v.prev = u;
 
-        Q.update(v);
+        if (!Q.has(v))
+          Q.push(v);
+        else
+          Q.update(v);
       }
     });
   }
