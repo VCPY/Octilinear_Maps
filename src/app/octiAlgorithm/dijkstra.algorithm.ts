@@ -14,6 +14,11 @@ export function resetTime() {
   sectionTime = 0;
 }
 
+/** Optimization:
+ * store each node that gets modified in a dijkstra run, this allows us to reset only modified nodes and
+ * avoid iterating over all nodes at the start of each run. */
+let lastModified: OctiNode[] = [];
+
 /**
  * Calculates the set to set shortest path
  */
@@ -22,11 +27,12 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
 
   const toSinks = to.flatMap(toGridNode => toGridNode.getOctiNode(Constants.SINK));
 
-  graph.allNodes.forEach(node => {
+  lastModified.forEach(node => {
     node.dist = Infinity;
     node.priority = Infinity;
     node.prev = node;
   });
+  lastModified = [];
 
   // create a temporary node and add an each to each starting sink node
   const tmpNode = new OctiNode(from[0], -1);
@@ -41,6 +47,7 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
   Q.push(tmpNode);
   let found = 0;
   sectionTime += performance.now() - start2;
+
   while (Q.size() > 0) {
     const u = Q.pop();
 
@@ -71,8 +78,10 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
         v.priority = alt + heuristic(v, to);
         v.prev = u;
 
-        if (!Q.has(v))
+        if (!Q.has(v)) {
+          lastModified.push(v);
           Q.push(v);
+        }
         else
           Q.update(v);
       }

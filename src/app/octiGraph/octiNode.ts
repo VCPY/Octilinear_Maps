@@ -39,7 +39,7 @@ export class OctiNode {
   }
 
   // used for path finding
-  private _dist: number = 0;
+  private _dist: number = Infinity;
 
   get dist(): number {
     return this._dist;
@@ -49,7 +49,7 @@ export class OctiNode {
     this._dist = value;
   }
 
-  private _priority: number = 0;
+  private _priority: number = Infinity;
 
 
   get priority(): number {
