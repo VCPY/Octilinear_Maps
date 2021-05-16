@@ -11,15 +11,6 @@ import {InputEdge} from "../inputGraph/inputEdge";
 import {InputGraph} from "../inputGraph/inputGraph";
 import {parseOctiGraphForOutput, parsePathsForOutput} from "../outputGraph/outputNode";
 
-export class WorkerVariables {
-  static allowCrossing = false
-  static exactString: string[] = []
-  static startsWith: string[] = []
-  static notStartsWith: string[] = []
-  static endsWith: string[] = []
-  static notEndsWith: string[] = []
-}
-
 function extractInputgraph(data: any): InputGraph {
   // convert from plain js object to typescript object and set correct references
   let inputGraph: InputGraph = plainToClass(InputGraph, data);
@@ -36,77 +27,12 @@ function extractInputgraph(data: any): InputGraph {
   return inputGraph;
 }
 
-function filterInputGraph(inputGraph: InputGraph) {
-  //TODO: add other filters
-  if (WorkerVariables.exactString.length!=0){
-    inputGraph.edges = inputGraph.edges.filter(e => e.line[0] in WorkerVariables.exactString)
-  }
-
-  //TODO: AND/Or intuitive?
-  if (WorkerVariables.exactString.length!=0) {
-    inputGraph.edges = inputGraph.edges.filter(e => e.line[0] in WorkerVariables.exactString)
-  }
-  if (WorkerVariables.startsWith.length!=0){
-    inputGraph.edges = inputGraph.edges.filter(e => {
-      for (let i = 0; i < WorkerVariables.startsWith.length; i++) {
-        let value = WorkerVariables.startsWith[i]
-        if (e.line[0].startsWith(value)) {
-          return true
-        }
-      }
-      return false
-    })
-  }
-  if (WorkerVariables.endsWith.length!=0) {
-    inputGraph.edges = inputGraph.edges.filter(e => {
-      for (let i = 0; i < WorkerVariables.endsWith.length; i++) {
-        let value = WorkerVariables.endsWith[i]
-        if (e.line[0].endsWith(value)) {
-          return true
-        }
-      }
-      return false
-    })
-  }
-  if (WorkerVariables.notStartsWith.length!=0) {
-    inputGraph.edges = inputGraph.edges.filter(e => {
-      for (let i = 0; i < WorkerVariables.notStartsWith.length; i++) {
-        let value = WorkerVariables.notStartsWith[i]
-        if (e.line[0].startsWith(value)) {
-          return false
-        }
-      }
-      return true
-    })
-  }
-  if (WorkerVariables.notEndsWith.length!=0){
-    inputGraph.edges = inputGraph.edges.filter(e => {
-      for (let i = 0; i < WorkerVariables.notEndsWith.length; i++) {
-        let value = WorkerVariables.notEndsWith[i]
-        if (e.line[0].endsWith(value)) {
-          return false
-        }
-      }
-      return true
-    })
-  }
-
-
-  return inputGraph
-}
 
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] started");
   let graphData = data["graph"]
-  WorkerVariables.exactString = data["exactString"];
-  WorkerVariables.startsWith = data["startsWith"];
-  WorkerVariables.endsWith = data["endsWith"];
-  WorkerVariables.notStartsWith = data["notStartsWith"];
-  WorkerVariables.notEndsWith = data["notEndsWith"];
-  WorkerVariables.allowCrossing = data["allowCrossing"]
   let inputGraph = extractInputgraph(graphData);
-  inputGraph = filterInputGraph(inputGraph)
-  let algorithm = new AlgorithmWorker(inputGraph);
+  let algorithm = new AlgorithmWorker(inputGraph, data);
   let algoData = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
   let plainGraphData = parseOctiGraphForOutput(algoData[0] as OctiGraph);
   let plainPathData = parsePathsForOutput(algoData[1] as Map<InputEdge, OctiNode[]>);
@@ -126,8 +52,24 @@ class AlgorithmWorker {
   private readonly _octiGraph: OctiGraph;
   private readonly _graphOffset;
   private readonly _ignoreError = true;
+  private readonly allowCrossing = false
+  private readonly exactString: string[] = []
+  private readonly startsWith: string[] = []
+  private readonly notStartsWith: string[] = []
+  private readonly endsWith: string[] = []
+  private readonly notEndsWith: string[] = []
 
-  constructor(inputGraph: InputGraph) {
+  constructor(inputGraph: InputGraph, data: any) {
+
+    this.exactString = data["exactString"];
+    this.startsWith = data["startsWith"];
+    this.endsWith = data["endsWith"];
+    this.notStartsWith = data["notStartsWith"];
+    this.notEndsWith = data["notEndsWith"];
+    this.allowCrossing = data["allowCrossing"]
+
+    inputGraph = this.filterInputGraph(inputGraph)
+
     // prepare the input graph
     inputGraph.mergeEqualEdges();
     inputGraph.calculateNodeLineDegrees();
@@ -205,7 +147,7 @@ class AlgorithmWorker {
       path.map(node => node.gridNode)
         .forEach(node => {
           node.closeSinkEdge();
-          node.closeBendEdges(WorkerVariables.allowCrossing ? Constants.COST_CROSSING : Infinity);
+          node.closeBendEdges(this.allowCrossing ? Constants.COST_CROSSING : Infinity);
         });
 
       /* To prevent crossing paths at diagonal grid edges,
@@ -219,7 +161,7 @@ class AlgorithmWorker {
         if (octiEdge != undefined) {
           octiEdge.used = true;
           octiEdge.weight = Infinity;
-          this._octiGraph.closeDiagonalEdge(octiEdge)
+          this._octiGraph.closeDiagonalEdge(octiEdge, this.allowCrossing)
         }
       }
     });
@@ -295,6 +237,47 @@ class AlgorithmWorker {
     }
     // from, to
     return [ret1, ret2];
+  }
+
+  filterInputGraph(inputGraph: InputGraph) {
+    if (this.exactString.length != 0)
+      inputGraph.edges = inputGraph.edges.filter(e => e.line[0] in this.exactString)
+
+    if (this.startsWith.length != 0) {
+      inputGraph.edges = inputGraph.edges.filter(e => {
+        for (let i = 0; i < this.startsWith.length; i++) {
+          if (e.line[0].startsWith(this.startsWith[i])) return true
+        }
+        return false
+      })
+    }
+    if (this.endsWith.length != 0) {
+      inputGraph.edges = inputGraph.edges.filter(e => {
+        for (let i = 0; i < this.endsWith.length; i++) {
+          if (e.line[0].endsWith(this.endsWith[i])) return true
+        }
+        return false
+      })
+    }
+    if (this.notStartsWith.length != 0) {
+      inputGraph.edges = inputGraph.edges.filter(e => {
+        for (let i = 0; i < this.notStartsWith.length; i++) {
+          if (e.line[0].startsWith(this.notStartsWith[i])) return false
+        }
+        return true
+      })
+    }
+    if (this.notEndsWith.length != 0) {
+      inputGraph.edges = inputGraph.edges.filter(e => {
+        for (let i = 0; i < this.notEndsWith.length; i++) {
+          if (e.line[0].endsWith(this.notEndsWith[i])) return false
+        }
+        return true
+      })
+    }
+
+
+    return inputGraph
   }
 
   private getGrapCoordinates(station: Station): Vector2 {
