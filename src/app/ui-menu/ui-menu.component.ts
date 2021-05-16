@@ -240,14 +240,17 @@ export class DialogDataSelection {
   }
 
   increaseChoice() {
-    let id = this.filterIDs[this.filterIDs.length - 1] + 1
+    let id: number;
+    if (this.filterIDs.length==0){
+      id = 1
+    } else {
+      id = this.filterIDs[this.filterIDs.length - 1] + 1
+    }
     this.filterIDs.push(id)
     this.filterSelection.push("must not start")
   }
 
   removeElementFromFilterList(id: number) {
-    if (this.filterIDs.length == 1) return;
-
     for (let i = 0; i < this.filterIDs.length; i++) {
       if (this.filterIDs[i] == id) {
         this.filterIDs.splice(i, 1)
