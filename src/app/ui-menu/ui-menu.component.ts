@@ -5,6 +5,8 @@ import {AlgorithmService} from "../services/algorithm.service";
 import {Filters} from "../inputGraph/inputGraph.filter";
 import {InputGraph} from "../inputGraph/inputGraph";
 import {SelectionModel} from "@angular/cdk/collections";
+import vienna from "../saves/vienna.json"
+import {plainToClass} from "class-transformer";
 
 @Component({
   selector: 'app-ui-menu',
@@ -29,7 +31,7 @@ export class UiMenuComponent implements OnInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogDataSelection, {
-      width: "500px",
+      width: "1000px",
       data: "",
       autoFocus: false,
       maxHeight: '90vh' //you can adjust the value as per your view
@@ -48,7 +50,14 @@ export class UiMenuComponent implements OnInit {
         // TODO: Load the according input Graph
         switch (data) {
           case "Vienna":
-            let b = 0
+            //TODO: use filters
+            let graph = plainToClass(InputGraph, vienna)
+            Filters.startsWith = result["startWith"]
+            Filters.endsWith = result["endWith"]
+            Filters.notStartsWith = result["notStartWith"]
+            Filters.notEndsWith = result["notEndWith"]
+            console.log("Call 2")
+            this.algorithmService.perform(graph!)
             break;
           default:
             alert("Error: Data could not be found")
@@ -78,6 +87,8 @@ export class DialogDataSelection {
   displayedColumns: string[] = ["name", "visible"]
   lines: FilterLine[] = []
   selection = new SelectionModel<FilterLine>(true, []);
+  filterIDs = [1]
+  filterSelection: string[] = []
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
@@ -171,7 +182,17 @@ export class DialogDataSelection {
 
         this.firstPage = false
       })
+    } else {
+      this.inputGraph = plainToClass(InputGraph, vienna)
 
+      let lines: string[] = []
+      this.inputGraph.edges.forEach(edge => lines.push(...edge.line))
+      this.lines = Array.from(new Set(lines)).map(line => {
+        let obj = {name: line, visible: true}
+        this.selection.select(obj)
+        return obj
+      })
+      this.firstPage = false
     }
   }
 
@@ -184,7 +205,65 @@ export class DialogDataSelection {
         lines: acceptedLines
       })
     } else if (this.preparedDataSelection) {
-      this.dialogRef.close({selection: this.preparedDataSelection})
+      //this.dialogRef.close({selection: this.preparedDataSelection})
+      let startWith = [];
+      let endWith = [];
+      let notStartWith = [];
+      let notEndWith = []
+      for (let i = 0; i < this.filterIDs.length; i++) {
+        let element = this.filterIDs[i]
+        let input = (<HTMLInputElement>document.getElementById("input" + element))!.value;
+        input = input.replace(" ", "")
+        let inputArray = input.split(",")
+        let selection = this.filterSelection[i]
+        switch (selection) {
+          case "must not start":
+            notStartWith.push(...inputArray);
+            break;
+          case "must not end":
+            notEndWith.push(...inputArray);
+            break;
+          case "must start":
+            startWith.push(...inputArray);
+            break;
+          case "must end":
+            endWith.push(...inputArray);
+            break;
+        }
+      }
+
+      this.dialogRef.close({
+        selection: this.preparedDataSelection,
+          startWith: startWith, endWith: endWith, notEndWith: notEndWith, notStartWith: notStartWith
+      })
+    }
+  }
+
+  increaseChoice() {
+    let id = this.filterIDs[this.filterIDs.length - 1] + 1
+    this.filterIDs.push(id)
+    this.filterSelection.push("must not start")
+  }
+
+  removeElementFromFilterList(id: number) {
+    if (this.filterIDs.length == 1) return;
+
+    for (let i = 0; i < this.filterIDs.length; i++) {
+      if (this.filterIDs[i] == id) {
+        this.filterIDs.splice(i, 1)
+        break;
+      }
+    }
+  }
+
+  changeSelected(value: string, n: number) {
+    let a = 0
+    for (let i = 0; i < this.filterIDs.length; i++) {
+      let id = this.filterIDs[i]
+      if (id == n) {
+        this.filterSelection[i] = value
+        break;
+      }
     }
   }
 }

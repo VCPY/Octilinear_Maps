@@ -15,6 +15,8 @@ import {FormsModule} from "@angular/forms";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatTableModule} from "@angular/material/table";
+import {MatSelectModule} from "@angular/material/select";
+import {MatIconModule} from "@angular/material/icon";
 
 @NgModule({
   declarations: [
@@ -35,7 +37,9 @@ import {MatTableModule} from "@angular/material/table";
     FormsModule,
     MatProgressSpinnerModule,
     MatCheckboxModule,
-    MatTableModule
+    MatTableModule,
+    MatSelectModule,
+    MatIconModule
   ],
   providers: [{
     provide: MatDialogRef,
