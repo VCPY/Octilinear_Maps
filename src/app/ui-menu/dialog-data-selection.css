@@ -10,3 +10,16 @@
 .mat-table {
     overflow-y: scroll;
 }
+
+.filtersBox {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 20em;
+}
+
+.tableBox {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 30vh;
+    width: 100%;
+}

@@ -31,7 +31,7 @@
         <span>Select Filters</span>
     </mat-toolbar>
     <div style="display: flex; flex-flow: row">
-        <div style="overflow-y: scroll; overflow-x: hidden; height: 30vh; width: 100%">
+        <div class="tableBox">
             <table mat-table [dataSource]="lines" style="width: 100%" class="mat-elevation-z8">
 
                 <ng-container matColumnDef="name">
@@ -57,7 +57,7 @@
             <div style="margin-top: 1em; margin-bottom: 1em">
                 Multiple strings can be separated by ","
             </div>
-            <div style="overflow-y: scroll; overflow-x: hidden; height: 20em">
+            <div class="filtersBox">
                 <div *ngFor="let el of this.filterIDs"
                      style="justify-content: center; align-items:center; display: flex; flex-flow: row;">
                     <div>
