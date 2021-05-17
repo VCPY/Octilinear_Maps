@@ -84,8 +84,9 @@ export class DialogDataSelection {
   displayedColumns: string[] = ["name", "visible"]
   lines: FilterLine[] = []
   selection = new SelectionModel<FilterLine>(true, []);
-  filterIDs = [1]
-  filterSelection: string[] = []
+  filterIDs = [0]
+  filterSelection: string[] = ["must not start"]
+  filterInput: string[] = []
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
@@ -169,28 +170,24 @@ export class DialogDataSelection {
           parseGTFSToObjectArray(self.stops!, FileType.STOPS),
           parseGTFSToObjectArray(self.routes!, FileType.ROUTES),
           parseGTFSToObjectArray(self.stopTimes!, FileType.STOPTIMES)])
-        let lines: string[] = []
-        this.inputGraph.edges.forEach(edge => lines.push(...edge.line))
-        this.lines = Array.from(new Set(lines)).map(line => {
-          let obj = {name: line, visible: true}
-          this.selection.select(obj)
-          return obj
-        })
-
+        this.prepareTable()
         this.firstPage = false
       })
     } else {
       this.inputGraph = plainToClass(InputGraph, vienna)
-
-      let lines: string[] = []
-      this.inputGraph.edges.forEach(edge => lines.push(...edge.line))
-      this.lines = Array.from(new Set(lines)).map(line => {
-        let obj = {name: line, visible: true}
-        this.selection.select(obj)
-        return obj
-      })
+      this.prepareTable()
       this.firstPage = false
     }
+  }
+
+  private prepareTable() {
+    let lines: string[] = []
+    this.inputGraph!.edges.forEach(edge => lines.push(...edge.line))
+    this.lines = Array.from(new Set(lines)).map(line => {
+      let obj = {name: line, visible: true}
+      this.selection.select(obj)
+      return obj
+    })
   }
 
   sendData() {
@@ -209,8 +206,7 @@ export class DialogDataSelection {
       for (let i = 0; i < this.filterIDs.length; i++) {
         let element = this.filterIDs[i]
         let input = (<HTMLInputElement>document.getElementById("input" + element))!.value;
-        input = input.replace(" ", "")
-        let inputArray = input.split(",")
+        let inputArray = DialogDataSelection.getIndividualLines(input)
         let selection = this.filterSelection[i]
         switch (selection) {
           case "must not start":
@@ -237,11 +233,12 @@ export class DialogDataSelection {
 
   increaseChoice() {
     let id: number;
-    if (this.filterIDs.length == 0) id = 1
+    if (this.filterIDs.length == 0) id = 0
     else id = this.filterIDs[this.filterIDs.length - 1] + 1
 
     this.filterIDs.push(id)
     this.filterSelection.push("must not start")
+    this.filterInput.push("")
   }
 
   removeElementFromFilterList(id: number) {
@@ -261,6 +258,46 @@ export class DialogDataSelection {
         break;
       }
     }
+    this.updateSelection()
+  }
+
+  updateListByStrings(event: Event, el: number) {
+    this.filterInput[el] = (<HTMLInputElement>(event.target)!).value
+    this.updateSelection()
+  }
+
+  updateSelection() {
+    this.lines.forEach(line => {
+      let keep = true;
+      for (let i = 0; i < this.filterInput.length; i++) {
+        let input = DialogDataSelection.getIndividualLines(this.filterInput[i]);
+        if (input[0] == "") continue
+        input.forEach(str => {
+          let select = this.filterSelection[i];
+          switch (select) {
+            case "must not start":
+              if (line.name.startsWith(str)) keep = false;
+              break;
+            case "must not end":
+              if (line.name.endsWith(str)) keep = false;
+              break;
+            case "must start":
+              if (!line.name.startsWith(str)) keep = false;
+              break;
+            case "must end":
+              if (!line.name.endsWith(str)) keep = false;
+              break;
+          }
+        })
+      }
+      if (!keep) this.selection.deselect(line)
+      else this.selection.select(line)
+    })
+  }
+
+  private static getIndividualLines(input: string) {
+    input = input.replace(" ", "")
+    return input.split(",")
   }
 }
 
