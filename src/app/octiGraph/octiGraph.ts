@@ -144,10 +144,10 @@ export class OctiGraph {
     return undefined;
   }
 
-  closeDiagonalEdge(edge: OctiEdge) {
+  closeDiagonalEdge(edge: OctiEdge, allowCrossing: boolean) {
     const diagonal = this.getDiagonal(edge);
     if (diagonal != undefined) {
-      if (Constants.ALLOW_CROSSING)
+      if (allowCrossing)
         diagonal.weight = Constants.COST_CROSSING;
       else
         diagonal.weight = Infinity;

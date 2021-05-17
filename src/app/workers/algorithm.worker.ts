@@ -263,7 +263,7 @@ class AlgorithmWorker {
       if (octiEdge != undefined) {
         octiEdge.used = true;
         octiEdge.weight = Infinity;
-        this._octiGraph.closeDiagonalEdge(octiEdge)
+        this._octiGraph.closeDiagonalEdge(octiEdge, this.allowCrossing)
       }
     }
   }

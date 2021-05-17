@@ -271,23 +271,21 @@ export class DialogDataSelection {
       for (let i = 0; i < this.filterInput.length; i++) {
         let input = DialogDataSelection.getIndividualLines(this.filterInput[i]);
         if (input[0] == "") continue
-        input.forEach(str => {
-          let select = this.filterSelection[i];
-          switch (select) {
-            case "must not start":
-              if (line.name.startsWith(str)) keep = false;
-              break;
-            case "must not end":
-              if (line.name.endsWith(str)) keep = false;
-              break;
-            case "must start":
-              if (!line.name.startsWith(str)) keep = false;
-              break;
-            case "must end":
-              if (!line.name.endsWith(str)) keep = false;
-              break;
-          }
-        })
+        let select = this.filterSelection[i];
+        switch (select) {
+          case "must not start":
+            if (input.some(v => line.name.startsWith(v))) keep = false;
+            break;
+          case "must not end":
+            if (input.some(v => line.name.endsWith(v))) keep = false;
+            break;
+          case "must start":
+            if (!input.some(v => line.name.startsWith(v))) keep = false;
+            break;
+          case "must end":
+            if (!input.some(v => line.name.endsWith(v))) keep = false;
+            break;
+        }
       }
       if (!keep) this.selection.deselect(line)
       else this.selection.select(line)
