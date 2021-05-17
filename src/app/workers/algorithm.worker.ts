@@ -283,7 +283,7 @@ class AlgorithmWorker {
 
     this.removeAllRoutingsTo(station);
 
-    if (allReRoutings.length == 0) throw new Error("No rerouting found");
+    if (allReRoutings.length == 0) return;
 
     const best = allReRoutings.reduce((a, b) => a.cost < b.cost ? a : b);
     //console.log(station.stationName, "offset by", best.x, best.y);
@@ -340,6 +340,7 @@ class AlgorithmWorker {
     const foundLocal = new Map<InputEdge, OctiNode[]>();
     // reroute all edges
     station.edgeOrdering.forEach(otherStation => {
+      if (!this._settledStations.has(otherStation)) return;
       const otherGridNode = this._settledStations.get(otherStation) as GridNode;
 
       const path = this.routePath(candidateGirdNode, otherGridNode, station, otherStation);
