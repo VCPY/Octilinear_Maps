@@ -79,7 +79,8 @@
                         </mat-form-field>
                     </div>
                     <div style="margin-left: 1em">
-                        <input id="{{'input' + el}}" placeholder="Enter string" value="">
+                        <input id="{{'input' + el}}" (change)="updateListByStrings($event,el)" placeholder="Enter string"
+                               value="">
                     </div>
                     <button id="{{'button' + el}}"
                             style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px"
