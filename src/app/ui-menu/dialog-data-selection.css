@@ -4,7 +4,8 @@
 
 .selectButtonDiv {
     display: flex;
-    flex-flow: row-reverse
+    flex-flow: row-reverse;
+    align-items: center;
 }
 
 .mat-table {
@@ -22,4 +23,10 @@
     overflow-x: hidden;
     height: 30vh;
     width: 100%;
+}
+
+.loadingDataBox {
+    display: flex;
+    flex-flow: row;
+    margin-right: 1em
 }

@@ -18,10 +18,18 @@
         <hr>
         <div>
             <h2>Upload Data</h2>
-            <div>TODO: add disclaimer about content</div>
+            <div style="margin-bottom: 1em">The upload takes a directory containing files in GTFS format as input. The
+                directory must contain the following files:<br/>
+                'stop_times.txt', 'stops.txt', 'trips.txt', 'routes.txt'
+            </div>
             <input #folderInput type="file" webkitdirectory mozdirectory (change)="saveFiles(folderInput.files)"/>
+
             <div class="selectButtonDiv">
                 <button mat-raised-button (click)="sendUploadedFiles()">Select</button>
+                <div *ngIf="showLoadingData" class="loadingDataBox">
+                    <div style="margin-right: 1em">Loading, please wait ...</div>
+                    <mat-spinner mode="indeterminate" [diameter]="20"></mat-spinner>
+                </div>
             </div>
         </div>
     </div>
@@ -79,7 +87,8 @@
                         </mat-form-field>
                     </div>
                     <div style="margin-left: 1em">
-                        <input id="{{'input' + el}}" (change)="updateListByStrings($event,el)" placeholder="Enter string"
+                        <input id="{{'input' + el}}" (change)="updateListByStrings($event,el)"
+                               placeholder="Enter string"
                                value="">
                     </div>
                     <button id="{{'button' + el}}"

@@ -60,18 +60,10 @@ class AlgorithmWorker {
   private readonly _cachedInputEdges = new Map<Station, InputEdge[]>();
   private readonly allowCrossing = false
   private readonly exactString: string[] = []
-  private readonly startsWith: string[] = []
-  private readonly notStartsWith: string[] = []
-  private readonly endsWith: string[] = []
-  private readonly notEndsWith: string[] = []
 
   constructor(inputGraph: InputGraph, data: any) {
 
     this.exactString = data["exactString"];
-    this.startsWith = data["startsWith"];
-    this.endsWith = data["endsWith"];
-    this.notStartsWith = data["notStartsWith"];
-    this.notEndsWith = data["notEndsWith"];
     this.allowCrossing = data["allowCrossing"]
 
     inputGraph = this.filterInputGraph(inputGraph)
@@ -227,42 +219,7 @@ class AlgorithmWorker {
 
   filterInputGraph(inputGraph: InputGraph) {
     if (this.exactString.length != 0)
-      inputGraph.edges = inputGraph.edges.filter(e => e.line[0] in this.exactString)
-
-    if (this.startsWith.length != 0) {
-      inputGraph.edges = inputGraph.edges.filter(e => {
-        for (let i = 0; i < this.startsWith.length; i++) {
-          if (e.line[0].startsWith(this.startsWith[i])) return true
-        }
-        return false
-      })
-    }
-    if (this.endsWith.length != 0) {
-      inputGraph.edges = inputGraph.edges.filter(e => {
-        for (let i = 0; i < this.endsWith.length; i++) {
-          if (e.line[0].endsWith(this.endsWith[i])) return true
-        }
-        return false
-      })
-    }
-    if (this.notStartsWith.length != 0) {
-      inputGraph.edges = inputGraph.edges.filter(e => {
-        for (let i = 0; i < this.notStartsWith.length; i++) {
-          if (e.line[0].startsWith(this.notStartsWith[i])) return false
-        }
-        return true
-      })
-    }
-    if (this.notEndsWith.length != 0) {
-      inputGraph.edges = inputGraph.edges.filter(e => {
-        for (let i = 0; i < this.notEndsWith.length; i++) {
-          if (e.line[0].endsWith(this.notEndsWith[i])) return false
-        }
-        return true
-      })
-    }
-
-
+      inputGraph.edges = inputGraph.edges.filter(e => this.exactString.some(x => x === e.line[0]))
     return inputGraph
   }
 
