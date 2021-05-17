@@ -19,31 +19,7 @@ export class Constants {
   static readonly COST_HOP = 6;
   static readonly COST_HOP_DIAGONAL = 9;
   static readonly COST_CROSSING = 20;
-  static ALLOW_CROSSING = false;
-
-  static octiGraph: { internalGraph: any, internalPaths: any, aListener: any, graph: any, paths: any, registerListener: (path: any) => void } = {
-    internalGraph: undefined,
-    internalPaths: undefined,
-    aListener: function (graph: any, paths: any) {
-    },
-    set graph(val) {
-      this.internalGraph = val;
-      this.aListener(this.internalGraph, this.internalPaths);
-    },
-    get graph() {
-      return this.internalGraph;
-    },
-    set paths(val) {
-      this.internalPaths = val;
-      this.aListener(this.internalGraph, this.internalPaths);
-    },
-    get paths() {
-      return this.internalGraph;
-    },
-    registerListener: function (listener: any) {
-      this.aListener = listener;
-    }
-  }
+  static ALLOW_CROSSING = true;
 
   static fixIndex(index: number) {
     if (index < 0) index += 8;

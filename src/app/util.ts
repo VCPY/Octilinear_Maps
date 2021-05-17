@@ -5,3 +5,13 @@ export function calculateAngleBetweenVectors(p1: number[], p2: number[]) {
 
   return angle;
 }
+
+export class Vector2 {
+  public x: number;
+  public y: number;
+
+  constructor(x: number = 0, y: number = 0) {
+    this.x = x;
+    this.y = y;
+  }
+}

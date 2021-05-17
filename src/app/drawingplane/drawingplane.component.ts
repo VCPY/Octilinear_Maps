@@ -1,11 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {OutputGraph} from "../outputGraph/outputGraph";
 import * as d3 from 'd3';
-import {plainToClass} from "class-transformer";
-import {Constants} from "../octiGraph/constants";
-import {OctiNode} from "../octiGraph/octiNode";
-import {InputEdge} from "../inputGraph/inputEdge";
-import {OutputNode} from "../outputGraph/outputNode";
+import {AlgorithmService} from "../services/algorithm.service";
+import {OutputEdge} from "../outputGraph/outputEdge";
+import {Vector2} from "../util";
+import {OutputStation} from "../outputGraph/outputStation";
 
 @Component({
   selector: 'app-drawingplane',
@@ -22,60 +21,33 @@ export class DrawingplaneComponent implements OnInit {
   planeWidth = 3000;
   planeHeight = 3000;
 
-  constructor() {
-  }
-
-  private static getGridID(id: number): number {
-    return parseFloat(("" + id).slice(0, -1) + "0");
+  constructor(private algorithmService: AlgorithmService) {
   }
 
   ngOnInit(): void {
-    Constants.octiGraph.registerListener(this.callback.bind(this));
+    this.algorithmService.OnReceivedResult.subscribe(o => this.callback(o));
   }
 
-  callback(graph: Object, paths: Map<InputEdge, OctiNode[]>) {
-    if (graph != undefined && paths != undefined) {
-      let octiGraph = plainToClass(OutputGraph, graph) as OutputGraph;
-      this.planeWidth = octiGraph.width * this.gapFactor + this.planeXOffset;
-      this.planeHeight = octiGraph.height * this.gapFactor + this.planeYOffset;
+  callback(outputGraph: OutputGraph) {
+    this.planeWidth = outputGraph.width * this.gapFactor + this.planeXOffset;
+    this.planeHeight = outputGraph.height * this.gapFactor + this.planeYOffset;
 
-      this.svg = d3.select("#drawingPlaneSVG").append("svg")
-        .attr("width", this.planeWidth)
-        .attr("height", this.planeHeight)
-        .append("g");
-      this.drawPaths(paths, octiGraph);
-    }
+    this.svg = d3.select("#drawingPlaneSVG").append("svg")
+      .attr("width", this.planeWidth)
+      .attr("height", this.planeHeight)
+      .append("g");
+
+    this.drawPaths(outputGraph);
   }
 
-  private drawPaths(paths: Map<InputEdge, OctiNode[]>, graph: OutputGraph) {
-    let stations = new Set<OutputNode>();
-    paths.forEach((value, key) => {
-      value = plainToClass(OctiNode, value);
-      key = plainToClass(InputEdge, key);
-
-      let firstPointID = DrawingplaneComponent.getGridID(value[0].id);
-      let lastPointID = DrawingplaneComponent.getGridID(value[value.length - 1].id);
-      let firstPoint = graph.getGridNodeById(firstPointID) as OutputNode;
-      let lastPoint = graph.getGridNodeById(lastPointID) as OutputNode;
-      stations.add(firstPoint);
-      stations.add(lastPoint);
-      this.drawLines(key, value, graph);
+  private drawPaths(outputGraph: OutputGraph) {
+    outputGraph.paths.forEach(path => {
+      this.drawLines(path);
     });
-    this.drawMainStations(stations)
+    this.drawMainStations(outputGraph.stations);
   }
 
-  private drawLines(edge: InputEdge, pathArray: OctiNode[], graph: OutputGraph) {
-    let lines: IntermediateStation[] = [];
-    for (let i = 0; i < pathArray.length - 1; i++) {
-      let one = DrawingplaneComponent.getGridID(pathArray[i].id);
-      let two = DrawingplaneComponent.getGridID(pathArray[i + 1].id);
-      if (one == two) continue;
-
-      let oneNode = graph.getGridNodeById(one) as OutputNode;
-      let twoNode = graph.getGridNodeById(two) as OutputNode;
-      lines.push(new IntermediateStation(oneNode.x, oneNode.y));
-      lines.push(new IntermediateStation(twoNode.x, twoNode.y));
-    }
+  private drawLines(edge: OutputEdge) {
 
     let self = this;
     let line = d3.line()
@@ -88,7 +60,7 @@ export class DrawingplaneComponent implements OnInit {
       .curve(d3.curveLinear);
 
     let lineSVG = this.svg.selectAll(".line")
-      .data([lines])
+      .data([edge.points])
       .enter();
 
     let path = lineSVG.append("path")
@@ -131,53 +103,43 @@ export class DrawingplaneComponent implements OnInit {
       });*/
   }
 
-  private drawMainStations(nodes: Set<OutputNode>) {
+  private drawMainStations(stations: OutputStation[]) {
     let circ = this.svg.selectAll(".dot")
       .append('g')
-      .data(nodes)
+      .data(stations)
       .enter();
 
     circ.append('circle')
-      .attr('cx', (node: OutputNode) => this.planeXPosition(node))
-      .attr('cy', (node: OutputNode) => this.planeYPosition(node))
+      .attr('cx', (s: OutputStation) => this.planeXPosition(s.position))
+      .attr('cy', (s: OutputStation) => this.planeYPosition(s.position))
       .attr('r', 10)
       .style('fill', 'black');
 
     circ.append("text")
       .attr("dx", 12)
       .attr("dy", ".35em")
-      .attr("transform", (node: OutputNode) => {
-        return "translate(" + this.planeXPosition(node) + "," + this.planeYPosition(node) + ") rotate(-30)";
+      .attr("transform", (station: OutputStation) => {
+        return "translate(" + this.planeXPosition(station.position) + "," + this.planeYPosition(station.position) + ") rotate(-30)";
       })
 
-      .text((node: OutputNode) => {
-        return node.stationName;
+      .text((station: OutputStation) => {
+        return station.name;
       });
   }
 
-  private planeXPosition(node: OutputNode) {
-    return (node.x * this.gapFactor) + this.planeXOffset;
+  private planeXPosition(position: Vector2) {
+    return (position.x * this.gapFactor) + this.planeXOffset;
   }
 
-  private planeXPosition2(node: IntermediateStation) {
-    return (node.x * 50) + this.planeXOffset;
+  private planeXPosition2(position: Vector2) {
+    return (position.x * 50) + this.planeXOffset;
   }
 
-  private planeYPosition(node: OutputNode) {
-    return this.planeHeight - ((node.y * this.gapFactor) + this.planeYOffset);
+  private planeYPosition(position: Vector2) {
+    return this.planeHeight - ((position.y * this.gapFactor) + this.planeYOffset);
   }
 
-  private planeYPosition2(node: IntermediateStation) {
-    return (node.y * 50) + this.planeXOffset;
-  }
-}
-
-class IntermediateStation {
-  x: number = -1;
-  y: number = -1;
-
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
+  private planeYPosition2(position: Vector2) {
+    return (position.y * 50) + this.planeXOffset;
   }
 }

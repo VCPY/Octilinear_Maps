@@ -9,7 +9,10 @@ import {GridNode} from "../octiGraph/gridNode";
 import {Station} from "../inputGraph/station";
 import {InputEdge} from "../inputGraph/inputEdge";
 import {InputGraph} from "../inputGraph/inputGraph";
-import {parseOctiGraphForOutput, parsePathsForOutput} from "../outputGraph/outputNode";
+import {Vector2} from "../util";
+import {OutputGraph} from "../outputGraph/outputGraph";
+import {OutputEdge} from "../outputGraph/outputEdge";
+import {OutputStation} from "../outputGraph/outputStation";
 
 function extractInputgraph(data: any): InputGraph {
   // convert from plain js object to typescript object and set correct references
@@ -32,12 +35,10 @@ addEventListener('message', ({data}) => {
   let inputGraph = extractInputgraph(data);
   let algorithm = new AlgorithmWorker(inputGraph);
   console.log("[algorithm-worker] starting algorithm")
-  let algoData = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
+  const outputGraph = algorithm.performAlgorithm(algo.orderEdges(inputGraph));
   console.log("[algorithm-worker] creating output graph");
-  let plainGraphData = parseOctiGraphForOutput(algoData[0] as OctiGraph);
-  let plainPathData = parsePathsForOutput(algoData[1] as Map<InputEdge, OctiNode[]>);
   console.log("[algorithm-worker] finished");
-  postMessage([plainGraphData, plainPathData]);
+  postMessage(outputGraph);
 });
 
 class AlgorithmWorker {
@@ -134,7 +135,7 @@ class AlgorithmWorker {
 
     dijkstra.resetTime();
     console.log("Total time in dijkstra:", dijkstra.totalTime, "section time:", dijkstra.sectionTime);
-    return [this._octiGraph, this._foundPaths];
+    return this.createOutputGraph();
   }
 
   private isSettled(from: GridNode[]): boolean {
@@ -405,14 +406,23 @@ class AlgorithmWorker {
       (station.longitude - this._graphOffset[0]) / this.D,
       (station.latitude - this._graphOffset[1]) / this.D);
   }
-}
 
-class Vector2 {
-  public x: number;
-  public y: number;
+  private createOutputGraph(): OutputGraph {
+    const stations: OutputStation[] = [];
+    this._settledStations.forEach((node, station) => {
+      stations.push(new OutputStation(new Vector2(node.x, node.y), station.stationName));
+    });
 
-  constructor(x: number = 0, y: number = 0) {
-    this.x = x;
-    this.y = y;
+    const paths: OutputEdge[] = [];
+    this._foundPaths.forEach((nodes, edge) => {
+
+      // remove grid nodes that occure multiple times
+      const uniqueGridNodes = [...new Set(nodes.map(n => n.gridNode))];
+      const points = uniqueGridNodes.map(n => new Vector2(n.x, n.y));
+
+      paths.push(new OutputEdge(points, edge.line, edge.inBetweenStations))
+    });
+
+    return new OutputGraph(this._octiGraph.width, this._octiGraph.height, stations, paths);
   }
 }
