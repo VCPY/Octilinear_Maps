@@ -93,7 +93,13 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
 }
 
 function heuristic(from: OctiNode, to: GridNode[]): number {
-  return Constants.COST_HOP * Math.min(...to.map(toNode => dist(from.gridNode, toNode) - 1));
+  let min = Infinity;
+  to.forEach(toNode => {
+    const h = dist(from.gridNode, toNode) - 1;
+    if (h < min) min = h;
+  })
+
+  return Constants.COST_HOP * min;
 }
 
 function dist(from: GridNode, to:GridNode): number {
