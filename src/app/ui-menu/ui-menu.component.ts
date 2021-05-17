@@ -38,7 +38,6 @@ export class UiMenuComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      let self = this
       let data = result["inputGraph"]
       if (data != undefined) {
         this.inputGraph = data
@@ -50,13 +49,11 @@ export class UiMenuComponent implements OnInit {
         // TODO: Load the according input Graph
         switch (data) {
           case "Vienna":
-            //TODO: use filters
             let graph = plainToClass(InputGraph, vienna)
             Filters.startsWith = result["startWith"]
             Filters.endsWith = result["endWith"]
             Filters.notStartsWith = result["notStartWith"]
             Filters.notEndsWith = result["notEndWith"]
-            console.log("Call 2")
             this.algorithmService.perform(graph!)
             break;
           default:
@@ -205,7 +202,6 @@ export class DialogDataSelection {
         lines: acceptedLines
       })
     } else if (this.preparedDataSelection) {
-      //this.dialogRef.close({selection: this.preparedDataSelection})
       let startWith = [];
       let endWith = [];
       let notStartWith = [];
@@ -234,18 +230,16 @@ export class DialogDataSelection {
 
       this.dialogRef.close({
         selection: this.preparedDataSelection,
-          startWith: startWith, endWith: endWith, notEndWith: notEndWith, notStartWith: notStartWith
+        startWith: startWith, endWith: endWith, notEndWith: notEndWith, notStartWith: notStartWith
       })
     }
   }
 
   increaseChoice() {
     let id: number;
-    if (this.filterIDs.length==0){
-      id = 1
-    } else {
-      id = this.filterIDs[this.filterIDs.length - 1] + 1
-    }
+    if (this.filterIDs.length == 0) id = 1
+    else id = this.filterIDs[this.filterIDs.length - 1] + 1
+
     this.filterIDs.push(id)
     this.filterSelection.push("must not start")
   }
@@ -260,7 +254,6 @@ export class DialogDataSelection {
   }
 
   changeSelected(value: string, n: number) {
-    let a = 0
     for (let i = 0; i < this.filterIDs.length; i++) {
       let id = this.filterIDs[i]
       if (id == n) {
