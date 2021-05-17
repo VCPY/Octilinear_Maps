@@ -31,6 +31,7 @@ export class UiMenuComponent implements OnInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogDataSelection, {
+      disableClose: true,
       width: "1000px",
       data: "",
       autoFocus: false,
@@ -191,6 +192,7 @@ export class DialogDataSelection {
 
   sendData() {
     Filters.setCrossing(this.allowCrossing)
+    this.updateSelection()
     if (this.uploadedFiles) {
       let acceptedLines = this.selection.selected.map(selection => selection.name)
       this.dialogRef.close({
