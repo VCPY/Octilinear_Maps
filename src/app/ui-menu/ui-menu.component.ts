@@ -50,10 +50,7 @@ export class UiMenuComponent implements OnInit {
         switch (data) {
           case "Vienna":
             let graph = plainToClass(InputGraph, vienna)
-            Filters.startsWith = result["startWith"]
-            Filters.endsWith = result["endWith"]
-            Filters.notStartsWith = result["notStartWith"]
-            Filters.notEndsWith = result["notEndWith"]
+            Filters.exactString.push(...result["lines"])
             this.algorithmService.perform(graph!)
             break;
           default:
@@ -76,10 +73,6 @@ export class DialogDataSelection {
   preparedDataSelection = undefined
   firstPage: boolean = true
   allowCrossing: boolean = true;
-  stops: string | undefined = undefined
-  stopTimes: string | undefined = undefined
-  trips: string | undefined = undefined
-  routes: string | undefined = undefined
   inputGraph: InputGraph | undefined = undefined
   displayedColumns: string[] = ["name", "visible"]
   lines: FilterLine[] = []
@@ -87,6 +80,7 @@ export class DialogDataSelection {
   filterIDs = [0]
   filterSelection: string[] = ["must not start"]
   filterInput: string[] = []
+  showLoadingData = false;
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
@@ -101,6 +95,7 @@ export class DialogDataSelection {
 
   sendUploadedFiles() {
     if (this.uploadedFiles) {
+      this.showLoadingData = true;
       let keys = Object.keys(this.uploadedFiles)
       let amount = 0
       keys.forEach((key: any) => {
@@ -144,33 +139,37 @@ export class DialogDataSelection {
     let self = this
     if (this.uploadedFiles) {
       let promises: any = []
-
       let keys = Object.keys(this.uploadedFiles)
+      let stops = ""
+      let trips = ""
+      let routes = ""
+      let stopTimes = ""
       keys.forEach((key: string) => {
         // @ts-ignore
         let file = this.uploadedFiles![key]
         switch (file.name) {
           case "trips.txt":
-            promises.push(file.text().then((text: string) => self.trips = text))
+            promises.push(file.text().then((text: string) => trips = text))
             break;
           case "stops.txt":
-            promises.push(file.text().then((text: string) => self.stops = text))
+            promises.push(file.text().then((text: string) => stops = text))
             break;
           case "routes.txt":
-            promises.push(file.text().then((text: string) => self.routes = text))
+            promises.push(file.text().then((text: string) => routes = text))
             break;
           case "stop_times.txt":
-            promises.push(file.text().then((text: string) => self.stopTimes = text))
+            promises.push(file.text().then((text: string) => stopTimes = text))
             break;
           default: //Ignore
         }
       })
       Promise.all(promises).then(_ => {
-        this.inputGraph = parseDataToInputGraph([parseGTFSToObjectArray(self.trips!, FileType.TRIPS),
-          parseGTFSToObjectArray(self.stops!, FileType.STOPS),
-          parseGTFSToObjectArray(self.routes!, FileType.ROUTES),
-          parseGTFSToObjectArray(self.stopTimes!, FileType.STOPTIMES)])
+        this.inputGraph = parseDataToInputGraph([parseGTFSToObjectArray(trips!, FileType.TRIPS),
+          parseGTFSToObjectArray(stops!, FileType.STOPS),
+          parseGTFSToObjectArray(routes!, FileType.ROUTES),
+          parseGTFSToObjectArray(stopTimes!, FileType.STOPTIMES)])
         this.prepareTable()
+        this.showLoadingData = false;
         this.firstPage = false
       })
     } else {
@@ -223,10 +222,10 @@ export class DialogDataSelection {
             break;
         }
       }
-
+      let acceptedLines = this.selection.selected.map(selection => selection.name)
       this.dialogRef.close({
         selection: this.preparedDataSelection,
-        startWith: startWith, endWith: endWith, notEndWith: notEndWith, notStartWith: notStartWith
+        lines: acceptedLines
       })
     }
   }

@@ -28,10 +28,6 @@ export class AlgorithmService {
       graph: inputGraph,
       allowCrossing: Filters.ALLOWCROSSING,
       exactString: Filters.exactString,
-      startsWith: Filters.startsWith,
-      endsWith: Filters.endsWith,
-      notStartsWith: Filters.notStartsWith,
-      notEndsWith: Filters.notEndsWith
     });
 
   }
