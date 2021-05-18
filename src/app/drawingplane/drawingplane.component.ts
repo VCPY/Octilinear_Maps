@@ -46,7 +46,7 @@ export class DrawingplaneComponent implements OnInit {
       this.drawLines(path);
     });
     this.drawMainStations(outputGraph.stations);
-    this.hideSpinner= true;
+    this.hideSpinner = true;
   }
 
   private drawLines(edge: OutputEdge) {
@@ -82,6 +82,7 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   private drawIntermediateStations(nodes: Array<[SVGPoint, string]>) {
+    let that = this;
     let circ = this.svg.selectAll(".interDot")
       .append('g')
       .data(nodes)
@@ -92,17 +93,41 @@ export class DrawingplaneComponent implements OnInit {
       .attr('cy', (p: [SVGPoint, string]) => p[0].y)
       .attr('r', 5)
       .style('fill', 'white')
-      .style('stroke', 'black');
+      .style('stroke', 'black')
+      .on('mouseover', (event: any, element: any) => {
+        let bar = that.svg.append("g")
+          .attr("transform", function (d: any, i: any) {
+            return "translate(0," + i * 50 + ")";
+          })
 
-    // Use if the intermediate stations should be labeled
-    /*circ.append("text")
-      .attr("dx", 12)
-      .attr("dy", ".35em")
-      .attr('x', (p: [SVGPoint, string]) => p[0].x)
-      .attr('y', (p: [SVGPoint, string]) => p[0].y)
-      .text((p:  [SVGPoint, string]) => {
-        return p[1];
-      });*/
+        let text = bar.append("text")
+          .attr("class", "label")
+          .style("text-anchor", "middle")
+          .attr("x", d3.pointer(event)[0] + 50)
+          .attr("y", d3.pointer(event)[1] - 10)
+          .text((d: any, i: any) => {
+            return element[1]
+          })
+
+        let bbox = text.node().getBBox()
+        bar.insert("rect", "text")
+          .attr("rx", 6)
+          .attr("ry", 6)
+          .attr("x", bbox.x - 2.5)
+          .attr("y", bbox.y - 2.5)
+          .attr("fill", "#ACFFA8")
+          .attr("width", bbox.width + 5)
+          .attr("height", bbox.height + 5)
+          .attr("padding", 20)
+          .attr("opacity", 1);
+
+
+      })
+      .on("mouseout", function (d: any, i: any) {
+        that.svg.selectAll("text.label").remove();
+        that.svg.selectAll("rect").remove();
+      })
+    ;
   }
 
   private drawMainStations(stations: OutputStation[]) {
