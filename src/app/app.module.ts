@@ -17,6 +17,7 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatTableModule} from "@angular/material/table";
 import {MatSelectModule} from "@angular/material/select";
 import {MatIconModule} from "@angular/material/icon";
+import {ColorPickerModule} from "ngx-color-picker";
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import {MatIconModule} from "@angular/material/icon";
     MatCheckboxModule,
     MatTableModule,
     MatSelectModule,
-    MatIconModule
+    MatIconModule,
+    ColorPickerModule
   ],
   providers: [{
     provide: MatDialogRef,

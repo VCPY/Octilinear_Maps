@@ -5,7 +5,8 @@ export class InputEdge {
     this._line.push(line);
     this._station1 = station1;
     this._station2 = station2;
-    this._color = color.length < 6 ? "#000000" : color;
+    if (color == undefined) this._color = "#000000"
+    else this._color = color.length < 6 ? "#000000" : color;
   }
 
   private _station1: Station;

@@ -21,6 +21,8 @@ export class DrawingplaneComponent implements OnInit {
   planeWidth = 3000;
   planeHeight = 3000;
   hideSpinner: boolean = false;
+  colors: { [id: string]: string } = {}
+  keys: string[] = []
 
   constructor(private algorithmService: AlgorithmService) {
   }
@@ -30,8 +32,9 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   callback(outputGraph: OutputGraph) {
-    this.planeWidth = outputGraph.width * this.gapFactor + this.planeXOffset;
-    this.planeHeight = outputGraph.height * this.gapFactor + this.planeYOffset;
+    this.calculatePlaneSize(outputGraph);
+    this.createColorPicker(outputGraph)
+    this.keys = Object.keys(this.colors)
 
     this.svg = d3.select("#drawingPlaneSVG").append("svg")
       .attr("width", this.planeWidth)
@@ -63,6 +66,7 @@ export class DrawingplaneComponent implements OnInit {
       .data([edge.points])
       .enter().append("path")
       .attr("d", line)
+      .attr("class", "lineclass" + edge.lines[0])
       .style("fill", "none")
       .style("stroke-width", "2px")
       .style("stroke", edge.color)
@@ -98,7 +102,8 @@ export class DrawingplaneComponent implements OnInit {
             .style("fill", "none")
             .style("class", "hello")
             .style("stroke-width", "2px")
-            .style("stroke", "red")
+            .style("stroke", edge.color)
+            .attr("class", "lineclass" + edge.lines[j])
             .attr("x1", this.planeXPosition2(data[0]) + offsetX)
             .attr("y1", this.planeYPosition(data[0]) + offsetY)
             .attr("x2", this.planeXPosition2(data[1]) + offsetX)
@@ -203,8 +208,7 @@ export class DrawingplaneComponent implements OnInit {
       .on("mouseout", function (d: any, i: any) {
         that.svg.selectAll("text.label").remove();
         that.svg.selectAll("rect").remove();
-      })
-    ;
+      });
   }
 
   private drawMainStations(stations: OutputStation[]) {
@@ -245,5 +249,57 @@ export class DrawingplaneComponent implements OnInit {
 
   private planeYPosition2(position: Vector2) {
     return (position.y * 50) + this.planeXOffset;
+  }
+
+  changeColor(event: string, el: string) {
+    d3.selectAll(".lineclass" + el)
+      .style("stroke", event)
+  }
+
+  private calculatePlaneSize(outputGraph: OutputGraph) {
+    let min_x = outputGraph.width
+    let min_y = outputGraph.height
+    let max_x = -1
+    let max_y = -1
+    outputGraph.paths.forEach(path => {
+        path.points.forEach(point => {
+          min_x = Math.min(min_x, point.x)
+          max_x = Math.max(max_x, point.x)
+          min_y = Math.min(min_y, point.y)
+          max_y = Math.max(max_y, point.y)
+        })
+      }
+    )
+    outputGraph.stations.forEach(station => {
+      min_x = Math.min(min_x, station.position.x)
+      max_x = Math.max(max_x, station.position.x)
+      min_y = Math.min(min_y, station.position.y)
+      max_y = Math.max(max_y, station.position.y)
+    })
+
+    this.planeHeight = ((2 + max_y) - min_y) * this.gapFactor + this.planeYOffset;
+    this.planeWidth = ((2 + max_x) - min_x) * this.gapFactor + this.planeXOffset
+
+    outputGraph.paths.forEach(path => {
+        path.points.forEach(point => {
+          point.y = point.y - min_y
+          point.x = point.x - min_x
+        })
+      }
+    )
+    outputGraph.stations.forEach(station => {
+      station.position.y = station.position.y - min_y
+      station.position.x = station.position.x - min_x
+    })
+  }
+
+  private createColorPicker(outputGraph: OutputGraph) {
+    let result: any = {};
+    outputGraph.paths.forEach(path => {
+      path.lines.forEach(line => {
+        this.colors[line] = path.color
+        result[line] = path.color
+      })
+    })
   }
 }
