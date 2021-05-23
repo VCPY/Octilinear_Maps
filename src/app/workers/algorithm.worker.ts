@@ -436,7 +436,7 @@ class AlgorithmWorker {
       const uniqueGridNodes = [...new Set(nodes.map(n => n.gridNode))];
       const points = uniqueGridNodes.map(n => new Vector2(n.x, n.y));
 
-      paths.push(new OutputEdge(points, edge.line, edge.inBetweenStations))
+      paths.push(new OutputEdge(points, edge.line, edge.inBetweenStations, edge.color))
     });
 
     return new OutputGraph(this._octiGraph.width, this._octiGraph.height, stations, paths);

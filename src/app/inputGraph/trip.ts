@@ -2,6 +2,7 @@ export class Trip {
   tripID: string = "";
   routeID: string = "";
   routeShortName: string = "";
+  lineColor: string = "";
   stops = new Map();
 
   constructor(tripID: string) {

@@ -65,7 +65,7 @@ export class DrawingplaneComponent implements OnInit {
       .attr("d", line)
       .style("fill", "none")
       .style("stroke-width", "2px")
-      .style("stroke", "black")
+      .style("stroke", edge.color)
       .on("mouseover", () => this.createLineLabel(edge))
       .on("mouseout", () => this.removeLineLabel());
 

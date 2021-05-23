@@ -6,12 +6,14 @@ export class OutputEdge {
   private _points: Vector2[];
   private _lines: string[];
   private _inBetweenStations: string[] = [];
+  private _color: string
 
 
-  constructor(points: Vector2[], line: string[], inBetweenStations: Station[]) {
+  constructor(points: Vector2[], line: string[], inBetweenStations: Station[], color: string) {
     this._points = points;
     this._lines = line;
     this._inBetweenStations = inBetweenStations?.map(station => station.stationName);
+    this._color = color
   }
 
 
@@ -25,5 +27,9 @@ export class OutputEdge {
 
   get inBetweenStations(): string[] {
     return this._inBetweenStations;
+  }
+
+  get color(): string {
+    return this._color;
   }
 }

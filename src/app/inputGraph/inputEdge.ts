@@ -1,10 +1,11 @@
 import {Station} from "./station";
 
 export class InputEdge {
-  constructor(line: string, station1: Station, station2: Station) {
+  constructor(line: string, station1: Station, station2: Station, color: string) {
     this._line.push(line);
     this._station1 = station1;
     this._station2 = station2;
+    this._color = color.length < 6 ? "#000000" : color;
   }
 
   private _station1: Station;
@@ -45,6 +46,16 @@ export class InputEdge {
 
   set inBetweenStations(value: Station[]) {
     this._inBetweenStations = value;
+  }
+
+  private _color: string
+
+  get color(): string {
+    return this._color;
+  }
+
+  set color(value: string) {
+    this._color = value;
   }
 
   getLineDegree() {
