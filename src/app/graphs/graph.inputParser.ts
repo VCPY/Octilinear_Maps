@@ -81,32 +81,20 @@ export default class GraphInputParser {
     });
 
     let allTripIDs = Object.keys(tripsByID);
+    let resultTrip: Trip[] = [];
     allTripIDs.forEach(tripID => {
       let trip = tripsByID[tripID];
       trip.routeID = routeIDsByTripIDs[trip.tripID];
       trip.routeShortName = routeNamesByRouteID[trip.routeID];
       trip.lineColor = routeColorByRouteID[trip.routeID];
 
-      tripsByID[tripID] = trip;
-    });
-
-
-    /**
-     * Searches through all trips for the largest (number of stations) trip for a certain route name
-     */
-    let largestTripByRouteName = new Map();
-    Object.values(tripsByID).forEach(trip => {
-      let routeName = trip.routeShortName;
-      if (largestTripByRouteName.has(routeName)) {
-        let currentLargestTrip = largestTripByRouteName.get(routeName);
-        largestTripByRouteName.set(routeName, getLargerTrip(currentLargestTrip, trip));
-      } else {
-        largestTripByRouteName.set(routeName, trip);
+      if (!containsTrip(resultTrip, trip)) {
+        resultTrip.push(trip);
       }
     });
 
     let edges: InputEdge[] = [];
-    largestTripByRouteName.forEach((trip: Trip, routeName: string) => {
+    resultTrip.forEach((trip: Trip) => {
       let stopSequence = trip.stops;
       for (let i = 2; i < stopSequence.size + 1; i++) {
         let id1 = stopSequence.get("" + (i - 1));
@@ -114,14 +102,19 @@ export default class GraphInputParser {
         let station1 = stationsByID[stationIdMapper.get(id1) as string];
         let station2 = stationsByID[stationIdMapper.get(id2) as string];
 
-        let inputEdge = new InputEdge(routeName, station1, station2, trip.lineColor);
-        if (inputEdge.station1.stopID != inputEdge.station2.stopID) {
+        let inputEdge = new InputEdge(trip.routeShortName, station1, station2, trip.lineColor);
+        if (inputEdge.station2 == undefined || inputEdge.station1 == undefined) {
+          continue
+        }
+        if (inputEdge.station1.stopID != inputEdge.station2.stopID && !containsEdge(edges, inputEdge)) {
           edges.push(inputEdge);
         }
       }
     });
 
     inputGraph.edges = edges;
+
+    console.log(inputGraph)
     return inputGraph;
   }
 
@@ -152,6 +145,42 @@ export function parseGTFSToObjectArray(lines: string, type: FileType) {
   });
   return result;
 }
+
+function containsEdge(arr: InputEdge[], edge: InputEdge) {
+  for (let i = 0; i < arr.length; i++) {
+    let arrStation = arr[i]
+    if (arrStation.equalsByStation(edge) && arrStation.line[0] == edge.line[0]) {
+      return true
+    }
+  }
+  return false
+}
+
+function containsTrip(tripsByID: Trip[], trip: Trip) {
+  for (let i = 0; i < tripsByID.length; i++) {
+    let arrTrip = tripsByID[i]
+    if (arrTrip.stops.size != trip.stops.size || trip.routeShortName != arrTrip.routeShortName) {
+      continue;
+    }
+
+    let equivalent = true;
+    for (let j = 1; j < arrTrip.stops.size + 1; j++) {
+      let stop1 = arrTrip.stops.get("" + j)
+      let stop2 = trip.stops.get("" + j)
+
+      if (stop1 != stop2) {
+        equivalent = false;
+        break;
+      }
+    }
+    if (equivalent) {
+      return true
+    }
+  }
+
+  return false;
+}
+
 
 export enum FileType {
   STOPS,

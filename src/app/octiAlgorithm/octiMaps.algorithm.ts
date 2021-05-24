@@ -77,7 +77,6 @@ export function orderEdges(graph: InputGraph) {
  */
 export function calculateAverageNodeDistance(graph: InputGraph): number {
   let sum: number = 0;
-  let amount: number = 0;
   graph.edges.forEach(edge => {
     sum += euclideanDistance(edge.station1, edge.station2);
   });

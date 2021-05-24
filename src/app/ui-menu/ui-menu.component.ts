@@ -137,7 +137,6 @@ export class DialogDataSelection {
   }
 
   switchPage() {
-    let self = this
     if (this.uploadedFiles) {
       let promises: any = []
       let keys = Object.keys(this.uploadedFiles)
