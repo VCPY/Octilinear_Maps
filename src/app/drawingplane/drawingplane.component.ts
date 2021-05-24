@@ -45,9 +45,7 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   private drawPaths(outputGraph: OutputGraph) {
-    outputGraph.paths.forEach(path => {
-      this.drawLines(path);
-    });
+    outputGraph.paths.forEach(path => this.drawLines(path));
     this.drawMainStations(outputGraph.stations);
     this.hideSpinner = true;
   }
@@ -56,7 +54,7 @@ export class DrawingplaneComponent implements OnInit {
     let line = d3.line()
       .x((d) =>
         // @ts-ignore
-        this.planeXPosition2(d))
+        this.planeXPosition(d))
       .y((d) =>
         // @ts-ignore
         this.planeYPosition(d))
@@ -104,9 +102,9 @@ export class DrawingplaneComponent implements OnInit {
             .style("stroke-width", "2px")
             .style("stroke", edge.color)
             .attr("class", "lineclass" + edge.lines[j])
-            .attr("x1", this.planeXPosition2(data[0]) + offsetX)
+            .attr("x1", this.planeXPosition(data[0]) + offsetX)
             .attr("y1", this.planeYPosition(data[0]) + offsetY)
-            .attr("x2", this.planeXPosition2(data[1]) + offsetX)
+            .attr("x2", this.planeXPosition(data[1]) + offsetX)
             .attr("y2", this.planeYPosition(data[1]) + offsetY)
             .on("mouseover", () => this.createLineLabel(edge))
             .on("mouseout", () => this.removeLineLabel())
@@ -187,9 +185,7 @@ export class DrawingplaneComponent implements OnInit {
           .style("text-anchor", "middle")
           .attr("x", d3.pointer(event)[0] + 50)
           .attr("y", d3.pointer(event)[1] - 10)
-          .text((d: any, i: any) => {
-            return element[1]
-          })
+          .text(() => element[1])
 
         let bbox = text.node().getBBox()
         bar.insert("rect", "text")
@@ -205,7 +201,7 @@ export class DrawingplaneComponent implements OnInit {
 
 
       })
-      .on("mouseout", function (d: any, i: any) {
+      .on("mouseout", () => {
         that.svg.selectAll("text.label").remove();
         that.svg.selectAll("rect").remove();
       });
@@ -239,16 +235,8 @@ export class DrawingplaneComponent implements OnInit {
     return (position.x * this.gapFactor) + this.planeXOffset;
   }
 
-  private planeXPosition2(position: Vector2) {
-    return (position.x * 50) + this.planeXOffset;
-  }
-
   private planeYPosition(position: Vector2) {
     return this.planeHeight - ((position.y * this.gapFactor) + this.planeYOffset);
-  }
-
-  private planeYPosition2(position: Vector2) {
-    return (position.y * 50) + this.planeXOffset;
   }
 
   changeColor(event: string, el: string) {
@@ -277,8 +265,8 @@ export class DrawingplaneComponent implements OnInit {
       max_y = Math.max(max_y, station.position.y)
     })
 
-    this.planeHeight = ((2 + max_y) - min_y) * this.gapFactor + this.planeYOffset;
-    this.planeWidth = ((2 + max_x) - min_x) * this.gapFactor + this.planeXOffset
+    this.planeHeight = (2 + max_y - min_y) * this.gapFactor + this.planeYOffset;
+    this.planeWidth = (2 + max_x - min_x) * this.gapFactor + this.planeXOffset
 
     outputGraph.paths.forEach(path => {
         path.points.forEach(point => {
@@ -294,12 +282,8 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   private createColorPicker(outputGraph: OutputGraph) {
-    let result: any = {};
     outputGraph.paths.forEach(path => {
-      path.lines.forEach(line => {
-        this.colors[line] = path.color
-        result[line] = path.color
-      })
+      path.lines.forEach(line => this.colors[line] = path.color)
     })
   }
 }
