@@ -148,7 +148,7 @@ export class GridNode {
 
   removeRouting(edge: InputEdge) {
     this._routedEdges = this._routedEdges.filter(routedEdge => {
-      routedEdge.edge != edge;
+      return routedEdge.edge != edge;
     });
   }
 
