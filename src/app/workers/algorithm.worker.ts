@@ -137,14 +137,20 @@ class AlgorithmWorker {
 
     console.log("Total time in dijkstra:", dijkstra.totalTime, "section time:", dijkstra.sectionTime);
     console.log("[algorithm-worker] starting local search");
+    dijkstra.resetTime();
 
     /* local search */
     Array.from(this._settledStations.keys()).forEach(station => {
       this.performLocalSearch(station);
     });
 
-    dijkstra.resetTime();
     console.log("Total time in dijkstra:", dijkstra.totalTime, "section time:", dijkstra.sectionTime);
+    console.log(`Found ${this._foundPaths.size} of ${this._inputGraph.edges.length}`);
+
+    this._inputGraph.edges.forEach(e => {
+      if (!this._foundPaths.has(e)) console.log("Did not find ", e);
+    });
+
     return this.createOutputGraph();
   }
 
@@ -300,7 +306,11 @@ class AlgorithmWorker {
 
     this.removeAllRoutingsTo(station);
 
-    if (allReRoutings.length == 0) return;
+    if (allReRoutings.length == 0)
+    {
+      console.log(`[algorithm-worker] Local search failed for: ${station.stationName}`);
+      return;
+    }
 
     const best = allReRoutings.reduce((a, b) => a.cost < b.cost ? a : b);
     //console.log(station.stationName, "offset by", best.x, best.y);
