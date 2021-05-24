@@ -76,9 +76,9 @@ export class Station {
     this._adjacentNodes = value;
   }
 
-  private _edgeOrdering: Station[] = [];
+  private _edgeOrdering: InputEdge[] = [];
 
-  get edgeOrdering(): Station[] {
+  get edgeOrdering(): InputEdge[] {
     return this._edgeOrdering;
   }
 
@@ -86,34 +86,35 @@ export class Station {
     this._lineDegree += amount
   }
 
-  calculateEdgeOrdering(edges: Set<InputEdge>, adjacentNodes: Set<Station>) {
+  calculateEdgeOrdering(adjacentEdges: Set<InputEdge>, adjacentNodes: Set<Station>) {
     let upVector = [0, 1];
-    this._edgeOrdering = Array.from(adjacentNodes.values())
-      .map(adjacentNode => {
+    this._edgeOrdering = Array.from(adjacentEdges.values())
+      .map(adjacentEdge => {
+        const adjacentNode = adjacentEdge.otherStation(this);
         const vectorToNode = [adjacentNode.latitude - this.latitude, adjacentNode.longitude - this.longitude];
         let angle: number = calculateAngleBetweenVectors(upVector, vectorToNode);
 
-        return {adjacentNode, angle};
+        return {adjacentNode, angle, adjacentEdge};
       })
       .sort((a, b) => {
         return b.angle - a.angle;
       })
-      .map(x => x.adjacentNode);
+      .map(x => x.adjacentEdge);
   }
 
-  replaceStation(before: string, after: Station) {
+  replaceStation(beforeId: string, after: Station, newEdge: InputEdge) {
     let nodeArray = Array.from(this.adjacentNodes);
     for (let i = 0; i < this.adjacentNodes.size; i++) {
       let node = nodeArray[i];
-      if (node.stopID == before) {
+      if (node.stopID == beforeId) {
         nodeArray[i] = after;
         break;
       }
     }
 
     for (let i = 0; i < this._edgeOrdering.length; i++) {
-      if (this._edgeOrdering[i].stopID == before) {
-        this._edgeOrdering[i] = after;
+      if (this._edgeOrdering[i].otherStation(this).stopID == beforeId) {
+        this._edgeOrdering[i] = newEdge;
         break;
       }
     }

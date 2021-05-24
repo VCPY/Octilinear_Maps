@@ -178,8 +178,8 @@ export class InputGraph {
                 edge.inBetweenStations.push(edge.station1);
                 edge.station1 = edge.station2.stopID == adjacentNodes[0].stopID ? adjacentNodes[1] : adjacentNodes[0];
               }
-              adjacentNodes[0].replaceStation(node.stopID, adjacentNodes[1]);
-              adjacentNodes[1].replaceStation(node.stopID, adjacentNodes[0]);
+              adjacentNodes[0].replaceStation(node.stopID, adjacentNodes[1], newEdge);
+              adjacentNodes[1].replaceStation(node.stopID, adjacentNodes[0], newEdge);
               foundFirstEdge = true;
             }
           }

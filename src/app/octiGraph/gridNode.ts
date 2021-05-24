@@ -158,13 +158,13 @@ export class GridNode {
    * edges.
    * (4.3)
    */
-  blockForCircularOrdering(stationToRoute: Station) {
+  blockForCircularOrdering(edgeToRoute: InputEdge) {
 
     if (this._station == undefined) return;
     if (this._station.adjacentNodes.size <= 2) return;
 
     const orderingCount = this._station.edgeOrdering.length;
-    const toRouteIndex = this._station.edgeOrdering.findIndex(s => s == stationToRoute);
+    const toRouteIndex = this._station.edgeOrdering.findIndex(e => e == edgeToRoute);
     let prevInOrdering = 0;
     let nextInOrdering = 0;
 
@@ -173,7 +173,7 @@ export class GridNode {
     for (let i = toRouteIndex + 1; i < toRouteIndex + orderingCount; i++) {
       const candidate = this._station.edgeOrdering[i % orderingCount];
 
-      const routed = this._routedEdges.find(edge => edge.to == candidate);
+      const routed = this._routedEdges.find(edge => edge.edge == candidate);
       if (routed != undefined) {
         nextInOrdering = Constants.fixIndex(routed.direction - skipped);
         break;
@@ -185,7 +185,7 @@ export class GridNode {
     for (let i = toRouteIndex - 1; i > toRouteIndex - orderingCount; i--) {
       const candidate = this._station.edgeOrdering[(i + orderingCount) % orderingCount];
 
-      const routed = this._routedEdges.find(edge => edge.to == candidate);
+      const routed = this._routedEdges.find(edge => edge.edge == candidate);
       if (routed != undefined) {
         prevInOrdering = Constants.fixIndex(routed.direction + skipped);
         break;

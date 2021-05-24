@@ -116,12 +116,12 @@ class AlgorithmWorker {
 
       if (this.isSettled(from)) {
         // Block sink edges to ensure this routing won't block a future routing
-        from[0].blockForCircularOrdering(station2);
+        from[0].blockForCircularOrdering(edge);
         from[0].addLineBendPenalty();
       }
       if (this.isSettled(to)) {
         // Block sink edges to ensure this routing won't block a future routing
-        to[0].blockForCircularOrdering(station1);
+        to[0].blockForCircularOrdering(edge);
         to[0].addLineBendPenalty();
       }
 
@@ -324,7 +324,7 @@ class AlgorithmWorker {
    * by reopening all edges and removing the stored paths
    */
   private removeAllRoutingsTo(station: Station) {
-    this._cachedInputEdges.get(station)?.forEach(edge => {
+    station.edgeOrdering.forEach(edge => {
       const path = this._foundPaths.get(edge);
       if (path == undefined) return;
 
@@ -366,7 +366,8 @@ class AlgorithmWorker {
     let costSum = 0;
     const foundLocal = new Map<InputEdge, OctiNode[]>();
     // reroute all edges
-    station.edgeOrdering.forEach(otherStation => {
+    station.edgeOrdering.forEach(edge => {
+      const otherStation = edge.otherStation(station);
       if (!this._settledStations.has(otherStation)) return;
       const otherGridNode = this._settledStations.get(otherStation) as GridNode;
 
@@ -374,7 +375,7 @@ class AlgorithmWorker {
       if (path.length == 0) return;
 
       costSum += path[path.length - 1].dist;
-      foundLocal.set(this.getEdgeBetween(station, otherStation) as InputEdge, path);
+      foundLocal.set(edge, path);
     });
 
     return {cost: costSum, found: foundLocal, x: 0, y: 0};
@@ -389,18 +390,20 @@ class AlgorithmWorker {
    * Routes a path between two stations
    */
   private routePath(candidateGirdNode: GridNode, otherGridNode: GridNode, station: Station, otherStation: Station) {
+
+    const edge = this.getEdgeBetween(station, otherStation) as InputEdge;
+
     // Block sink edges to ensure this routing won't block a future routing
     candidateGirdNode.reopenSinkEdges();
-    candidateGirdNode.blockForCircularOrdering(otherStation);
+    candidateGirdNode.blockForCircularOrdering(edge);
     candidateGirdNode.addLineBendPenalty();
     otherGridNode.reopenSinkEdges();
-    otherGridNode.blockForCircularOrdering(station);
+    otherGridNode.blockForCircularOrdering(edge);
     otherGridNode.addLineBendPenalty();
 
     const path = dijkstra.setToSet(this._octiGraph, [candidateGirdNode],[otherGridNode]);
     if (path.length == 0) return [];
 
-    const edge = this.getEdgeBetween(station, otherStation) as InputEdge;
     this.storePath(path, edge, station, otherStation);
 
     return path;
