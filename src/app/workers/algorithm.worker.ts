@@ -57,7 +57,6 @@ class AlgorithmWorker {
   private readonly _ignoreError = true;
   private readonly _settledStations = new Map<Station, GridNode>();
   private readonly _foundPaths = new Map<InputEdge, OctiNode[]>();
-  private readonly _cachedInputEdges = new Map<Station, InputEdge[]>();
   private readonly allowCrossing = false
   private readonly exactString: string[] = []
 
@@ -81,13 +80,6 @@ class AlgorithmWorker {
     // I think it is more accurate to keep the same ordering as before merging 2-deg nodes,
     // but it looks better when we recalculate it.
     inputGraph.calculateEdgeOrderingAtNode();
-
-    // cache the edges for each station to improve performance
-    inputGraph.nodes.forEach(station => this._cachedInputEdges.set(station, []));
-    inputGraph.edges.forEach(edge => {
-      this._cachedInputEdges.get(edge.station1)?.push(edge);
-      this._cachedInputEdges.get(edge.station2)?.push(edge);
-    });
 
     this.r = 1;
     this._inputGraph = inputGraph;
@@ -371,7 +363,7 @@ class AlgorithmWorker {
       if (!this._settledStations.has(otherStation)) return;
       const otherGridNode = this._settledStations.get(otherStation) as GridNode;
 
-      const path = this.routePath(candidateGirdNode, otherGridNode, station, otherStation);
+      const path = this.routePath(candidateGirdNode, otherGridNode, station, otherStation, edge);
       if (path.length == 0) return;
 
       costSum += path[path.length - 1].dist;
@@ -381,17 +373,10 @@ class AlgorithmWorker {
     return {cost: costSum, found: foundLocal, x: 0, y: 0};
   }
 
-  private getEdgeBetween(station: Station, otherStation: Station): InputEdge {
-    return this._cachedInputEdges.get(station)
-      ?.find(edge => edge.station1 == otherStation || edge.station2 == otherStation) as InputEdge;
-  }
-
   /**
    * Routes a path between two stations
    */
-  private routePath(candidateGirdNode: GridNode, otherGridNode: GridNode, station: Station, otherStation: Station) {
-
-    const edge = this.getEdgeBetween(station, otherStation) as InputEdge;
+  private routePath(candidateGirdNode: GridNode, otherGridNode: GridNode, station: Station, otherStation: Station, edge: InputEdge) {
 
     // Block sink edges to ensure this routing won't block a future routing
     candidateGirdNode.reopenSinkEdges();
