@@ -434,9 +434,22 @@ class AlgorithmWorker {
       const uniqueGridNodes = [...new Set(nodes.map(n => n.gridNode))];
       const points = uniqueGridNodes.map(n => new Vector2(n.x, n.y));
 
+      let startingStation = edge.station1
+      // Sort edges to have the correct ordering for drawing
+      edge.inBetweenStations = edge.inBetweenStations.sort((a: Station, b: Station) => {
+        let dist1 = this.euclideanDistance([startingStation.latitude, startingStation.longitude], [a.latitude, a.longitude])
+        let dist2 = this.euclideanDistance([startingStation.latitude, startingStation.longitude], [b.latitude, b.longitude])
+        if (uniqueGridNodes[0].station == edge.station2) return dist2 - dist1
+        else return dist1 - dist2
+      })
+
       paths.push(new OutputEdge(points, edge.line, edge.inBetweenStations, edge.color))
     });
 
     return new OutputGraph(this._octiGraph.width, this._octiGraph.height, stations, paths);
+  }
+
+  private euclideanDistance(point1: number[], point2: number[]) {
+    return Math.sqrt(Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2))
   }
 }
