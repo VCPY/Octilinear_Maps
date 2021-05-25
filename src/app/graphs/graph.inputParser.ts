@@ -114,7 +114,6 @@ export default class GraphInputParser {
 
     inputGraph.edges = edges;
 
-    console.log(inputGraph)
     return inputGraph;
   }
 
