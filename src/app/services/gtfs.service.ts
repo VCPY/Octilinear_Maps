@@ -82,8 +82,7 @@ export class GtfsService {
 
 
   private createEdge(station1: Station, station2: Station, line: string): InputEdge {
-    let edge = new InputEdge(line, station1, station2, "#000000");
-    return edge;
+    return new InputEdge(line, station1, station2, "#000000");
   }
 
   private createStation(name: string, id: string, longitude: string, latitude: string) {

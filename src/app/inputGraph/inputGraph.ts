@@ -34,7 +34,7 @@ export class InputGraph {
     let minX = Infinity;
     let minY = Infinity;
 
-    let min = this.nodes.forEach(n => {
+    this.nodes.forEach(n => {
       if (n.longitude < minX) minX = n.longitude;
       if (n.latitude < minY) minY = n.latitude;
     });
@@ -49,7 +49,7 @@ export class InputGraph {
     let maxX = -Infinity;
     let maxY = -Infinity;
 
-    let min = this.nodes.forEach(n => {
+    this.nodes.forEach(n => {
       if (n.longitude < minX) minX = n.longitude;
       if (n.longitude > maxX) maxX = n.longitude;
       if (n.latitude < minY) minY = n.latitude;

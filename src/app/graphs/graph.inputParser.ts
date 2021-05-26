@@ -6,20 +6,7 @@ import {Trip} from "../inputGraph/trip";
 export function parseDataToInputGraph(data: any[]) {
   console.log("Creating InputGraph from gtfs data");
   let inputParser = new GraphInputParser(data[0], data[1], data[2], data[3]);
-  let inputGraph: InputGraph = inputParser.parseToInputGraph();
-  return inputGraph
-}
-
-
-function getLargerTrip(trip1: Trip, trip2: Trip): Trip {
-  let sequences1 = trip1.stops.size;
-  let sequences2 = trip2.stops.size;
-
-  if (sequences2 > sequences1) {
-    return trip2;
-  } else {
-    return trip1;
-  }
+  return inputParser.parseToInputGraph()
 }
 
 export default class GraphInputParser {
@@ -189,8 +176,8 @@ export enum FileType {
 }
 
 function splitLine(str: string): string[] {
-  var myRegexp = /[^\s"]+|"([^"]*)"/gi;
-  var myArray = [];
+  let myRegexp = /[^\s"]+|"([^"]*)"/gi;
+  let myArray = [];
 
   if (str.indexOf('"') >= 0) {
 

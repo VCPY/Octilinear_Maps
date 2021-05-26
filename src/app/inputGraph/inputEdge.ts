@@ -76,10 +76,6 @@ export class InputEdge {
     this._line.push(...line)
   }
 
-  contains(station: Station) {
-    return this._station1.stopID == station.stopID || this._station2.stopID == station.stopID;
-  }
-
   otherStation(station: Station): Station {
     if (this.station1 == station) return this.station2;
     return this.station1;

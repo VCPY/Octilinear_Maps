@@ -9,7 +9,7 @@ import {DialogDataSelection, UiMenuComponent} from './ui-menu/ui-menu.component'
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MatRadioModule} from "@angular/material/radio";
-import {MatToolbar, MatToolbarModule} from "@angular/material/toolbar";
+import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatButtonModule} from "@angular/material/button";
 import {FormsModule} from "@angular/forms";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";

@@ -190,7 +190,7 @@ export class DialogDataSelection {
   }
 
   sendData() {
-    Filters.setCrossing(this.allowCrossing)
+    Filters.ALLOWCROSSING = this.allowCrossing
     this.updateSelection()
     let acceptedLines = this.selection.selected.map(selection => selection.name)
     if (this.uploadedFiles) {
