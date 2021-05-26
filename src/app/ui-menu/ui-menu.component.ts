@@ -220,9 +220,12 @@ export class DialogDataSelection {
     for (let i = 0; i < this.filterIDs.length; i++) {
       if (this.filterIDs[i] == id) {
         this.filterIDs.splice(i, 1)
+        this.filterInput.splice(i, 1)
+        this.filterSelection.splice(i, 1)
         break;
       }
     }
+    this.updateSelection()
   }
 
   changeSelected(value: string, n: number) {
@@ -237,8 +240,13 @@ export class DialogDataSelection {
   }
 
   updateListByStrings(event: Event, el: number) {
-    this.filterInput[el] = (<HTMLInputElement>(event.target)!).value
-    this.updateSelection()
+    for (let i = 0; i < this.filterIDs.length; i++) {
+      if (this.filterIDs[i] == el) {
+        this.filterInput[i] = (<HTMLInputElement>(event.target)!).value
+        this.updateSelection()
+        break;
+      }
+    }
   }
 
   updateSelection() {
