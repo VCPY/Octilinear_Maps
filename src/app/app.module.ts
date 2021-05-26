@@ -3,7 +3,6 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {OctiTestComponent} from './octi-test/octi-test.component';
 import {DrawingplaneComponent} from './drawingplane/drawingplane.component';
 import {DialogDataSelection, UiMenuComponent} from './ui-menu/ui-menu.component';
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
@@ -22,7 +21,6 @@ import {ColorPickerModule} from "ngx-color-picker";
 @NgModule({
   declarations: [
     AppComponent,
-    OctiTestComponent,
     DrawingplaneComponent,
     UiMenuComponent,
     DialogDataSelection
