@@ -192,38 +192,13 @@ export class DialogDataSelection {
   sendData() {
     Filters.setCrossing(this.allowCrossing)
     this.updateSelection()
+    let acceptedLines = this.selection.selected.map(selection => selection.name)
     if (this.uploadedFiles) {
-      let acceptedLines = this.selection.selected.map(selection => selection.name)
       this.dialogRef.close({
         inputGraph: this.inputGraph,
         lines: acceptedLines
       })
     } else if (this.preparedDataSelection) {
-      let startWith = [];
-      let endWith = [];
-      let notStartWith = [];
-      let notEndWith = []
-      for (let i = 0; i < this.filterIDs.length; i++) {
-        let element = this.filterIDs[i]
-        let input = (<HTMLInputElement>document.getElementById("input" + element))!.value;
-        let inputArray = DialogDataSelection.getIndividualLines(input)
-        let selection = this.filterSelection[i]
-        switch (selection) {
-          case "must not start":
-            notStartWith.push(...inputArray);
-            break;
-          case "must not end":
-            notEndWith.push(...inputArray);
-            break;
-          case "must start":
-            startWith.push(...inputArray);
-            break;
-          case "must end":
-            endWith.push(...inputArray);
-            break;
-        }
-      }
-      let acceptedLines = this.selection.selected.map(selection => selection.name)
       this.dialogRef.close({
         selection: this.preparedDataSelection,
         lines: acceptedLines
