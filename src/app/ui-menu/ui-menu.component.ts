@@ -271,22 +271,43 @@ export class DialogDataSelection {
       let keep = true;
       for (let i = 0; i < this.filterInput.length; i++) {
         let input = DialogDataSelection.getIndividualLines(this.filterInput[i]);
-        if (input[0] == "") continue
+        if (input.length == 0) continue
         let select = this.filterSelection[i];
         switch (select) {
           case "must not start":
-            if (input.some(v => line.name.startsWith(v))) keep = false;
+            for (let j = 0; j < input.length; j++) {
+              let val = input[j]
+              if (line.name.startsWith(val)) keep = false;
+            }
             break;
           case "must not end":
-            if (input.some(v => line.name.endsWith(v))) keep = false;
+            for (let j = 0; j < input.length; j++) {
+              let val = input[j]
+              if (line.name.endsWith(val)) keep = false;
+            }
             break;
           case "must start":
-            if (!input.some(v => line.name.startsWith(v))) keep = false;
+            keep = false
+            for (let j = 0; j < input.length; j++) {
+              let val = input[j]
+              if (line.name.startsWith(val)) {
+                keep = true
+                break;
+              }
+            }
             break;
           case "must end":
-            if (!input.some(v => line.name.endsWith(v))) keep = false;
+            keep = false
+            for (let j = 0; j < input.length; j++) {
+              let val = input[j]
+              if (line.name.endsWith(val)) {
+                keep = true
+                break;
+              }
+            }
             break;
         }
+        if (!keep) break
       }
       if (!keep) this.selection.deselect(line)
       else this.selection.select(line)
@@ -294,8 +315,10 @@ export class DialogDataSelection {
   }
 
   private static getIndividualLines(input: string) {
-    input = input.replace(" ", "")
-    return input.split(",")
+    input = input.replace(/\s/g, "")
+    let inputArr = input.split(",")
+    inputArr = inputArr.filter(str => str.length > 0);
+    return inputArr
   }
 }
 
