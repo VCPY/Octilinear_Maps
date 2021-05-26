@@ -120,7 +120,7 @@ export default class GraphInputParser {
 }
 
 export function parseGTFSToObjectArray(lines: string, type: FileType) {
-  const linesArray = lines.split("\r\n");
+  const linesArray = lines.split(/\r?\n/);
   let keysString: string = linesArray.shift() || "";
   keysString = keysString.replace(/['"]+/g, '');
   let keys = keysString.split(",");
@@ -192,18 +192,23 @@ function splitLine(str: string): string[] {
   var myRegexp = /[^\s"]+|"([^"]*)"/gi;
   var myArray = [];
 
-  do {
-    var match = myRegexp.exec(str);
-    if (match != null) {
-      myArray.push(match[1] ? match[1] : match[0]);
-    }
-  } while (match != null);
+  if (str.indexOf('"') >= 0) {
 
-  for (let i = 0; i < myArray.length; i++) {
-    if (myArray[i] == ",") {
-      myArray.splice(i, 1);
-      i--;
+    do {
+      var match = myRegexp.exec(str);
+      if (match != null) {
+        myArray.push(match[1] ? match[1] : match[0]);
+      }
+    } while (match != null);
+
+    for (let i = 0; i < myArray.length; i++) {
+      if (myArray[i] == ",") {
+        myArray.splice(i, 1);
+        i--;
+      }
     }
+  } else {
+    myArray = str.split(",")
   }
   return myArray
 }
