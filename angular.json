@@ -17,6 +17,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "xlsx"
+              ],
             "outputPath": "dist/octilinear-maps",
             "index": "src/index.html",
             "main": "src/main.ts",

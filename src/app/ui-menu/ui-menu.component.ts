@@ -140,34 +140,31 @@ export class DialogDataSelection {
     if (this.uploadedFiles) {
       let promises: any = []
       let keys = Object.keys(this.uploadedFiles)
-      let stops = ""
-      let trips = ""
-      let routes = ""
-      let stopTimes = ""
+      let stops: any;
+      let trips: any;
+      let routes: any;
+      let stopTimes: any;
       keys.forEach((key: string) => {
         // @ts-ignore
         let file = this.uploadedFiles![key]
         switch (file.name) {
           case "trips.txt":
-            promises.push(file.text().then((text: string) => trips = text))
+            promises.push(parseGTFSToObjectArray(file, FileType.TRIPS).then(result => trips = result));
             break;
           case "stops.txt":
-            promises.push(file.text().then((text: string) => stops = text))
+            promises.push(parseGTFSToObjectArray(file!, FileType.STOPS).then(result => stops = result))
             break;
           case "routes.txt":
-            promises.push(file.text().then((text: string) => routes = text))
+            promises.push(parseGTFSToObjectArray(file!, FileType.ROUTES).then(result => routes = result))
             break;
           case "stop_times.txt":
-            promises.push(file.text().then((text: string) => stopTimes = text))
+            promises.push(parseGTFSToObjectArray(file!, FileType.STOPTIMES).then(result => stopTimes = result))
             break;
           default: //Ignore
         }
       })
       Promise.all(promises).then(_ => {
-        this.inputGraph = parseDataToInputGraph([parseGTFSToObjectArray(trips!, FileType.TRIPS),
-          parseGTFSToObjectArray(stops!, FileType.STOPS),
-          parseGTFSToObjectArray(routes!, FileType.ROUTES),
-          parseGTFSToObjectArray(stopTimes!, FileType.STOPTIMES)])
+        this.inputGraph = parseDataToInputGraph([trips, stops, routes, stopTimes])
         this.prepareTable()
         this.showLoadingData = false;
         this.firstPage = false

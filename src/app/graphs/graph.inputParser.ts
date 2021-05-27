@@ -2,6 +2,7 @@ import {Station} from "../inputGraph/station";
 import {InputEdge} from "../inputGraph/inputEdge";
 import {InputGraph} from "../inputGraph/inputGraph";
 import {Trip} from "../inputGraph/trip";
+import * as XLSX from 'xlsx'
 
 export function parseDataToInputGraph(data: any[]) {
   console.log("Creating InputGraph from gtfs data");
@@ -30,31 +31,31 @@ export default class GraphInputParser {
     let stationsByID: { [id: string]: Station } = {};
     this.stops.forEach(stop => {
       let station = new Station();
-      station.stationName = stop["stop_name"];
+      station.stationName = "" + stop["stop_name"];
 
-      if (!stationIdByName.has(stop["stop_name"])) {
-        stationIdByName.set(stop["stop_name"], stop["stop_id"]);
-        station.stopID = stationIdByName.get(stop["stop_name"]) as string;
-        stationIdMapper.set(stop["stop_id"], stop["stop_id"]);
+      if (!stationIdByName.has("" + stop["stop_name"])) {
+        stationIdByName.set("" + stop["stop_name"], "" + stop["stop_id"]);
+        station.stopID = stationIdByName.get("" + stop["stop_name"]) as string;
+        stationIdMapper.set("" + stop["stop_id"], "" + stop["stop_id"]);
 
         station.latitude = parseFloat(stop["stop_lat"]);
         station.longitude = parseFloat(stop["stop_lon"]);
         stations.push(station);
-        stationsByID[stop["stop_id"]] = station;
+        stationsByID["" + stop["stop_id"]] = station;
       } else {
-        stationIdMapper.set(stop["stop_id"], stationIdByName.get(stop["stop_name"]) as string);
+        stationIdMapper.set("" + stop["stop_id"], stationIdByName.get("" + stop["stop_name"]) as string);
       }
     });
     inputGraph.nodes = stations;
 
     let routeIDsByTripIDs: { [id: string]: string } = {};
-    this.trips.forEach(trip => routeIDsByTripIDs[trip["trip_id"]] = trip["route_id"]);
+    this.trips.forEach(trip => routeIDsByTripIDs["" + trip["trip_id"]] = "" + trip["route_id"]);
 
     let routeNamesByRouteID: { [id: string]: string } = {};
     let routeColorByRouteID: { [id: string]: string } = {};
-    this.routes.forEach(route => routeNamesByRouteID[route["route_id"]] = route["route_short_name"]);
+    this.routes.forEach(route => routeNamesByRouteID["" + route["route_id"]] = "" + route["route_short_name"]);
     this.routes.forEach(route => {
-      if (route["route_color"] != undefined) routeColorByRouteID[route["route_id"]] = "#" + route["route_color"]
+      if (route["route_color"] != undefined) routeColorByRouteID["" + route["route_id"]] = "#" + route["route_color"]
     })
 
     let tripsByID: { [id: string]: Trip } = {};
@@ -62,7 +63,7 @@ export default class GraphInputParser {
       let tripID = stopTime["trip_id"];
 
       let trip = (tripsByID[tripID] == undefined) ? new Trip(tripID) : tripsByID[tripID];
-      trip.addStop(stopTime["stop_id"], stopTime["stop_sequence"]);
+      trip.addStop("" + stopTime["stop_id"], stopTime["stop_sequence"]);
 
       tripsByID[tripID] = trip;
     });
@@ -106,30 +107,65 @@ export default class GraphInputParser {
 
 }
 
-export function parseGTFSToObjectArray(lines: string, type: FileType) {
-  const linesArray = lines.split(/\r?\n/);
-  let keysString: string = linesArray.shift() || "";
-  keysString = keysString.replace(/['"]+/g, '');
-  let keys = keysString.split(",");
-  const values = linesArray;
 
-  let result: { [id: string]: string }[] = [];
-  values.forEach(line => {
-    if (line.length !== 0) {
-      let element: { [id: string]: string } = {};
-      let elementValues = splitLine(line);
-      for (let i = 0; i < keys.length; i++) {
-        let elementValue = elementValues[i];
-        let key = keys[i];
-        let typeProperties = FileTypeProperties.getPropertiesByType(type);
-        if (typeProperties!.includes(key)) {
-          element[key] = elementValue;
-        }
-      }
-      result.push(element);
+function createObjectsFromXLSX(data: any[][], keys: any[]) {
+  let result = []
+  for (let i = 0; i < data.length; i++) {
+    let el = data[i]
+    let obj: { [id: string]: string } = {}
+    for (let j = 0; j < el.length; j++) {
+      obj[keys[j]] = el[j]
     }
-  });
+    result.push(obj)
+  }
   return result;
+}
+
+export async function parseGTFSToObjectArray(file: File, type: FileType) {
+  let result: { [id: string]: string }[] = [];
+  if (type != FileType.STOPTIMES) {
+    type AOA = any[][];
+    return new Promise((resolve, reject) => {
+      const reader: FileReader = new FileReader();
+      reader.onload = (e: any) => {
+        const bstr: string = e.target.result;
+        const wb: XLSX.WorkBook = XLSX.read(bstr, {type: 'binary'});
+
+        const wsname: string = wb.SheetNames[0];
+        const ws: XLSX.WorkSheet = wb.Sheets[wsname];
+
+        let data = <AOA>(XLSX.utils.sheet_to_json(ws, {header: 1}));
+        let keys: any[] = data.shift() || []
+        result = createObjectsFromXLSX(data, keys)
+        resolve(result)
+      }
+      reader.readAsBinaryString(file);
+    })
+  } else {
+    await file.text().then((text) => {
+      const linesArray = text.split(/\r?\n/);
+      let keysString: string = linesArray.shift() || "";
+      keysString = keysString.replace(/['"]+/g, '');
+      let keys = keysString.split(",");
+
+      linesArray.forEach(line => {
+        if (line.length !== 0) {
+          let element: { [id: string]: string } = {};
+          let elementValues = splitLine(line);
+          for (let i = 0; i < keys.length; i++) {
+            let elementValue = elementValues[i];
+            let key = keys[i];
+            let typeProperties = FileTypeProperties.getPropertiesByType(type);
+            if (typeProperties!.includes(key)) {
+              element[key] = elementValue;
+            }
+          }
+          result.push(element);
+        }
+      });
+    })
+    return result;
+  }
 }
 
 function containsEdge(arr: InputEdge[], edge: InputEdge) {
@@ -179,8 +215,13 @@ function splitLine(str: string): string[] {
   let myRegexp = /[^\s"]+|"([^"]*)"/gi;
   let myArray = [];
 
-  if (str.indexOf('"') >= 0) {
 
+  let mat = (str.match(/"/g) || []).length;
+  let num = -1
+  num = (mat / 2) - 1
+  let numComma = (str.match(new RegExp(",", "g")) || []).length;
+
+  if (num == numComma) {
     do {
       var match = myRegexp.exec(str);
       if (match != null) {
