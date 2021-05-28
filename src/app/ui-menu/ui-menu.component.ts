@@ -6,6 +6,9 @@ import {Filters} from "../inputGraph/inputGraph.filter";
 import {InputGraph} from "../inputGraph/inputGraph";
 import {SelectionModel} from "@angular/cdk/collections";
 import vienna from "../saves/vienna.json"
+import rome from "../saves/rome.json"
+import prague from "../saves/prague.json"
+import detroit from "../saves/detroit.json"
 import {plainToClass} from "class-transformer";
 
 @Component({
@@ -47,16 +50,26 @@ export class UiMenuComponent implements OnInit {
       }
       data = result["selection"]
       if (data != undefined) {
-        // TODO: Load the according input Graph
+        let graph;
         switch (data) {
           case "Vienna":
-            let graph = plainToClass(InputGraph, vienna)
-            Filters.exactString.push(...result["lines"])
-            this.algorithmService.perform(graph!)
+            graph = plainToClass(InputGraph, vienna)
+            break;
+          case "Rome":
+            graph = plainToClass(InputGraph, rome)
+            break;
+          case "Prague":
+            graph = plainToClass(InputGraph, prague)
+            break;
+          case "Detroit":
+            graph = plainToClass(InputGraph, detroit)
             break;
           default:
             alert("Error: Data could not be found")
+            return
         }
+        Filters.exactString.push(...result["lines"])
+        this.algorithmService.perform(graph!)
       }
 
     })
@@ -171,8 +184,26 @@ export class DialogDataSelection {
       })
     } else {
       this.inputGraph = plainToClass(InputGraph, vienna)
-      this.prepareTable()
-      this.firstPage = false
+      if (this.preparedDataSelection != undefined) {
+        switch (this.preparedDataSelection!) {
+          case "Vienna":
+            this.inputGraph = plainToClass(InputGraph, vienna)
+            break;
+          case "Rome":
+            this.inputGraph = plainToClass(InputGraph, rome)
+            break;
+          case "Prague":
+            this.inputGraph = plainToClass(InputGraph, prague)
+            break;
+          case "Detroit":
+            this.inputGraph = plainToClass(InputGraph, detroit)
+            break;
+          default:
+            alert("Error: Data could not be found")
+        }
+        this.prepareTable()
+        this.firstPage = false
+      }
     }
   }
 
