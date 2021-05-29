@@ -183,7 +183,6 @@ export class DialogDataSelection {
         this.firstPage = false
       })
     } else {
-      this.inputGraph = plainToClass(InputGraph, vienna)
       if (this.preparedDataSelection != undefined) {
         switch (this.preparedDataSelection!) {
           case "Vienna":
