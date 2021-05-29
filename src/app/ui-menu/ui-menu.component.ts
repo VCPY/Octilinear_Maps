@@ -95,6 +95,7 @@ export class DialogDataSelection {
   filterSelection: string[] = ["must not start"]
   filterInput: string[] = []
   showLoadingData = false;
+  sliderRValue: number = 0.5;
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
@@ -218,6 +219,7 @@ export class DialogDataSelection {
 
   sendData() {
     Filters.ALLOWCROSSING = this.allowCrossing
+    Filters.r = 1 - this.sliderRValue
     this.updateSelection()
     let acceptedLines = this.selection.selected.map(selection => selection.name)
     if (this.uploadedFiles) {

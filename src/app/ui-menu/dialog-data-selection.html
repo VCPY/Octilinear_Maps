@@ -114,6 +114,10 @@
             <mat-checkbox [(ngModel)]="allowCrossing" class="example-margin">Allow lines to cross each other
             </mat-checkbox>
             Warning: Some lines may not be positionable if crossing is not allowed.
+            <mat-slider style="width: 20%; margin-top: 1em; margin-bottom: -0.5em" [(ngModel)]="sliderRValue" min="0.1" max="0.9" step="0.05"
+                        value="0.5"></mat-slider>
+            <div>Graph Scale: {{sliderRValue}}</div>
+            Warning: Some graphs may not be drawable if the value is set to a too large value
         </div>
     </div>
     <div class="selectButtonDiv">

@@ -36,6 +36,7 @@ export class AlgorithmService {
     this.worker.postMessage({
       graph: inputGraph,
       allowCrossing: Filters.ALLOWCROSSING,
+      r: Filters.r,
       exactString: Filters.exactString,
     });
 

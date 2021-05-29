@@ -73,7 +73,7 @@ class AlgorithmWorker {
     inputGraph.calculateEdgeOrderingAtNode();
     inputGraph.removeNodesWithoutEdges();
 
-    this.D = algo.calculateAverageNodeDistance(inputGraph) * 0.75;
+    this.D = algo.calculateAverageNodeDistance(inputGraph) * parseFloat(data["r"]);
 
     inputGraph.removeTwoDegreeNodes();
 

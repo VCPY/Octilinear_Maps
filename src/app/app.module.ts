@@ -17,6 +17,7 @@ import {MatTableModule} from "@angular/material/table";
 import {MatSelectModule} from "@angular/material/select";
 import {MatIconModule} from "@angular/material/icon";
 import {ColorPickerModule} from "ngx-color-picker";
+import {MatSliderModule} from "@angular/material/slider";
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import {ColorPickerModule} from "ngx-color-picker";
     MatTableModule,
     MatSelectModule,
     MatIconModule,
-    ColorPickerModule
+    ColorPickerModule,
+    MatSliderModule
   ],
   providers: [{
     provide: MatDialogRef,
