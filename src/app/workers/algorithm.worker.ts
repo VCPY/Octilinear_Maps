@@ -177,7 +177,7 @@ class AlgorithmWorker {
           if (ret1.includes(node) || ret2.includes(node)) break;
           // ignore if this node is settled
           if (Array.from(this._settledStations.values()).includes(node)) break;
-          if (this.nodeIsUsed(x, y, this._foundPaths)) break;
+          //if (this.nodeIsUsed(x, y, this._foundPaths)) break;
 
           // check distance to both stations, assign to lower
           const distance1 = Math.sqrt((coordinates1.x - x) * (coordinates1.x - x) + (coordinates1.y - y) * (coordinates1.y - y));
