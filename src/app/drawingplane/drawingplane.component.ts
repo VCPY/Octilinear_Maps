@@ -11,6 +11,9 @@ import {OutputStation} from "../outputGraph/outputStation";
   templateUrl: './drawingplane.component.html',
   styleUrls: ['./drawingplane.component.css']
 })
+/**
+ * Component in which the created graph is drawn.
+ */
 export class DrawingplaneComponent implements OnInit {
 
   planeXOffset = 50;
@@ -44,12 +47,23 @@ export class DrawingplaneComponent implements OnInit {
     this.drawPaths(outputGraph);
   }
 
+  /**
+   * Draws the nodes and edges of the outputGraph as stations and lines, respectively.
+   * @param outputGraph The graph containing the data to be drawn
+   * @private
+   */
   private drawPaths(outputGraph: OutputGraph) {
     outputGraph.paths.forEach(path => this.drawLines(path));
     this.drawMainStations(outputGraph.stations);
     this.hideSpinner = true;
   }
 
+  /**
+   * Draws the lines for the given edge. If the edge.lines >1, then multiple parallel lines are drawn. Draws
+   * elements in edge.inBetweenStations as equally spaced points on the created lines.
+   * @param edge The edge which should be drawn
+   * @private
+   */
   private drawLines(edge: OutputEdge) {
     let line = d3.line()
       .x((d) =>
@@ -123,6 +137,11 @@ export class DrawingplaneComponent implements OnInit {
     this.drawIntermediateStations(intermediatePoints);
   }
 
+  /**
+   * Appends a label with the line names for the given edge to the svg
+   * @param edge The edge which is labelled
+   * @private
+   */
   private createLineLabel(edge: OutputEdge) {
     let bar = this.svg.append("g")
       .attr("transform", function (d: any, i: any) {
@@ -156,11 +175,21 @@ export class DrawingplaneComponent implements OnInit {
       .attr("opacity", 1);
   }
 
+  /**
+   * Removes any line labels from the svg.
+   * @private
+   */
   private removeLineLabel() {
     this.svg.selectAll("text.labelLine").remove();
     this.svg.selectAll("rect").remove();
   }
 
+  /**
+   * Draws nodes as small dots at the given SVGPoint
+   * @param nodes Array with length 2. First element is the point where the dot should be drawn,
+   * second element the text which should be displayed on a mouseover event.
+   * @private
+   */
   private drawIntermediateStations(nodes: Array<[SVGPoint, string]>) {
     let that = this;
     let circ = this.svg.selectAll(".interDot")
@@ -198,8 +227,6 @@ export class DrawingplaneComponent implements OnInit {
           .attr("height", bbox.height + 5)
           .attr("padding", 20)
           .attr("opacity", 1);
-
-
       })
       .on("mouseout", () => {
         that.svg.selectAll("text.label").remove();
@@ -207,6 +234,11 @@ export class DrawingplaneComponent implements OnInit {
       });
   }
 
+  /**
+   * Draws the stations as dots in the svg
+   * @param stations
+   * @private
+   */
   private drawMainStations(stations: OutputStation[]) {
     let circ = this.svg.selectAll(".dot")
       .append('g')
@@ -231,19 +263,39 @@ export class DrawingplaneComponent implements OnInit {
       });
   }
 
+  /**
+   * Calculates the X position on the svg plane using the grid position.
+   * @param position The x- and y-position in the grid graph.
+   * @private
+   */
   private planeXPosition(position: Vector2) {
     return (position.x * this.gapFactor) + this.planeXOffset;
   }
 
+  /**
+   * Calculates the Y position on the svg plane using the grid position.
+   * @param position The x- and y-position in the grid graph.
+   * @private
+   */
   private planeYPosition(position: Vector2) {
     return this.planeHeight - ((position.y * this.gapFactor) + this.planeYOffset);
   }
 
+  /**
+   * Callback for a change in the color pickers in the UI
+   * @param event The new color
+   * @param el The color picker whose color has changed
+   */
   changeColor(event: string, el: string) {
     d3.selectAll(".lineclass" + el)
       .style("stroke", event)
   }
 
+  /**
+   * Calculates the size of the SVG Plane.
+   * @param outputGraph The graph which should be drawn on the plane.
+   * @private
+   */
   private calculatePlaneSize(outputGraph: OutputGraph) {
     let min_x = outputGraph.width
     let min_y = outputGraph.height
@@ -281,6 +333,11 @@ export class DrawingplaneComponent implements OnInit {
     })
   }
 
+  /**
+   * Initializes the color pickers for the UI
+   * @param outputGraph The graph to draw
+   * @private
+   */
   private createColorPicker(outputGraph: OutputGraph) {
     outputGraph.paths.forEach(path => {
       path.lines.forEach(line => this.colors[line] = path.color)

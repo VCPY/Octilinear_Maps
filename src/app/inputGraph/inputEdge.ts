@@ -1,5 +1,8 @@
 import {Station} from "./station";
 
+/**
+ * Represents an edge between two stations. Used in the InputGraph for the algorithm.
+ */
 export class InputEdge {
   constructor(line: string, station1: Station, station2: Station, color: string) {
     this._line.push(line);
@@ -29,6 +32,10 @@ export class InputEdge {
     this._station2 = value;
   }
 
+  /**
+   * Array containing the lines which travel along this edge
+   * @private
+   */
   private _line: string[] = [];
 
   get line(): string[] {
@@ -39,6 +46,10 @@ export class InputEdge {
     this._line = value;
   }
 
+  /**
+   * Stations with a line degree of two which lie on this edge
+   * @private
+   */
   private _inBetweenStations: Station[] = [];
 
   get inBetweenStations(): Station[] {
@@ -59,10 +70,17 @@ export class InputEdge {
     this._color = value;
   }
 
+  /**
+   * Returns the number of lines
+   */
   getLineDegree() {
     return this._line.length
   }
 
+  /**
+   * Checks if @param other equals this edge by the id of the stations only. The order of the stations is irrelevant.
+   * @param other The edge the compare this edge with
+   */
   equalsByStation(other: InputEdge) {
     if (this.station2.stopID == other.station2.stopID && this.station1.stopID == other.station1.stopID) {
       return true;

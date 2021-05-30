@@ -4,16 +4,35 @@ import {InputGraph} from "../inputGraph/inputGraph";
 import {Trip} from "../inputGraph/trip";
 import * as XLSX from 'xlsx'
 
+/**
+ * Parses the data from the GTFS files to the input graph format
+ * @param data array with length 4 containing the content from trips.txt, stops.txt, routes.txt, stop_times.txt
+ */
 export function parseDataToInputGraph(data: any[]) {
   console.log("Creating InputGraph from gtfs data");
   let inputParser = new GraphInputParser(data[0], data[1], data[2], data[3]);
   return inputParser.parseToInputGraph()
 }
 
+/**
+ * Parser for parsing GTFS Data to the InputGraph format
+ */
 export default class GraphInputParser {
+  /**
+   * Content of the routes.txt file
+   */
   routes: any[];
+  /**
+   * Content of the stops.txt file
+   */
   stops: any[];
+  /**
+   * Content of the stop_times.txt file
+   */
   stopTimes: any[];
+  /**
+   * Content of the trips.txt file
+   */
   trips: any[];
 
   constructor(trips: any[], stops: any[], routes: any[], stopTimes: any[]) {
@@ -23,6 +42,9 @@ export default class GraphInputParser {
     this.trips = trips;
   }
 
+  /**
+   * Parses the content of the array routes, stops, stopTimes and trips to an InputGraph
+   */
   parseToInputGraph(): InputGraph {
     let inputGraph: InputGraph = new InputGraph();
     let stations: Station[] = [];
@@ -101,13 +123,15 @@ export default class GraphInputParser {
     });
 
     inputGraph.edges = edges;
-
     return inputGraph;
   }
-
 }
 
-
+/**
+ * Creates javascript objects from xlsx data
+ * @param data the xlsx data
+ * @param keys the keys for the xlsx data
+ */
 function createObjectsFromXLSX(data: any[][], keys: any[]) {
   let result = []
   for (let i = 0; i < data.length; i++) {
@@ -121,6 +145,11 @@ function createObjectsFromXLSX(data: any[][], keys: any[]) {
   return result;
 }
 
+/**
+ * Parses a file to a javascript object. Each line is considered one object
+ * @param file The file to parse
+ * @param type The type and name of the file.
+ */
 export async function parseGTFSToObjectArray(file: File, type: FileType) {
   let result: { [id: string]: string }[] = [];
   if (type != FileType.STOPTIMES) {
@@ -168,6 +197,11 @@ export async function parseGTFSToObjectArray(file: File, type: FileType) {
   }
 }
 
+/**
+ * Checks if the given array contains the given edge.
+ * @param arr The array to search through
+ * @param edge The edge to search for
+ */
 function containsEdge(arr: InputEdge[], edge: InputEdge) {
   for (let i = 0; i < arr.length; i++) {
     let arrStation = arr[i]
@@ -178,6 +212,11 @@ function containsEdge(arr: InputEdge[], edge: InputEdge) {
   return false
 }
 
+/**
+ * Checks if the given tripsByID contains the given trip.
+ * @param tripsByID The array to search through
+ * @param trip The trip to search for
+ */
 function containsTrip(tripsByID: Trip[], trip: Trip) {
   for (let i = 0; i < tripsByID.length; i++) {
     let arrTrip = tripsByID[i]
@@ -199,11 +238,12 @@ function containsTrip(tripsByID: Trip[], trip: Trip) {
       return true
     }
   }
-
   return false;
 }
 
-
+/**
+ * Enum for the type of file from the GTFS Format
+ */
 export enum FileType {
   STOPS,
   TRIPS,
@@ -211,10 +251,13 @@ export enum FileType {
   STOPTIMES
 }
 
+/**
+ * Splits a line into its elements
+ * @param str The line to split
+ */
 function splitLine(str: string): string[] {
   let myRegexp = /[^\s"]+|"([^"]*)"/gi;
   let myArray = [];
-
 
   let mat = (str.match(/"/g) || []).length;
   let num = -1
@@ -241,6 +284,9 @@ function splitLine(str: string): string[] {
   return myArray
 }
 
+/**
+ * Stores the names of the attributes which should be fetched from the GTFS files.
+ */
 class FileTypeProperties {
   static stops = ["stop_id", "stop_lat", "stop_lon", "stop_name"];
   static trips = ["route_id", "trip_id"];

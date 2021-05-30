@@ -4,6 +4,9 @@ import {Station} from "./station";
 import {InputEdge} from "./inputEdge";
 import {StationStatus} from "./stationStatus";
 
+/**
+ * Graph used as input for the algorithm
+ */
 export class InputGraph {
   constructor() {
   }
@@ -30,6 +33,9 @@ export class InputGraph {
     this._edges = value;
   }
 
+  /**
+   * Get the minimum longitude and latitude values from the nodes.
+   */
   getMinCoordinates() {
     let minX = Infinity;
     let minY = Infinity;
@@ -42,8 +48,10 @@ export class InputGraph {
     return [minX, minY];
   }
 
+  /**
+   * Get the differences between the maximum and minimum latitude and longitude values of the nodes.
+   */
   getDimensions() {
-
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
@@ -72,6 +80,9 @@ export class InputGraph {
     return this._nodes.find(x => x.stopID == id);
   }
 
+  /**
+   * Returns all nodes which have the status unprocessed or dangling
+   */
   getAllNotProcessedNodesIDs(): string[] {
     let result = this.getNodeIDsByStatus(StationStatus.unprocessed);
     return result.concat(this.getNodeIDsByStatus(StationStatus.dangling));
@@ -84,6 +95,9 @@ export class InputGraph {
     }
   }
 
+  /**
+   * Calculates the line degree for each station
+   */
   calculateNodeLineDegrees() {
     this.edges.forEach(edge => {
       let station1 = edge.station1.stopID;
@@ -139,6 +153,9 @@ export class InputGraph {
     return this.nodes.filter(node => nodeIDs.indexOf(node.stopID) != -1);
   }
 
+  /**
+   * Calculates the ordering of incident edges at each station stored in this.nodes.
+   */
   calculateEdgeOrderingAtNode() {
     this.nodes.forEach(node => {
       let adjacentEdges = new Set<InputEdge>();
@@ -159,6 +176,10 @@ export class InputGraph {
     })
   }
 
+  /**
+   * Removes stations with a line degree of two from the graph and contracts adjacent edges to one.
+   * Adds removed stations to the property inBetweenStations of the newly created edge.
+   */
   removeTwoDegreeNodes() {
     for (let i = 0; i < this.nodes.length; i++) {
       let node = this.nodes[i];
@@ -203,6 +224,9 @@ export class InputGraph {
     }
   }
 
+  /**
+   * Merge edges which run between the same stations and contract the names of the lines.
+   */
   mergeEqualEdges() {
     let result: InputEdge[] = [];
     for (let i = 0; i < this._edges.length; i++) {
