@@ -5,6 +5,9 @@ import {Station} from "../inputGraph/station";
 import {RoutedEdge} from "./routedEdge";
 import {InputEdge} from "../inputGraph/inputEdge";
 
+/**
+ * Represents a node within a 2D Array/Grid.
+ */
 export class GridNode {
   constructor(id: number, x: number, y: number) {
     this._id = id;

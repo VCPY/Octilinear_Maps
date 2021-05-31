@@ -16,6 +16,9 @@ import {plainToClass} from "class-transformer";
   templateUrl: './ui-menu.component.html',
   styleUrls: ['./ui-menu.component.css']
 })
+/**
+ * Component for the initial menu for selecting the graph data to be drawn
+ */
 export class UiMenuComponent implements OnInit {
 
   fileNames = ["stop_times", "stops", "trips", "routes"]
@@ -38,7 +41,7 @@ export class UiMenuComponent implements OnInit {
       width: "1000px",
       data: "",
       autoFocus: false,
-      maxHeight: '90vh' //you can adjust the value as per your view
+      maxHeight: '90vh'
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
@@ -81,6 +84,9 @@ export class UiMenuComponent implements OnInit {
   templateUrl: 'dialog-data-selection.html',
   styleUrls: ['./dialog-data-selection.css']
 })
+/**
+ * Dialog for the menu pop-up
+ */
 export class DialogDataSelection {
 
   uploadedFiles: FileList | undefined = undefined;
@@ -102,12 +108,19 @@ export class DialogDataSelection {
     @Inject(MAT_DIALOG_DATA) public data: string) {
   }
 
+  /**
+   * Method to store the content of the parameter files in a component variable
+   * @param files
+   */
   saveFiles(files: FileList | null) {
     if (files) {
       this.uploadedFiles = files
     }
   }
 
+  /**
+   * Method called when individual files have been uploaded and the "Select" button has been clicked.
+   */
   sendUploadedFiles() {
     if (this.uploadedFiles) {
       this.showLoadingData = true;
@@ -142,6 +155,9 @@ export class DialogDataSelection {
     }
   }
 
+  /**
+   * Method called when the "Select" button for prepared data has been clicked.
+   */
   selectPreparedData() {
     if (this.preparedDataSelection == undefined) {
       alert("Please select a dataset")
@@ -150,6 +166,9 @@ export class DialogDataSelection {
     this.switchPage()
   }
 
+  /**
+   * Switches the view from selecting the data to filtering the data.
+   */
   switchPage() {
     if (this.uploadedFiles) {
       let promises: any = []
@@ -207,6 +226,10 @@ export class DialogDataSelection {
     }
   }
 
+  /**
+   * Prepares the table of lines for the second page.
+   * @private
+   */
   private prepareTable() {
     let lines: string[] = []
     this.inputGraph!.edges.forEach(edge => lines.push(...edge.line))
@@ -217,6 +240,9 @@ export class DialogDataSelection {
     })
   }
 
+  /**
+   * Sends the data and filters to the algorithm
+   */
   sendData() {
     Filters.ALLOWCROSSING = this.allowCrossing
     Filters.r = 1 - this.sliderRValue
@@ -235,6 +261,9 @@ export class DialogDataSelection {
     }
   }
 
+  /**
+   * Increases the number of string filters and initializes its values.
+   */
   increaseChoice() {
     let id: number;
     if (this.filterIDs.length == 0) id = 0
@@ -245,6 +274,10 @@ export class DialogDataSelection {
     this.filterInput.push("")
   }
 
+  /**
+   * Removes the element with the given id from the list of string filters.
+   * @param id The id of the element to remove.
+   */
   removeElementFromFilterList(id: number) {
     for (let i = 0; i < this.filterIDs.length; i++) {
       if (this.filterIDs[i] == id) {
@@ -257,10 +290,15 @@ export class DialogDataSelection {
     this.updateSelection()
   }
 
-  changeSelected(value: string, n: number) {
+  /**
+   * Callback for the selection of the string filters.
+   * @param value The new value of the selection.
+   * @param elementID The ID of the element which has changed.
+   */
+  changeSelected(value: string, elementID: number) {
     for (let i = 0; i < this.filterIDs.length; i++) {
       let id = this.filterIDs[i]
-      if (id == n) {
+      if (id == elementID) {
         this.filterSelection[i] = value
         break;
       }
@@ -268,9 +306,14 @@ export class DialogDataSelection {
     this.updateSelection()
   }
 
-  updateListByStrings(event: Event, el: number) {
+  /**
+   * Callback for changes in the input fields of the string filters.
+   * @param event The event of the change.
+   * @param id The id of the element which has detected a change.
+   */
+  updateListOfStrings(event: Event, id: number) {
     for (let i = 0; i < this.filterIDs.length; i++) {
-      if (this.filterIDs[i] == el) {
+      if (this.filterIDs[i] == id) {
         this.filterInput[i] = (<HTMLInputElement>(event.target)!).value
         this.updateSelection()
         break;
@@ -278,11 +321,14 @@ export class DialogDataSelection {
     }
   }
 
+  /**
+   * Update function which updates the selection of lines based on the string filters.
+   */
   updateSelection() {
     this.lines.forEach(line => {
       let keep = true;
       for (let i = 0; i < this.filterInput.length; i++) {
-        let input = DialogDataSelection.getIndividualLines(this.filterInput[i]);
+        let input = DialogDataSelection.getIndividualStrings(this.filterInput[i]);
         if (input.length == 0) continue
         let select = this.filterSelection[i];
         switch (select) {
@@ -326,7 +372,12 @@ export class DialogDataSelection {
     })
   }
 
-  private static getIndividualLines(input: string) {
+  /**
+   * Takes a string as input and returns an array of the contained individual strings. Splits by comma, whitespace is removed.
+   * @param input The string which should be split.
+   * @private
+   */
+  private static getIndividualStrings(input: string) {
     input = input.replace(/\s/g, "")
     let inputArr = input.split(",")
     inputArr = inputArr.filter(str => str.length > 0);

@@ -14,6 +14,10 @@ import {OutputGraph} from "../outputGraph/outputGraph";
 import {OutputEdge} from "../outputGraph/outputEdge";
 import {OutputStation} from "../outputGraph/outputStation";
 
+/**
+ * TODO: Add information
+ * @param data
+ */
 function extractInputgraph(data: any): InputGraph {
   // convert from plain js object to typescript object and set correct references
   let inputGraph: InputGraph = plainToClass(InputGraph, data);
@@ -30,7 +34,9 @@ function extractInputgraph(data: any): InputGraph {
   return inputGraph;
 }
 
-
+/**
+ * Listener which takes the retrieved data and applies the algorithm onto it.
+ */
 addEventListener('message', ({data}) => {
   console.log("[algorithm-worker] preparing");
   let graphData = data["graph"]
@@ -43,12 +49,15 @@ addEventListener('message', ({data}) => {
   postMessage(outputGraph);
 });
 
+/**
+ * Worker which applies the algorithm from the paper onto the input data.
+ */
 class AlgorithmWorker {
 
   private readonly D: number;
 
-  /*
-  Radius in which nodes around a station are considered
+  /**
+   * Radius in which nodes around a station are considered
    */
   private readonly r: number;
   private readonly _inputGraph: InputGraph;
@@ -58,6 +67,11 @@ class AlgorithmWorker {
   private readonly _settledStations = new Map<Station, GridNode>();
   private readonly _foundPaths = new Map<InputEdge, OctiNode[]>();
   private readonly allowCrossing = false
+
+  /**
+   * Names of the lines which should be drawn
+   * @private
+   */
   private readonly exactString: string[] = []
 
   constructor(inputGraph: InputGraph, data: any) {
@@ -90,7 +104,9 @@ class AlgorithmWorker {
     this._octiGraph = new OctiGraph(inputSize[0] / this.D, inputSize[1] / this.D);
   }
 
-  /* Runs the algorithm with an edge ordering */
+  /**
+   *  Runs the algorithm with an edge ordering
+   */
   performAlgorithm(edgeOrdering: InputEdge[]) {
     this._foundPaths.clear();
     this._settledStations.clear();
@@ -215,6 +231,10 @@ class AlgorithmWorker {
     return [ret1, ret2];
   }
 
+  /**
+   * Filters the edges of the inputgraph by the names within this.exactString
+   * @param inputGraph
+   */
   filterInputGraph(inputGraph: InputGraph) {
     if (this.exactString.length != 0)
       inputGraph.edges = inputGraph.edges.filter(e => this.exactString.some(x => x === e.line[0]))
@@ -421,6 +441,10 @@ class AlgorithmWorker {
       (station.latitude - this._graphOffset[1]) / this.D);
   }
 
+  /**
+   * Creates an output graph for drawing from the calculated data.
+   * @private
+   */
   private createOutputGraph(): OutputGraph {
     const stations: OutputStation[] = [];
     this._settledStations.forEach((node, station) => {

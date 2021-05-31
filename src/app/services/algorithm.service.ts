@@ -39,6 +39,5 @@ export class AlgorithmService {
       r: Filters.r,
       exactString: Filters.exactString,
     });
-
   }
 }

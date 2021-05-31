@@ -8,7 +8,6 @@ export class OutputEdge {
   private _inBetweenStations: string[] = [];
   private _color: string
 
-
   constructor(points: Vector2[], line: string[], inBetweenStations: Station[], color: string) {
     this._points = points;
     this._lines = line;

@@ -51,7 +51,7 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
   while (Q.size() > 0) {
     const u = Q.pop();
 
-    // no no node with non infinty lenght remaining
+    // no no node with non infintiy length remaining
     if (u.dist == Infinity) {
       if (found > 0) {
         totalTime += performance.now() - start1;
@@ -92,6 +92,11 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
   return [];
 }
 
+/**
+ * TODO: Add information
+ * @param from
+ * @param to
+ */
 function heuristic(from: OctiNode, to: GridNode[]): number {
   let min = Infinity;
   to.forEach(toNode => {
@@ -102,6 +107,11 @@ function heuristic(from: OctiNode, to: GridNode[]): number {
   return Constants.COST_HOP * min;
 }
 
+/**
+ * TODO: Add information
+ * @param from
+ * @param to
+ */
 function dist(from: GridNode, to:GridNode): number {
   const dx = Math.abs(from.x - to.x);
   const dy = Math.abs(from.y - to.y);
@@ -113,6 +123,11 @@ function comparator(a: OctiNode, b: OctiNode): number {
   return b.priority - a.priority;
 }
 
+/**
+ * TODO: Add information
+ * @param tmpNode
+ * @param toNodes
+ */
 function createPath(tmpNode: OctiNode, toNodes: OctiNode[]): OctiNode[] {
 
   const to = min(toNodes);
@@ -128,7 +143,9 @@ function createPath(tmpNode: OctiNode, toNodes: OctiNode[]): OctiNode[] {
   return ret.reverse();
 }
 
-// get the toNode with lowest dist
+/**
+ * Get the toNode with lowest dist
+  */
 function min(nodes: OctiNode[]): OctiNode {
   return nodes.reduce((r, e) => r.dist < e.dist ? r : e);
 }

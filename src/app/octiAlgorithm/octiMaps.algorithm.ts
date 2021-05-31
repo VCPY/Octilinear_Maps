@@ -7,15 +7,23 @@ function compareByLineDegree(a: Station, b: Station) {
   return b.lineDegree - a.lineDegree
 }
 
+/**
+ * Calculates the euclidean distance between the coordinates of two stations
+ * @param station1
+ * @param station2
+ */
 function euclideanDistance(station1: Station, station2: Station): number {
   let latDiff = Math.pow((station1.latitude - station2.latitude), 2);
   let longDiff = Math.pow((station1.longitude - station2.longitude), 2);
   return Math.sqrt(latDiff + longDiff);
 }
 
-
+/**
+ * Order the edges by the line degree of incident nodes. Returns an array of the ordered edges.
+ * @param graph The graph whose nodes should be ordered
+ */
 export function orderEdges(graph: InputGraph) {
-  // Sort edges by line degree
+  // Sort nodes by line degree
   graph.nodes.sort(compareByLineDegree);
 
   let orderedEdges: InputEdge[] = [];

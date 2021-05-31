@@ -1,6 +1,9 @@
 import {Station} from "../inputGraph/station";
 import {InputEdge} from "../inputGraph/inputEdge";
 
+/**
+ * TODO: Add information
+ */
 export class RoutedEdge {
   constructor(to: Station, direction: number, edge: InputEdge) {
     this._to = to;

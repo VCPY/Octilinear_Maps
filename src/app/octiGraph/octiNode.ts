@@ -1,6 +1,9 @@
 import {OctiEdge} from "./octiEdge";
 import {GridNode} from "./gridNode";
 
+/**
+ * TODO: Add information
+ */
 export class OctiNode {
   constructor(gridNode: GridNode, id: number, direction: number = 0) {
     this._gridNode = gridNode;

@@ -1,3 +1,6 @@
+/**
+ * TODO: Add information
+ */
 export class BinaryHeap<T> {
   content: T[];
   comparator: (a: T, b: T) => number;

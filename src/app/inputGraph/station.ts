@@ -56,6 +56,10 @@ export class Station {
     this._lineDegree = value;
   }
 
+  /**
+   * Status needed for the algorithm
+   * @private
+   */
   private _status: StationStatus = StationStatus.unprocessed;
 
   get status(): StationStatus {
@@ -86,6 +90,11 @@ export class Station {
     this._lineDegree += amount
   }
 
+  /**
+   * TODO: Add information
+   * @param adjacentEdges
+   * @param adjacentNodes
+   */
   calculateEdgeOrdering(adjacentEdges: Set<InputEdge>, adjacentNodes: Set<Station>) {
     let upVector = [0, 1];
     this._edgeOrdering = Array.from(adjacentEdges.values())
@@ -102,6 +111,12 @@ export class Station {
       .map(x => x.adjacentEdge);
   }
 
+  /**
+   * TODO: Add information
+   * @param beforeId
+   * @param after
+   * @param newEdge
+   */
   replaceStation(beforeId: string, after: Station, newEdge: InputEdge) {
     let nodeArray = Array.from(this.adjacentNodes);
     for (let i = 0; i < this.adjacentNodes.size; i++) {

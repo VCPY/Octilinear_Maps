@@ -1,7 +1,7 @@
 import {Station} from "./station";
 
 /**
- * Represents an edge between two stations. Used in the InputGraph for the algorithm.
+ * Represents a connection between two stations. Used in the InputGraph for the algorithm.
  */
 export class InputEdge {
   constructor(line: string, station1: Station, station2: Station, color: string) {
@@ -60,6 +60,10 @@ export class InputEdge {
     this._inBetweenStations = value;
   }
 
+  /**
+   * The color of the lines for drawing the graph.
+   * @private
+   */
   private _color: string
 
   get color(): string {
@@ -71,7 +75,7 @@ export class InputEdge {
   }
 
   /**
-   * Returns the number of lines
+   * Returns the number of lines stored in this._line
    */
   getLineDegree() {
     return this._line.length
@@ -90,10 +94,18 @@ export class InputEdge {
     return false;
   }
 
+  /**
+   * Adds a line to this._line
+   * @param line
+   */
   addLine(line: string[]) {
     this._line.push(...line)
   }
 
+  /**
+   * Given a station, this method retrieves the according other station. Both are part of this edge.
+   * @param station
+   */
   otherStation(station: Station): Station {
     if (this.station1 == station) return this.station2;
     return this.station1;

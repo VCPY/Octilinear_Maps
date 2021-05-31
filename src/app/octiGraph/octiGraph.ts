@@ -3,6 +3,9 @@ import {OctiNode} from "./octiNode";
 import {OctiEdge} from "./octiEdge";
 import {GridNode} from "./gridNode";
 
+/**
+ * TODO: Add information
+ */
 export class OctiGraph {
 
   private readonly _width;
@@ -87,6 +90,10 @@ export class OctiGraph {
     return this._gridNodes[x][y];
   }
 
+  /**
+   * For the given edge, the edge which is crossing it within the Graph is returned. Both edges must be diagonally placed.
+   * @param edge
+   */
   getDiagonal(edge: OctiEdge) {
     let nodeA = edge.nodeA;
     let nodeB = edge.nodeB;
@@ -144,6 +151,12 @@ export class OctiGraph {
     return undefined;
   }
 
+  /**
+   * For the given edge, its crossing (diagonally) edge is closed by setting the weight to infinity. If crossing is allowed
+   * within the graph, then the weight is set to Constants.COST_CROSSING.
+   * @param edge The edge whose crossing edge should be closed.
+   * @param allowCrossing Boolean if crossing of edges within the graph is allowed.
+   */
   closeDiagonalEdge(edge: OctiEdge, allowCrossing: boolean) {
     const diagonal = this.getDiagonal(edge);
     if (diagonal != undefined) {
