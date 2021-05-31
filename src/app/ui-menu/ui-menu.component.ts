@@ -22,10 +22,6 @@ import {plainToClass} from "class-transformer";
 export class UiMenuComponent implements OnInit {
 
   fileNames = ["stop_times", "stops", "trips", "routes"]
-  stops: string | undefined = undefined
-  stopTimes: string | undefined = undefined
-  trips: string | undefined = undefined
-  routes: string | undefined = undefined
   inputGraph: InputGraph | undefined = undefined
 
   constructor(public dialog: MatDialog, private algorithmService: AlgorithmService) {
