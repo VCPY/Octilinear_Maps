@@ -174,10 +174,10 @@ class AlgorithmWorker {
           const node = this._octiGraph.getNode(x, y);
 
           // avoid duplicates
-          if (ret1.includes(node) || ret2.includes(node)) break;
+          if (ret1.includes(node) || ret2.includes(node)) continue;
           // ignore if this node is settled
-          if (Array.from(this._settledStations.values()).includes(node)) break;
-          //if (this.nodeIsUsed(x, y, this._foundPaths)) break;
+          if (Array.from(this._settledStations.values()).includes(node)) continue;
+          if (this.nodeIsUsed(node)) continue;
 
           // check distance to both stations, assign to lower
           const distance1 = Math.sqrt((coordinates1.x - x) * (coordinates1.x - x) + (coordinates1.y - y) * (coordinates1.y - y));
@@ -216,27 +216,10 @@ class AlgorithmWorker {
     return [ret1, ret2];
   }
 
-  private nodeIsUsed(x: number, y: number, array: Map<InputEdge, OctiNode[]>) {
-    let isUsed = false;
-    if (!this.allowCrossing) {
-      // All nodes which have been used in a path cannot be used
-      array.forEach((value: OctiNode[], key) => {
-        value.forEach(node => {
-          if (node.gridNode.x == x && node.gridNode.y == y) isUsed = true;
-        })
-      });
-    } else {
-      // The nodes at the end of each path cannot be used
-      array.forEach((value: OctiNode[], key) => {
-        if (value.length >= 2) {
-          let first = value[0]
-          let last = value[value.length - 1]
-          if (first.gridNode.x == x && first.gridNode.y == y) isUsed = true
-          if (last.gridNode.x == x && last.gridNode.y == y) isUsed = true
-        }
-      });
-    }
-    return isUsed;
+  private nodeIsUsed(node: GridNode) {
+    return node.octiNodes
+      .flatMap(octNode => octNode.edges)
+      .some(edge => edge.used);
   }
 
   filterInputGraph(inputGraph: InputGraph) {
@@ -310,13 +293,11 @@ class AlgorithmWorker {
         if (candidateGirdNode.station != undefined) continue;
 
         this.removeAllRoutingsTo(station);
+        if (this.nodeIsUsed(candidateGirdNode)) continue;
 
         const result = this.routeAllStationEdges(station, candidateGirdNode);
         result.x = x;
         result.y = y;
-
-        //TODO: Use the correct list to avoid overlaps at the stations
-        //if (this.nodeIsUsed(candidateGirdNode.x, candidateGirdNode.y, this._foundPaths)) continue;
 
         if (result.found.size == station.edgeOrdering.length)
           allReRoutings.push(result);
