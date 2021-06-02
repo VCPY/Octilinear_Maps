@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {FileType, parseDataToInputGraph, parseGTFSToObjectArray} from "../graphs/graph.inputParser";
 import {AlgorithmService} from "../services/algorithm.service";
@@ -10,6 +10,7 @@ import rome from "../saves/rome.json"
 import prague from "../saves/prague.json"
 import detroit from "../saves/detroit.json"
 import {plainToClass} from "class-transformer";
+import {MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-ui-menu',
@@ -75,6 +76,42 @@ export class UiMenuComponent implements OnInit {
   }
 }
 
+class FilterData {
+  private _type: string;
+  private _value: string = "";
+
+  constructor(type: string) {
+    this._type = type;
+  }
+
+  match(line: FilterLine) {
+    if (this._value == "") return false;
+
+    switch (this._type) {
+      case "Starts with":
+        return line.name.startsWith(this._value);
+      case "Ends with":
+        return line.name.endsWith(this._value);
+      case "Is":
+        return line.name == this._value;
+
+      default: return false;
+    };
+  }
+
+  get type(): string {
+    return this._type;
+  }
+
+  get value(): string {
+    return this._value;
+  }
+
+  set value(value: string) {
+    this._value = value;
+  }
+}
+
 @Component({
   selector: 'dialog-data-selection',
   templateUrl: 'dialog-data-selection.html',
@@ -98,6 +135,7 @@ export class DialogDataSelection {
   filterInput: string[] = []
   showLoadingData = false;
   sliderRValue: number = 0.5;
+  filters: FilterData[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
@@ -260,30 +298,28 @@ export class DialogDataSelection {
   /**
    * Increases the number of string filters and initializes its values.
    */
-  increaseChoice() {
-    let id: number;
-    if (this.filterIDs.length == 0) id = 0
-    else id = this.filterIDs[this.filterIDs.length - 1] + 1
+  addFilter(ref: MatSelect, value: string) {
+    ref.value = "";
 
-    this.filterIDs.push(id)
-    this.filterSelection.push("must not start")
-    this.filterInput.push("")
+    this.filters.push(new FilterData(value));
   }
 
   /**
    * Removes the element with the given id from the list of string filters.
    * @param id The id of the element to remove.
    */
-  removeElementFromFilterList(id: number) {
-    for (let i = 0; i < this.filterIDs.length; i++) {
-      if (this.filterIDs[i] == id) {
-        this.filterIDs.splice(i, 1)
-        this.filterInput.splice(i, 1)
-        this.filterSelection.splice(i, 1)
-        break;
-      }
-    }
+  removeElementFromFilterList(filter: FilterData) {
+    this.filters = this.filters.filter(f => f != filter);
+
     this.updateSelection()
+  }
+
+  filterChanged(event: Event, filterData: FilterData) {
+    const target = event.target as HTMLTextAreaElement;
+    const value = target.value;
+    filterData.value = value;
+
+    this.updateSelection();
   }
 
   /**
@@ -322,47 +358,11 @@ export class DialogDataSelection {
    */
   updateSelection() {
     this.lines.forEach(line => {
-      let keep = true;
-      for (let i = 0; i < this.filterInput.length; i++) {
-        let input = DialogDataSelection.getIndividualStrings(this.filterInput[i]);
-        if (input.length == 0) continue
-        let select = this.filterSelection[i];
-        switch (select) {
-          case "must not start":
-            for (let j = 0; j < input.length; j++) {
-              let val = input[j]
-              if (line.name.startsWith(val)) keep = false;
-            }
-            break;
-          case "must not end":
-            for (let j = 0; j < input.length; j++) {
-              let val = input[j]
-              if (line.name.endsWith(val)) keep = false;
-            }
-            break;
-          case "must start":
-            keep = false
-            for (let j = 0; j < input.length; j++) {
-              let val = input[j]
-              if (line.name.startsWith(val)) {
-                keep = true
-                break;
-              }
-            }
-            break;
-          case "must end":
-            keep = false
-            for (let j = 0; j < input.length; j++) {
-              let val = input[j]
-              if (line.name.endsWith(val)) {
-                keep = true
-                break;
-              }
-            }
-            break;
-        }
-        if (!keep) break
-      }
+      let keep = false;
+      this.filters.forEach(filter => {
+        if (filter.match(line)) keep = true;
+      });
+
       if (!keep) this.selection.deselect(line)
       else this.selection.select(line)
     })

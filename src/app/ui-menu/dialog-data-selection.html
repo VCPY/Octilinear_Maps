@@ -68,42 +68,31 @@
                 Multiple strings can be separated by ","
             </div>
             <div class="filtersBox">
-                <div *ngFor="let el of this.filterIDs"
+                <div *ngFor="let filterData of this.filters"
                      style="justify-content: center; align-items:center; display: flex; flex-flow: row;">
-                    <div>
-                        <mat-form-field appearance="fill" id="{{'form' + el}}">
-                            <mat-select value="must not start" (selectionChange)="changeSelected($event.value, el)">
-                                <mat-option value="must not start">
-                                    Must not start with
-                                </mat-option>
-                                <mat-option value="must not end">
-                                    Must not end with
-                                </mat-option>
-                                <mat-option value="must start">
-                                    Must start with
-                                </mat-option>
-                                <mat-option value="must end">
-                                    Must end with
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
+                    <div>{{filterData.type}}</div>
+
                     <div style="margin-left: 1em">
-                        <input id="{{'input' + el}}" (change)="updateListOfStrings($event,el)"
-                               placeholder="Enter string"
-                               value="">
+                        <input (change)="filterChanged($event, filterData)"
+                                placeholder="Enter string"
+                                value="">
                     </div>
-                    <button id="{{'button' + el}}"
-                            style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px"
-                            (click)="removeElementFromFilterList(el)">
+                    <button style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px"
+                            (click)="removeElementFromFilterList(filterData)">
                         -
                     </button>
                 </div>
             </div>
             <div>
-                <button mat-mini-fab style="background-color: green" (click)="increaseChoice()">
-                    <mat-icon>+</mat-icon>
-                </button>
+
+                <mat-form-field appearance="fill">
+                    <mat-label>Select</mat-label>
+                    <mat-select (selectionChange)="addFilter($event.source, $event.value)">
+                        <mat-option value="Starts with">Starts with</mat-option>
+                        <mat-option value="Ends with">Ends with</mat-option>
+                        <mat-option value="Is">Is</mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
 
         </div>
