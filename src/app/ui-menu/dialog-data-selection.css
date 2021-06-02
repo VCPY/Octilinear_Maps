@@ -10,20 +10,13 @@
 }
 
 .mat-table {
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .filtersBox {
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
-    height: 20em;
-}
-
-.tableBox {
-    overflow-y: scroll;
-    overflow-x: hidden;
-    height: 25em;
-    width: 100%;
+    height: 10em;
 }
 
 .loadingDataBox {
@@ -44,3 +37,26 @@
 .title { grid-area: title; }
 .prepared { grid-area: prepared; }
 .upload { grid-area: upload; }
+
+.grid-container-2 {
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 1fr;
+    grid-template-rows: min-content 1fr;
+    gap: 0px 0px;
+    grid-template-areas:
+            "title    title     title"
+            "lines    whitelist blacklist"
+            "settings settings  settings";
+}
+.lines { grid-area: lines; overflow-y: scroll; }
+.whitelist {
+    grid-area: whitelist;
+    overflow-y: auto;
+    padding: 1em;
+}
+.blacklist {
+    grid-area: blacklist;
+    overflow-y: auto;
+    padding: 1em;
+}
+.settings  { grid-area: settings; }

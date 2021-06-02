@@ -37,12 +37,14 @@
     </div>
 </div>
 <div *ngIf="!firstPage">
-    <mat-toolbar color="primary">
-        <span>Select Filters</span>
-    </mat-toolbar>
-    <div style="display: flex; flex-flow: row">
-        <div class="tableBox">
-            <table mat-table [dataSource]="lines" style="width: 100%" class="mat-elevation-z8">
+    <div class="grid-container-2">
+        <div class="title">
+            <mat-toolbar color="primary">
+                <span>Select Filters</span>
+            </mat-toolbar>
+        </div>
+        <div class="lines" style="height: 20em">
+            <table mat-table mat-table-scroll [dataSource]="lines" style="width: 100%" class="mat-elevation-z8">
 
                 <ng-container matColumnDef="name">
                     <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -63,30 +65,12 @@
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
         </div>
-        <div style="margin-left:1em; margin-top:1em; ">
-            <div style="margin-top: 1em; margin-bottom: 1em">
-                Multiple strings can be separated by ","
-            </div>
-            <div class="filtersBox">
-                <div *ngFor="let filterData of this.filters"
-                     style="justify-content: center; align-items:center; display: flex; flex-flow: row;">
-                    <div>{{filterData.type}}</div>
 
-                    <div style="margin-left: 1em">
-                        <input (change)="filterChanged($event, filterData)"
-                                placeholder="Enter string"
-                                value="">
-                    </div>
-                    <button style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px"
-                            (click)="removeElementFromFilterList(filterData)">
-                        -
-                    </button>
-                </div>
-            </div>
-            <div>
-
+        <div class="whitelist">
+            <div style="display: flex; justify-content: space-between">
+                <h2>Whitelist</h2>
                 <mat-form-field appearance="fill">
-                    <mat-label>Select</mat-label>
+                    <mat-label>Add Filter</mat-label>
                     <mat-select (selectionChange)="addFilter($event.source, $event.value)">
                         <mat-option value="Starts with">Starts with</mat-option>
                         <mat-option value="Ends with">Ends with</mat-option>
@@ -95,19 +79,51 @@
                 </mat-form-field>
             </div>
 
+
+            <div class="filtersBox">
+                <div *ngFor="let filterData of this.filters"
+                     style="align-items:center; display: flex; flex-flow: row; margin-bottom: 0.25rem">
+                    <div style="width: 30%">{{filterData.type}}</div>
+
+                    <div style="width: 60%">
+                        <input (change)="filterChanged($event, filterData)"
+                               placeholder="Enter value"
+                               value="">
+                    </div>
+                    <div style="width: 10%">
+                        <button style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px"
+                                (click)="removeElementFromFilterList(filterData)">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="blacklist">
+            <h2>Blacklist</h2>
+        </div>
+
+        <div class="settings">
+            <div style="display: flex; flex-flow: column">
+                <mat-checkbox [(ngModel)]="allowCrossing" class="example-margin">Allow lines to cross each other
+                </mat-checkbox>
+                Warning: Some lines may not be positionable if crossing is not allowed.
+                <mat-slider style="width: 20%; margin-top: 1em; margin-bottom: -0.5em" [(ngModel)]="sliderRValue" min="0.1" max="0.9" step="0.05"
+                            value="0.5"></mat-slider>
+                <div>Graph Scale: {{sliderRValue}}</div>
+                Warning: Some graphs may not be drawable if the value is set to a too large value
+            </div>
         </div>
     </div>
+
+
+
+
+
+
     <hr>
     <div>
-        <div style="display: flex; flex-flow: column">
-            <mat-checkbox [(ngModel)]="allowCrossing" class="example-margin">Allow lines to cross each other
-            </mat-checkbox>
-            Warning: Some lines may not be positionable if crossing is not allowed.
-            <mat-slider style="width: 20%; margin-top: 1em; margin-bottom: -0.5em" [(ngModel)]="sliderRValue" min="0.1" max="0.9" step="0.05"
-                        value="0.5"></mat-slider>
-            <div>Graph Scale: {{sliderRValue}}</div>
-            Warning: Some graphs may not be drawable if the value is set to a too large value
-        </div>
+
     </div>
     <div class="selectButtonDiv">
         <button mat-raised-button (click)="sendData()">Draw Graph</button>
