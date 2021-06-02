@@ -299,8 +299,7 @@ class AlgorithmWorker {
         result.x = x;
         result.y = y;
 
-        if (result.found.size == station.edgeOrdering.length)
-          allReRoutings.push(result);
+        allReRoutings.push(result);
       }
     }
 
@@ -312,8 +311,14 @@ class AlgorithmWorker {
       return;
     }
 
-    const best = allReRoutings.reduce((a, b) => a.cost < b.cost ? a : b);
-    //console.log(station.stationName, "offset by", best.x, best.y);
+    const best = allReRoutings.reduce((a, b) => {
+      if (a.found.size > b.found.size) return a;
+      if (a.found.size < b.found.size) return b;
+      return a.cost < b.cost ? a : b
+    });
+
+    if (best.found.size < station.edgeOrdering.length)
+      console.log(`[algorithm-worker] Local search missing ${station.edgeOrdering.length - best.found.size} edges for: ${station.stationName}`);
 
     best.found.forEach((path, edge) =>
       this.storePath(path, edge, station, edge.otherStation(station)))
