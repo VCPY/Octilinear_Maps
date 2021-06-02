@@ -1,9 +1,11 @@
 <div *ngIf="this.firstPage">
-    <mat-toolbar color="primary">
-        <span>Select Data</span>
-    </mat-toolbar>
-    <div>
-        <div>
+    <div class="grid-container-1">
+        <div class="title">
+            <mat-toolbar color="primary">
+                <span>Select Data</span>
+            </mat-toolbar>
+        </div>
+        <div class="prepared">
             <h2>Prepared Data</h2>
             <mat-radio-group aria-label="Select an option" [(ngModel)]="this.preparedDataSelection"
                              style="display: flex; flex-flow: column; margin-bottom: 2em">
@@ -14,20 +16,18 @@
             </mat-radio-group>
 
             <div class="selectButtonDiv">
-                <button mat-raised-button (click)="selectPreparedData()">Select</button>
+                <button mat-raised-button (click)="selectPreparedData()" style="width : 80%;">Select</button>
             </div>
         </div>
-        <hr>
-        <div>
+        <div class="upload">
             <h2>Upload Data</h2>
-            <div style="margin-bottom: 1em">The upload takes a directory containing files in GTFS format as input. The
-                directory must contain the following files:<br/>
+            <div style="margin-bottom: 1em">You can provide your own data using the gtfs format. The upload takes a directory containing the files following files:<br/>
                 'stop_times.txt', 'stops.txt', 'trips.txt', 'routes.txt'
             </div>
             <input #folderInput type="file" webkitdirectory mozdirectory (change)="saveFiles(folderInput.files)"/>
 
             <div class="selectButtonDiv">
-                <button mat-raised-button (click)="sendUploadedFiles()">Select</button>
+                <button mat-raised-button (click)="sendUploadedFiles()" style="width : 80%; margin-top: 2rem">Select</button>
                 <div *ngIf="showLoadingData" class="loadingDataBox">
                     <div style="margin-right: 1em">Loading, please wait ...</div>
                     <mat-spinner mode="indeterminate" [diameter]="20"></mat-spinner>
