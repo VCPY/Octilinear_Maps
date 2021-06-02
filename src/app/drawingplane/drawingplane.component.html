@@ -1,6 +1,7 @@
 <div style="height: 100vh; display: flex; flex-flow: row">
     <div style="width: 80%; height: 99%; overflow-y: auto; overflow-x: auto">
-        <div id="drawingPlaneSVG"></div>
+        <div id="container" class="svg-container"></div>
+
         <div *ngIf="!hideSpinner"
              style="justify-content: center; display:flex; align-items: center; width: 100%; height: 100vh">
             <mat-spinner mode="indeterminate"></mat-spinner>

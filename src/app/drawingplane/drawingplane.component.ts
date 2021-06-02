@@ -39,10 +39,25 @@ export class DrawingplaneComponent implements OnInit {
     this.createColorPicker(outputGraph)
     this.keys = Object.keys(this.colors)
 
-    this.svg = d3.select("#drawingPlaneSVG").append("svg")
-      .attr("width", this.planeWidth)
-      .attr("height", this.planeHeight)
-      .append("g");
+    const zoom = d3.zoom<SVGSVGElement, unknown>()
+      .on('zoom', (event) => {
+        this.svg.attr('transform', event.transform);
+      })
+      .scaleExtent([1, 40]);
+
+    this.svg = d3.select<SVGSVGElement, unknown>("div#container")
+      .append("svg")
+      .attr("preserveAspectRatio", "xMinYMin meet")
+      .attr("viewBox", "0 0 " + this.planeWidth + " " + this.planeHeight)
+      .style("display", "inline-block")
+      .style("position", "absolute-block")
+      .style("top", 0)
+      .style("left", 0);
+
+    this.svg
+      .call(zoom);
+
+    this.svg = this.svg.append("g");
 
     this.drawPaths(outputGraph);
   }
