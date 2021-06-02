@@ -89,11 +89,11 @@ class FilterData {
 
     switch (this._type) {
       case "Starts with":
-        return line.name.startsWith(this._value);
+        return this.getIndividualStrings().some(value => line.name.startsWith(value));
       case "Ends with":
-        return line.name.endsWith(this._value);
+        return this.getIndividualStrings().some(value => line.name.endsWith(value));
       case "Is":
-        return line.name == this._value;
+        return this.getIndividualStrings().some(value => line.name == value);
 
       default: return false;
     };
@@ -109,6 +109,18 @@ class FilterData {
 
   set value(value: string) {
     this._value = value;
+  }
+
+  /**
+   * Takes a string as input and returns an array of the contained individual strings. Splits by comma, whitespace is removed.
+   * @param input The string which should be split.
+   * @private
+   */
+  private getIndividualStrings() {
+    const input =this._value.replace(/\s/g, "")
+    let inputArr = input.split(",")
+    inputArr = inputArr.filter(str => str.length > 0);
+    return inputArr
   }
 }
 
@@ -269,7 +281,7 @@ export class DialogDataSelection {
     this.inputGraph!.edges.forEach(edge => lines.push(...edge.line))
     this.lines = Array.from(new Set(lines)).map(line => {
       let obj = {name: line, visible: true}
-      this.selection.select(obj)
+      this.selection.deselect(obj)
       return obj
     })
   }
@@ -339,21 +351,6 @@ export class DialogDataSelection {
   }
 
   /**
-   * Callback for changes in the input fields of the string filters.
-   * @param event The event of the change.
-   * @param id The id of the element which has detected a change.
-   */
-  updateListOfStrings(event: Event, id: number) {
-    for (let i = 0; i < this.filterIDs.length; i++) {
-      if (this.filterIDs[i] == id) {
-        this.filterInput[i] = (<HTMLInputElement>(event.target)!).value
-        this.updateSelection()
-        break;
-      }
-    }
-  }
-
-  /**
    * Update function which updates the selection of lines based on the string filters.
    */
   updateSelection() {
@@ -366,18 +363,6 @@ export class DialogDataSelection {
       if (!keep) this.selection.deselect(line)
       else this.selection.select(line)
     })
-  }
-
-  /**
-   * Takes a string as input and returns an array of the contained individual strings. Splits by comma, whitespace is removed.
-   * @param input The string which should be split.
-   * @private
-   */
-  private static getIndividualStrings(input: string) {
-    input = input.replace(/\s/g, "")
-    let inputArr = input.split(",")
-    inputArr = inputArr.filter(str => str.length > 0);
-    return inputArr
   }
 }
 
