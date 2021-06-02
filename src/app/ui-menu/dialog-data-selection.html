@@ -71,7 +71,7 @@
                 <h2>Whitelist</h2>
                 <mat-form-field appearance="fill">
                     <mat-label>Add Filter</mat-label>
-                    <mat-select (selectionChange)="addFilter($event.source, $event.value)">
+                    <mat-select (selectionChange)="addFilter($event.source, $event.value, true)">
                         <mat-option value="Starts with">Starts with</mat-option>
                         <mat-option value="Ends with">Ends with</mat-option>
                         <mat-option value="Is">Is</mat-option>
@@ -81,7 +81,7 @@
 
 
             <div class="filtersBox">
-                <div *ngFor="let filterData of this.filters"
+                <div *ngFor="let filterData of this.whitelist"
                      style="align-items:center; display: flex; flex-flow: row; margin-bottom: 0.25rem">
                     <div style="width: 30%">{{filterData.type}}</div>
 
@@ -92,7 +92,7 @@
                     </div>
                     <div style="width: 10%">
                         <button style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px"
-                                (click)="removeElementFromFilterList(filterData)">
+                                (click)="removeElementFromFilterList(filterData, true)">
                         </button>
                     </div>
                 </div>
@@ -100,7 +100,36 @@
         </div>
 
         <div class="blacklist">
-            <h2>Blacklist</h2>
+            <div style="display: flex; justify-content: space-between">
+                <h2>Blacklist</h2>
+                <mat-form-field appearance="fill">
+                    <mat-label>Add Filter</mat-label>
+                    <mat-select (selectionChange)="addFilter($event.source, $event.value, false)">
+                        <mat-option value="Starts with">Starts with</mat-option>
+                        <mat-option value="Ends with">Ends with</mat-option>
+                        <mat-option value="Is">Is</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+
+            <div class="filtersBox">
+                <div *ngFor="let filterData of this.blacklist"
+                     style="align-items:center; display: flex; flex-flow: row; margin-bottom: 0.25rem">
+                    <div style="width: 30%">{{filterData.type}}</div>
+
+                    <div style="width: 60%">
+                        <input (change)="filterChanged($event, filterData)"
+                               placeholder="Enter value"
+                               value="">
+                    </div>
+                    <div style="width: 10%">
+                        <button style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px"
+                                (click)="removeElementFromFilterList(filterData, false)">
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="settings">

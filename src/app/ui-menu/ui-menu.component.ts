@@ -142,12 +142,10 @@ export class DialogDataSelection {
   displayedColumns: string[] = ["name", "visible"]
   lines: FilterLine[] = []
   selection = new SelectionModel<FilterLine>(true, []);
-  filterIDs = [0]
-  filterSelection: string[] = ["must not start"]
-  filterInput: string[] = []
   showLoadingData = false;
   sliderRValue: number = 0.5;
-  filters: FilterData[] = [];
+  whitelist: FilterData[] = [];
+  blacklist: FilterData[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
@@ -310,18 +308,24 @@ export class DialogDataSelection {
   /**
    * Increases the number of string filters and initializes its values.
    */
-  addFilter(ref: MatSelect, value: string) {
+  addFilter(ref: MatSelect, value: string, whitelist: boolean) {
     ref.value = "";
 
-    this.filters.push(new FilterData(value));
+    if (whitelist)
+      this.whitelist.push(new FilterData(value));
+    else
+      this.blacklist.push(new FilterData(value));
   }
 
   /**
    * Removes the element with the given id from the list of string filters.
    * @param id The id of the element to remove.
    */
-  removeElementFromFilterList(filter: FilterData) {
-    this.filters = this.filters.filter(f => f != filter);
+  removeElementFromFilterList(filter: FilterData, whitelist: boolean) {
+    if (whitelist)
+      this.whitelist = this.whitelist.filter(f => f != filter);
+    else
+    this.blacklist = this.blacklist.filter(f => f != filter);
 
     this.updateSelection()
   }
@@ -335,29 +339,17 @@ export class DialogDataSelection {
   }
 
   /**
-   * Callback for the selection of the string filters.
-   * @param value The new value of the selection.
-   * @param elementID The ID of the element which has changed.
-   */
-  changeSelected(value: string, elementID: number) {
-    for (let i = 0; i < this.filterIDs.length; i++) {
-      let id = this.filterIDs[i]
-      if (id == elementID) {
-        this.filterSelection[i] = value
-        break;
-      }
-    }
-    this.updateSelection()
-  }
-
-  /**
    * Update function which updates the selection of lines based on the string filters.
    */
   updateSelection() {
     this.lines.forEach(line => {
       let keep = false;
-      this.filters.forEach(filter => {
+      this.whitelist.forEach(filter => {
         if (filter.match(line)) keep = true;
+      });
+
+      this.blacklist.forEach(filter => {
+        if (filter.match(line)) keep = false;
       });
 
       if (!keep) this.selection.deselect(line)
