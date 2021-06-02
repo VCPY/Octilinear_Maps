@@ -21,4 +21,6 @@
 .lines {
     grid-area: lines;
     overflow-y: scroll;
+    background-color: #eceaea;
+    padding-left: 1em;
 }
