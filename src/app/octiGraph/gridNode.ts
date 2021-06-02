@@ -200,7 +200,7 @@ export class GridNode {
   }
 
   closeEdgesBetweenIndices(from: number, to: number) {
-    let value = from;
+    let value = Constants.fixIndex(from);
     value = value % 8;
     while (value != to) {
       this.octiNodes[Constants.SINK].edges[value].weight = Infinity;

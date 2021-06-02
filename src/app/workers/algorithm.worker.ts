@@ -95,7 +95,7 @@ class AlgorithmWorker {
     // but it looks better when we recalculate it.
     inputGraph.calculateEdgeOrderingAtNode();
 
-    this.r = 1;
+    this.r = 2;
     this._inputGraph = inputGraph;
 
     // create octi graph
@@ -190,9 +190,10 @@ class AlgorithmWorker {
           const node = this._octiGraph.getNode(x, y);
 
           // avoid duplicates
-          if (ret1.includes(node) || ret2.includes(node)) break;
+          if (ret1.includes(node) || ret2.includes(node)) continue;
           // ignore if this node is settled
-          if (Array.from(this._settledStations.values()).includes(node)) break;
+          if (Array.from(this._settledStations.values()).includes(node)) continue;
+          if (this.nodeIsUsed(node)) continue;
 
           // check distance to both stations, assign to lower
           const distance1 = Math.sqrt((coordinates1.x - x) * (coordinates1.x - x) + (coordinates1.y - y) * (coordinates1.y - y));
@@ -229,6 +230,16 @@ class AlgorithmWorker {
     }
     // from, to
     return [ret1, ret2];
+  }
+
+  /**
+   * Checks if the node has already been used in any routing.
+   * @param node
+   */
+  private nodeIsUsed(node: GridNode) {
+    return node.octiNodes
+      .flatMap(octNode => octNode.edges)
+      .some(edge => edge.used);
   }
 
   /**
@@ -306,13 +317,13 @@ class AlgorithmWorker {
         if (candidateGirdNode.station != undefined) continue;
 
         this.removeAllRoutingsTo(station);
+        if (this.nodeIsUsed(candidateGirdNode)) continue;
 
         const result = this.routeAllStationEdges(station, candidateGirdNode);
         result.x = x;
         result.y = y;
 
-        if (result.found.size == station.edgeOrdering.length)
-          allReRoutings.push(result);
+        allReRoutings.push(result);
       }
     }
 
@@ -324,8 +335,14 @@ class AlgorithmWorker {
       return;
     }
 
-    const best = allReRoutings.reduce((a, b) => a.cost < b.cost ? a : b);
-    //console.log(station.stationName, "offset by", best.x, best.y);
+    const best = allReRoutings.reduce((a, b) => {
+      if (a.found.size > b.found.size) return a;
+      if (a.found.size < b.found.size) return b;
+      return a.cost < b.cost ? a : b
+    });
+
+    if (best.found.size < station.edgeOrdering.length)
+      console.log(`[algorithm-worker] Local search missing ${station.edgeOrdering.length - best.found.size} edges for: ${station.stationName}`);
 
     best.found.forEach((path, edge) =>
       this.storePath(path, edge, station, edge.otherStation(station)))
