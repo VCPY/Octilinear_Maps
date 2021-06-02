@@ -97,6 +97,8 @@ class FilterData {
         return this.getIndividualStrings().some(value => line.name == value);
       case "All":
         return true;
+      case "Route Type":
+        return false; //this.getIndividualStrings().some(value => line.routeType == value));
 
       default: return false;
     };
@@ -339,6 +341,12 @@ export class DialogDataSelection {
     const target = event.target as HTMLTextAreaElement;
     const value = target.value;
     filterData.value = value;
+
+    this.updateSelection();
+  }
+
+  filterSelectChanged(matSelect: MatSelect, filterData: FilterData) {
+    filterData.value = (<string[]>matSelect.value).join(",");
 
     this.updateSelection();
   }

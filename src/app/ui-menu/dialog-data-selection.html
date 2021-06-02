@@ -72,6 +72,7 @@
                 <mat-form-field appearance="fill">
                     <mat-label>Add Filter</mat-label>
                     <mat-select (selectionChange)="addFilter($event.source, $event.value, true)">
+                        <mat-option value="Route Type">Route Type</mat-option>
                         <mat-option value="Starts with">Starts with</mat-option>
                         <mat-option value="Ends with">Ends with</mat-option>
                         <mat-option value="Is">Is</mat-option>
@@ -87,9 +88,23 @@
                     <div style="width: 30%">{{filterData.type}}</div>
 
                     <div style="width: 60%">
-                        <input *ngIf="filterData.type != 'All'" (change)="filterChanged($event, filterData)"
+                        <input *ngIf="['Starts with', 'Ends with', 'Is'].includes(filterData.type)" (change)="filterChanged($event, filterData)"
                                placeholder="Enter value"
                                value="">
+
+                        <mat-select *ngIf="filterData.type == 'Route Type'" multiple
+                                    (selectionChange)="filterSelectChanged($event.source, filterData)">
+                            <mat-option value="0">Tram</mat-option>
+                            <mat-option value="1">Subway</mat-option>
+                            <mat-option value="2">Rail</mat-option>
+                            <mat-option value="3">Bus</mat-option>
+                            <mat-option value="4">Ferry</mat-option>
+                            <mat-option value="5">Cable Tram</mat-option>
+                            <mat-option value="6">Aerial lift</mat-option>
+                            <mat-option value="7">Funicular</mat-option>
+                            <mat-option value="11">Trolleybus</mat-option>
+                            <mat-option value="12">Monorail</mat-option>
+                        </mat-select>
                     </div>
                     <div style="width: 10%">
                         <button style="background-color: #ff0000; margin-left: 1em; border-radius: 50%; width: 20px; height:20px; border: none"
