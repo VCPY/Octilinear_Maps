@@ -96,7 +96,7 @@ export class DrawingplaneComponent implements OnInit {
       .attr("class", "lineclass" + edge.lines[0])
       .style("fill", "none")
       .style("stroke-width", "2px")
-      .style("stroke", edge.color);
+      .style("stroke", edge.colors[0]);
 
     if (edge.lines.length > 1) {
       for (let j = 1; j < edge.lines.length; j++) {
@@ -130,7 +130,7 @@ export class DrawingplaneComponent implements OnInit {
             .style("fill", "none")
             .style("class", "hello")
             .style("stroke-width", "2px")
-            .style("stroke", edge.color)
+            .style("stroke", edge.colors[j])
             .attr("class", "lineclass" + edge.lines[j])
             .attr("x1", this.planeXPosition(data[0]) + offsetX)
             .attr("y1", this.planeYPosition(data[0]) + offsetY)
@@ -389,7 +389,9 @@ export class DrawingplaneComponent implements OnInit {
    */
   private createColorPicker(outputGraph: OutputGraph) {
     outputGraph.paths.forEach(path => {
-      path.lines.forEach(line => this.colors[line] = path.color)
-    })
+      for (let i = 0; i < path.lines.length; i++) {
+        this.colors[path.lines[i]] = path.colors[i];
+      }
+    });
   }
 }

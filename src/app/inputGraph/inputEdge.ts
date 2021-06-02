@@ -8,8 +8,8 @@ export class InputEdge {
     this._line.push(line);
     this._station1 = station1;
     this._station2 = station2;
-    if (color == undefined) this._color = "#000000"
-    else this._color = color.length < 6 ? "#000000" : color;
+    if (color == undefined) this._color.push("#000000");
+    else this._color.push(color.length < 6 ? "#000000" : color);
   }
 
   private _station1: Station;
@@ -42,10 +42,6 @@ export class InputEdge {
     return this._line;
   }
 
-  set line(value: string[]) {
-    this._line = value;
-  }
-
   /**
    * Stations with a line degree of two which lie on this edge
    * @private
@@ -61,16 +57,16 @@ export class InputEdge {
   }
 
   /**
-   * The color of the lines for drawing the graph.
+   * The colors of the lines for drawing the graph.
    * @private
    */
-  private _color: string
+  private _color: string[] = []
 
-  get color(): string {
+  get color(): string[] {
     return this._color;
   }
 
-  set color(value: string) {
+  set color(value: string[]) {
     this._color = value;
   }
 
@@ -98,8 +94,9 @@ export class InputEdge {
    * Adds a line to this._line
    * @param line
    */
-  addLine(line: string[]) {
-    this._line.push(...line)
+  addLine(line: string[], color: string[]) {
+    this._line.push(...line);
+    this._color.push(...color);
   }
 
   /**
