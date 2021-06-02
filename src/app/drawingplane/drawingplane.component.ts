@@ -96,9 +96,7 @@ export class DrawingplaneComponent implements OnInit {
       .attr("class", "lineclass" + edge.lines[0])
       .style("fill", "none")
       .style("stroke-width", "2px")
-      .style("stroke", edge.color)
-      .on("mouseover", () => this.createLineLabel(edge))
-      .on("mouseout", () => this.removeLineLabel());
+      .style("stroke", edge.color);
 
     if (edge.lines.length > 1) {
       for (let j = 1; j < edge.lines.length; j++) {
@@ -137,12 +135,26 @@ export class DrawingplaneComponent implements OnInit {
             .attr("x1", this.planeXPosition(data[0]) + offsetX)
             .attr("y1", this.planeYPosition(data[0]) + offsetY)
             .attr("x2", this.planeXPosition(data[1]) + offsetX)
-            .attr("y2", this.planeYPosition(data[1]) + offsetY)
-            .on("mouseover", () => this.createLineLabel(edge))
-            .on("mouseout", () => this.removeLineLabel())
+            .attr("y2", this.planeYPosition(data[1]) + offsetY);
         }
       }
     }
+
+    let hover = this.svg.selectAll(".line")
+      .data([edge.points])
+      .enter().append("path")
+      .attr("d", line)
+      .style("fill", "none")
+      .style("stroke-width", "16px")
+      .style("stroke", "rgba(0, 0, 0, 0)")
+      .on("mouseover", () => {
+        this.createLineLabel(edge);
+        this.highlight(edge);
+      })
+      .on("mouseout", () => {
+        this.removeLineLabel();
+        this.removeHighlight();
+      });
 
     let pathNode = path.node();
     let pathLength = pathNode.getTotalLength();
@@ -200,6 +212,25 @@ export class DrawingplaneComponent implements OnInit {
   private removeLineLabel() {
     this.svg.selectAll("text.labelLine").remove();
     this.svg.selectAll("rect").remove();
+  }
+
+  /**
+   * Adds a dropshadow to all lines that match the edge by adding the global .highlight class.
+   * @param edge
+   */
+  private highlight(edge: OutputEdge) {
+    edge.lines.forEach(line => {
+      d3.selectAll(".lineclass" + line)
+        .classed("highlight", true)
+    });
+  }
+
+  /**
+   * Removes all highlights.
+   */
+  private removeHighlight() {
+    this.svg.selectAll("*")
+      .classed("highlight", false);
   }
 
   /**
