@@ -2,7 +2,23 @@
     display: inline-block;
     position: relative;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     vertical-align: top;
     overflow: hidden;
+}
+
+.grid-container {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 20em;
+    grid-template-rows: 1fr;
+    gap: 0px 0px;
+    grid-template-areas:
+            "graph lines";
+}
+.graph { grid-area: graph; }
+.lines {
+    grid-area: lines;
+    overflow-y: scroll;
 }

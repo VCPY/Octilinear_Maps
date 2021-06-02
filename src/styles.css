@@ -5,3 +5,8 @@
     filter: drop-shadow(0 0 0.4rem rgba(0, 0, 0, 0.8));
     transition: opacity 0.3s ease-in-out;
 }
+
+html, body {
+    padding: 0;
+    margin: 0;
+}
