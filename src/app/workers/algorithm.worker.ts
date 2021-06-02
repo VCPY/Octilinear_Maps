@@ -81,7 +81,7 @@ class AlgorithmWorker {
     // but it looks better when we recalculate it.
     inputGraph.calculateEdgeOrderingAtNode();
 
-    this.r = 1;
+    this.r = 2;
     this._inputGraph = inputGraph;
 
     // create octi graph
