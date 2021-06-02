@@ -85,15 +85,18 @@ class FilterData {
   }
 
   match(line: FilterLine) {
-    if (this._value == "") return false;
-
     switch (this._type) {
       case "Starts with":
+        if (this._value == "") return false;
         return this.getIndividualStrings().some(value => line.name.startsWith(value));
       case "Ends with":
+        if (this._value == "") return false;
         return this.getIndividualStrings().some(value => line.name.endsWith(value));
       case "Is":
+        if (this._value == "") return false;
         return this.getIndividualStrings().some(value => line.name == value);
+      case "All":
+        return true;
 
       default: return false;
     };
@@ -315,6 +318,8 @@ export class DialogDataSelection {
       this.whitelist.push(new FilterData(value));
     else
       this.blacklist.push(new FilterData(value));
+
+    this.updateSelection();
   }
 
   /**

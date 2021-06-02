@@ -75,6 +75,7 @@
                         <mat-option value="Starts with">Starts with</mat-option>
                         <mat-option value="Ends with">Ends with</mat-option>
                         <mat-option value="Is">Is</mat-option>
+                        <mat-option value="All">All</mat-option>
                     </mat-select>
                 </mat-form-field>
             </div>
@@ -86,12 +87,12 @@
                     <div style="width: 30%">{{filterData.type}}</div>
 
                     <div style="width: 60%">
-                        <input (change)="filterChanged($event, filterData)"
+                        <input *ngIf="filterData.type != 'All'" (change)="filterChanged($event, filterData)"
                                placeholder="Enter value"
                                value="">
                     </div>
                     <div style="width: 10%">
-                        <button style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px; border: none"
+                        <button style="background-color: #ff0000; margin-left: 1em; border-radius: 50%; width: 20px; height:20px; border: none"
                                 (click)="removeElementFromFilterList(filterData, true)">
                         </button>
                     </div>
