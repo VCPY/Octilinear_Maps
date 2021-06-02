@@ -59,4 +59,4 @@
     overflow-y: auto;
     padding: 1em;
 }
-.settings  { grid-area: settings; }
+.settings  { grid-area: settings; padding-top: 0.5rem; }
