@@ -107,21 +107,24 @@ export class DrawingplaneComponent implements OnInit {
         if (j % 2 != 0) step *= -1;
 
         for (let i = 0; i < edge.points.length - 1; i++) {
-          let data = [edge.points[i], edge.points[i + 1]]
-          let dx = Math.abs(edge.points[i].x - edge.points[i + 1].x)
-          let dy = Math.abs(edge.points[i].y - edge.points[i + 1].y)
+          let data = [edge.points[i], edge.points[i + 1]];
+          let dx = edge.points[i].x - edge.points[i + 1].x;
+          let dy = edge.points[i].y - edge.points[i + 1].y;
 
-          let offsetX = 2.5 * step
-          let offsetY = 0
+          let offsetX = 0;
+          let offsetY = 0;
           if (dx == 0) {
-            offsetX = 2.5 * step
+            offsetX = 2.5 * step;
+            offsetY = 0;
           } else if (dy == 0) {
-            offsetX = 0
-            offsetY = 2.5 * step
-          } else if (dx == 1 && dy == 1) {
-            offsetX = 3 * step
-          } else if (dx == -1 && dy == 1) {
-            offsetX = -3 * step
+            offsetX = 0;
+            offsetY = 2.5 * step;
+          } else if (dx * dy > 0) {
+            offsetX = 2.5 / 1.41 * step;
+            offsetY = 2.5 / 1.41 * step;
+          } else if (dx * dy < 0) {
+            offsetX = -2.5 / 1.41 * step;
+            offsetY = 2.5 / 1.41 * step;
           }
 
           this.svg
