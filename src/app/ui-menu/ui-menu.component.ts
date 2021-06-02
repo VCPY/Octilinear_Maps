@@ -98,7 +98,7 @@ class FilterData {
       case "All":
         return true;
       case "Route Type":
-        return false; //this.getIndividualStrings().some(value => line.routeType == value));
+        return this.getIndividualStrings().some(value => line.routeType == value);
 
       default: return false;
     };
@@ -280,13 +280,14 @@ export class DialogDataSelection {
    * @private
    */
   private prepareTable() {
-    let lines: string[] = []
-    this.inputGraph!.edges.forEach(edge => lines.push(...edge.line))
-    this.lines = Array.from(new Set(lines)).map(line => {
-      let obj = {name: line, visible: true}
-      this.selection.deselect(obj)
-      return obj
-    })
+    const lines = new Map<string, FilterLine>();
+
+    this.inputGraph!.edges.forEach(edge => {
+      if (!lines.has(edge.line[0]))
+        lines.set(edge.line[0], {name: edge.line[0], visible: false, routeType: edge.routeType})
+    });
+
+    this.lines = Array.from(lines.values());
   }
 
   /**
@@ -374,4 +375,5 @@ export class DialogDataSelection {
 export interface FilterLine {
   name: string,
   visible: boolean,
+  routeType: string,
 }
