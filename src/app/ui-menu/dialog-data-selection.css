@@ -45,6 +45,7 @@
     gap: 0px 0px;
     grid-template-areas:
             "title    title     title"
+            "lines    note      note"
             "lines    whitelist blacklist"
             "settings settings  settings";
 }
@@ -60,3 +61,4 @@
     padding: 1em;
 }
 .settings  { grid-area: settings; padding-top: 0.5rem; }
+.note {grid-area: note; padding: 1em;}

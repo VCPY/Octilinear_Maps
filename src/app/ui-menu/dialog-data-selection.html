@@ -43,6 +43,7 @@
                 <span>Select Filters</span>
             </mat-toolbar>
         </div>
+        <div class="note">Multiple strings can be separated by ","</div>
         <div class="lines" style="height: 20em">
             <table mat-table mat-table-scroll [dataSource]="lines" style="width: 100%" class="mat-elevation-z8">
 
@@ -93,7 +94,7 @@
                     </div>
                     <div style="width: 10%">
                         <button style="background-color: #ff0000; margin-left: 1em; border-radius: 50%; width: 20px; height:20px; border: none"
-                                (click)="removeElementFromFilterList(filterData, true)">
+                                (click)="removeElementFromFilterList(filterData, true)">X
                         </button>
                     </div>
                 </div>
@@ -126,7 +127,7 @@
                     </div>
                     <div style="width: 10%">
                         <button style="background-color: red; margin-left: 1em; border-radius: 50%; width: 20px; height:20px; border: none"
-                                (click)="removeElementFromFilterList(filterData, false)">
+                                (click)="removeElementFromFilterList(filterData, false)">X
                         </button>
                     </div>
                 </div>
