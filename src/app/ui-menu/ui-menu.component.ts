@@ -1,6 +1,5 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {FileType, parseDataToInputGraph, parseGTFSToObjectArray} from "../graphs/graph.inputParser";
 import {AlgorithmService} from "../services/algorithm.service";
 import {Filters} from "../inputGraph/inputGraph.filter";
 import {InputGraph} from "../inputGraph/inputGraph";
@@ -11,6 +10,7 @@ import prague from "../saves/prague.json"
 import detroit from "../saves/detroit.json"
 import {plainToClass} from "class-transformer";
 import {MatSelect} from "@angular/material/select";
+import {GtfsService} from "../services/gtfs.service";
 
 @Component({
   selector: 'app-ui-menu',
@@ -152,7 +152,7 @@ export class DialogDataSelection {
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
-    @Inject(MAT_DIALOG_DATA) public data: string) {
+    @Inject(MAT_DIALOG_DATA) public data: string, private gtfsService: GtfsService) {
   }
 
   /**
@@ -229,26 +229,43 @@ export class DialogDataSelection {
         let file = this.uploadedFiles![key]
         switch (file.name) {
           case "trips.txt":
-            promises.push(parseGTFSToObjectArray(file, FileType.TRIPS).then(result => trips = result));
+            trips = file
+            //promises.push(parseGTFSToObjectArray(file, FileType.TRIPS).then(result => trips = result));
             break;
           case "stops.txt":
-            promises.push(parseGTFSToObjectArray(file!, FileType.STOPS).then(result => stops = result))
+            stops = file
+            //promises.push(parseGTFSToObjectArray(file!, FileType.STOPS).then(result => stops = result))
             break;
           case "routes.txt":
-            promises.push(parseGTFSToObjectArray(file!, FileType.ROUTES).then(result => routes = result))
+            routes = file
+            //promises.push(parseGTFSToObjectArray(file!, FileType.ROUTES).then(result => routes = result))
             break;
           case "stop_times.txt":
-            promises.push(parseGTFSToObjectArray(file!, FileType.STOPTIMES).then(result => stopTimes = result))
+            stopTimes = file
+            //promises.push(parseGTFSToObjectArray(file!, FileType.STOPTIMES).then(result => stopTimes = result))
             break;
           default: //Ignore
         }
       })
-      Promise.all(promises).then(_ => {
-        this.inputGraph = parseDataToInputGraph([trips, stops, routes, stopTimes])
+      let that = this
+      this.gtfsService.OnReceivedResult.subscribe(graph=>{
+        // Here graph is an object
+        that.inputGraph = graph
+        // Inside here, graph.edges is undefined
+        that.prepareTable()
+        that.showLoadingData = false;
+        that.firstPage = false
+      })
+     this.gtfsService.loadData(routes, trips, stops, stopTimes)
+
+
+      /*Promise.all(promises).then(_ => {
+        this.inputGraph = parseDataToInputGraphparseDataToInputGraph([trips, stops, routes, stopTimes])
         this.prepareTable()
         this.showLoadingData = false;
         this.firstPage = false
-      })
+      })*/
+
     } else {
       if (this.preparedDataSelection != undefined) {
         switch (this.preparedDataSelection!) {
@@ -279,6 +296,8 @@ export class DialogDataSelection {
    */
   private prepareTable() {
     let lines: string[] = []
+    console.log(this.inputGraph)
+    // Here this.inputgraph.edges is undefined (although in the log output it is not)
     this.inputGraph!.edges.forEach(edge => lines.push(...edge.line))
     this.lines = Array.from(new Set(lines)).map(line => {
       let obj = {name: line, visible: true}
