@@ -11,6 +11,7 @@ import detroit from "../saves/detroit.json"
 import {plainToClass} from "class-transformer";
 import {MatSelect} from "@angular/material/select";
 import {GtfsService} from "../services/gtfs.service";
+import {extractInputgraph} from "../workers/algorithm.worker";
 
 @Component({
   selector: 'app-ui-menu',
@@ -249,9 +250,7 @@ export class DialogDataSelection {
       })
       let that = this
       this.gtfsService.OnReceivedResult.subscribe(graph=>{
-        // Here graph is an object
-        that.inputGraph = graph
-        // Inside here, graph.edges is undefined
+        that.inputGraph = extractInputgraph(graph)
         that.prepareTable()
         that.showLoadingData = false;
         that.firstPage = false
@@ -296,8 +295,6 @@ export class DialogDataSelection {
    */
   private prepareTable() {
     let lines: string[] = []
-    console.log(this.inputGraph)
-    // Here this.inputgraph.edges is undefined (although in the log output it is not)
     this.inputGraph!.edges.forEach(edge => lines.push(...edge.line))
     this.lines = Array.from(new Set(lines)).map(line => {
       let obj = {name: line, visible: true}

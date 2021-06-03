@@ -18,7 +18,7 @@ import {OutputStation} from "../outputGraph/outputStation";
  * Takes the data retrieved from the event listener and parses the elements from plain javascript object to their respective classes.
  * @param data The plain object input graph to parse.
  */
-function extractInputgraph(data: any): InputGraph {
+export function extractInputgraph(data: any): InputGraph {
   // convert from plain js object to typescript object and set correct references
   let inputGraph: InputGraph = plainToClass(InputGraph, data);
   inputGraph.nodes = inputGraph.nodes.map(n => plainToClass(Station, n));
