@@ -21,8 +21,6 @@ export class GtfsService {
 
     this.worker = new Worker('../workers/gtfs.worker', {type: 'module', name: "gtfs-worker"});
     this.worker.onmessage = ({data}) => {
-      //TODO:
-      console.log("On message called")
       this._inputGraphSubject.next(data);
     };
   }

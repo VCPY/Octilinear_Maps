@@ -231,19 +231,15 @@ export class DialogDataSelection {
         switch (file.name) {
           case "trips.txt":
             trips = file
-            //promises.push(parseGTFSToObjectArray(file, FileType.TRIPS).then(result => trips = result));
             break;
           case "stops.txt":
             stops = file
-            //promises.push(parseGTFSToObjectArray(file!, FileType.STOPS).then(result => stops = result))
             break;
           case "routes.txt":
             routes = file
-            //promises.push(parseGTFSToObjectArray(file!, FileType.ROUTES).then(result => routes = result))
             break;
           case "stop_times.txt":
             stopTimes = file
-            //promises.push(parseGTFSToObjectArray(file!, FileType.STOPTIMES).then(result => stopTimes = result))
             break;
           default: //Ignore
         }
@@ -256,15 +252,6 @@ export class DialogDataSelection {
         that.firstPage = false
       })
      this.gtfsService.loadData(routes, trips, stops, stopTimes)
-
-
-      /*Promise.all(promises).then(_ => {
-        this.inputGraph = parseDataToInputGraphparseDataToInputGraph([trips, stops, routes, stopTimes])
-        this.prepareTable()
-        this.showLoadingData = false;
-        this.firstPage = false
-      })*/
-
     } else {
       if (this.preparedDataSelection != undefined) {
         switch (this.preparedDataSelection!) {
