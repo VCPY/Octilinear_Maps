@@ -75,9 +75,11 @@ export default class GraphInputParser {
 
     let routeNamesByRouteID: { [id: string]: string } = {};
     let routeColorByRouteID: { [id: string]: string } = {};
+    let routeTypeByRouteID: { [id: string]: string } = {};
     this.routes.forEach(route => routeNamesByRouteID["" + route["route_id"]] = "" + route["route_short_name"]);
     this.routes.forEach(route => {
       if (route["route_color"] != undefined) routeColorByRouteID["" + route["route_id"]] = "#" + route["route_color"]
+      routeTypeByRouteID["" + route["route_id"]] = "" + route["route_type"];
     })
 
     let tripsByID: { [id: string]: Trip } = {};
@@ -97,6 +99,7 @@ export default class GraphInputParser {
       trip.routeID = routeIDsByTripIDs[trip.tripID];
       trip.routeShortName = routeNamesByRouteID[trip.routeID];
       trip.lineColor = routeColorByRouteID[trip.routeID];
+      trip.routeType = routeTypeByRouteID[trip.routeID];
 
       if (!containsTrip(resultTrip, trip)) {
         resultTrip.push(trip);
@@ -112,7 +115,7 @@ export default class GraphInputParser {
         let station1 = stationsByID[stationIdMapper.get(id1) as string];
         let station2 = stationsByID[stationIdMapper.get(id2) as string];
 
-        let inputEdge = new InputEdge(trip.routeShortName, station1, station2, trip.lineColor);
+        let inputEdge = new InputEdge(trip.routeShortName, station1, station2, trip.lineColor, trip.routeType);
         if (inputEdge.station2 == undefined || inputEdge.station1 == undefined) {
           continue
         }

@@ -233,7 +233,7 @@ export class InputGraph {
       let edge = this._edges[i];
       let equalEdge = this.containsEdge(result, edge);
       if (equalEdge != undefined) {
-        equalEdge.addLine(edge.line)
+        equalEdge.addLine(edge.line, edge.color)
       } else {
         result.push(edge);
       }
