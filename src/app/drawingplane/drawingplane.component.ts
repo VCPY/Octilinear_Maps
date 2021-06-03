@@ -39,10 +39,25 @@ export class DrawingplaneComponent implements OnInit {
     this.createColorPicker(outputGraph)
     this.keys = Object.keys(this.colors)
 
-    this.svg = d3.select("#drawingPlaneSVG").append("svg")
-      .attr("width", this.planeWidth)
-      .attr("height", this.planeHeight)
-      .append("g");
+    const zoom = d3.zoom<SVGSVGElement, unknown>()
+      .on('zoom', (event) => {
+        this.svg.attr('transform', event.transform);
+      })
+      .scaleExtent([1, 40]);
+
+    this.svg = d3.select<SVGSVGElement, unknown>("div#container")
+      .append("svg")
+      .attr("preserveAspectRatio", "xMinYMin meet")
+      .attr("viewBox", "0 0 " + this.planeWidth + " " + this.planeHeight)
+      .style("display", "inline-block")
+      .style("position", "absolute-block")
+      .style("top", 0)
+      .style("left", 0);
+
+    this.svg
+      .call(zoom);
+
+    this.svg = this.svg.append("g");
 
     this.drawPaths(outputGraph);
   }
@@ -81,9 +96,7 @@ export class DrawingplaneComponent implements OnInit {
       .attr("class", "lineclass" + edge.lines[0])
       .style("fill", "none")
       .style("stroke-width", "2px")
-      .style("stroke", edge.color)
-      .on("mouseover", () => this.createLineLabel(edge))
-      .on("mouseout", () => this.removeLineLabel());
+      .style("stroke", edge.colors[0]);
 
     if (edge.lines.length > 1) {
       for (let j = 1; j < edge.lines.length; j++) {
@@ -92,21 +105,24 @@ export class DrawingplaneComponent implements OnInit {
         if (j % 2 != 0) step *= -1;
 
         for (let i = 0; i < edge.points.length - 1; i++) {
-          let data = [edge.points[i], edge.points[i + 1]]
-          let dx = Math.abs(edge.points[i].x - edge.points[i + 1].x)
-          let dy = Math.abs(edge.points[i].y - edge.points[i + 1].y)
+          let data = [edge.points[i], edge.points[i + 1]];
+          let dx = edge.points[i].x - edge.points[i + 1].x;
+          let dy = edge.points[i].y - edge.points[i + 1].y;
 
-          let offsetX = 2.5 * step
-          let offsetY = 0
+          let offsetX = 0;
+          let offsetY = 0;
           if (dx == 0) {
-            offsetX = 2.5 * step
+            offsetX = 2.5 * step;
+            offsetY = 0;
           } else if (dy == 0) {
-            offsetX = 0
-            offsetY = 2.5 * step
-          } else if (dx == 1 && dy == 1) {
-            offsetX = 3 * step
-          } else if (dx == -1 && dy == 1) {
-            offsetX = -3 * step
+            offsetX = 0;
+            offsetY = 2.5 * step;
+          } else if (dx * dy > 0) {
+            offsetX = 2.5 / 1.41 * step;
+            offsetY = 2.5 / 1.41 * step;
+          } else if (dx * dy < 0) {
+            offsetX = -2.5 / 1.41 * step;
+            offsetY = 2.5 / 1.41 * step;
           }
 
           this.svg
@@ -114,17 +130,31 @@ export class DrawingplaneComponent implements OnInit {
             .style("fill", "none")
             .style("class", "hello")
             .style("stroke-width", "2px")
-            .style("stroke", edge.color)
+            .style("stroke", edge.colors[j])
             .attr("class", "lineclass" + edge.lines[j])
             .attr("x1", this.planeXPosition(data[0]) + offsetX)
             .attr("y1", this.planeYPosition(data[0]) + offsetY)
             .attr("x2", this.planeXPosition(data[1]) + offsetX)
-            .attr("y2", this.planeYPosition(data[1]) + offsetY)
-            .on("mouseover", () => this.createLineLabel(edge))
-            .on("mouseout", () => this.removeLineLabel())
+            .attr("y2", this.planeYPosition(data[1]) + offsetY);
         }
       }
     }
+
+    let hover = this.svg.selectAll(".line")
+      .data([edge.points])
+      .enter().append("path")
+      .attr("d", line)
+      .style("fill", "none")
+      .style("stroke-width", "16px")
+      .style("stroke", "rgba(0, 0, 0, 0)")
+      .on("mouseover", () => {
+        this.createLineLabel(edge);
+        this.highlight(edge);
+      })
+      .on("mouseout", () => {
+        this.removeLineLabel();
+        this.removeHighlight();
+      });
 
     let pathNode = path.node();
     let pathLength = pathNode.getTotalLength();
@@ -182,6 +212,25 @@ export class DrawingplaneComponent implements OnInit {
   private removeLineLabel() {
     this.svg.selectAll("text.labelLine").remove();
     this.svg.selectAll("rect").remove();
+  }
+
+  /**
+   * Adds a dropshadow to all lines that match the edge by adding the global .highlight class.
+   * @param edge
+   */
+  private highlight(edge: OutputEdge) {
+    edge.lines.forEach(line => {
+      d3.selectAll(".lineclass" + line)
+        .classed("highlight", true)
+    });
+  }
+
+  /**
+   * Removes all highlights.
+   */
+  private removeHighlight() {
+    this.svg.selectAll("*")
+      .classed("highlight", false);
   }
 
   /**
@@ -340,7 +389,9 @@ export class DrawingplaneComponent implements OnInit {
    */
   private createColorPicker(outputGraph: OutputGraph) {
     outputGraph.paths.forEach(path => {
-      path.lines.forEach(line => this.colors[line] = path.color)
-    })
+      for (let i = 0; i < path.lines.length; i++) {
+        this.colors[path.lines[i]] = path.colors[i];
+      }
+    });
   }
 }

@@ -1,6 +1,5 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {FileType, parseDataToInputGraph, parseGTFSToObjectArray} from "../graphs/graph.inputParser";
 import {AlgorithmService} from "../services/algorithm.service";
 import {Filters} from "../inputGraph/inputGraph.filter";
 import {InputGraph} from "../inputGraph/inputGraph";
@@ -10,6 +9,9 @@ import rome from "../saves/rome.json"
 import prague from "../saves/prague.json"
 import detroit from "../saves/detroit.json"
 import {plainToClass} from "class-transformer";
+import {MatSelect} from "@angular/material/select";
+import {GtfsService} from "../services/gtfs.service";
+import {extractInputgraph} from "../workers/algorithm.worker";
 
 @Component({
   selector: 'app-ui-menu',
@@ -75,6 +77,59 @@ export class UiMenuComponent implements OnInit {
   }
 }
 
+class FilterData {
+  private _type: string;
+  private _value: string = "";
+
+  constructor(type: string) {
+    this._type = type;
+  }
+
+  match(line: FilterLine) {
+    switch (this._type) {
+      case "Starts with":
+        if (this._value == "") return false;
+        return this.getIndividualStrings().some(value => line.name.startsWith(value));
+      case "Ends with":
+        if (this._value == "") return false;
+        return this.getIndividualStrings().some(value => line.name.endsWith(value));
+      case "Is":
+        if (this._value == "") return false;
+        return this.getIndividualStrings().some(value => line.name == value);
+      case "All":
+        return true;
+      case "Route Type":
+        return this.getIndividualStrings().some(value => line.routeType == value);
+
+      default: return false;
+    };
+  }
+
+  get type(): string {
+    return this._type;
+  }
+
+  get value(): string {
+    return this._value;
+  }
+
+  set value(value: string) {
+    this._value = value;
+  }
+
+  /**
+   * Takes a string as input and returns an array of the contained individual strings. Splits by comma, whitespace is removed.
+   * @param input The string which should be split.
+   * @private
+   */
+  private getIndividualStrings() {
+    const input =this._value.replace(/\s/g, "")
+    let inputArr = input.split(",")
+    inputArr = inputArr.filter(str => str.length > 0);
+    return inputArr
+  }
+}
+
 @Component({
   selector: 'dialog-data-selection',
   templateUrl: 'dialog-data-selection.html',
@@ -93,15 +148,14 @@ export class DialogDataSelection {
   displayedColumns: string[] = ["name", "visible"]
   lines: FilterLine[] = []
   selection = new SelectionModel<FilterLine>(true, []);
-  filterIDs = [0]
-  filterSelection: string[] = ["must not start"]
-  filterInput: string[] = []
   showLoadingData = false;
   sliderRValue: number = 0.5;
+  whitelist: FilterData[] = [];
+  blacklist: FilterData[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<DialogDataSelection>,
-    @Inject(MAT_DIALOG_DATA) public data: string) {
+    @Inject(MAT_DIALOG_DATA) public data: string, private gtfsService: GtfsService) {
   }
 
   /**
@@ -178,26 +232,28 @@ export class DialogDataSelection {
         let file = this.uploadedFiles![key]
         switch (file.name) {
           case "trips.txt":
-            promises.push(parseGTFSToObjectArray(file, FileType.TRIPS).then(result => trips = result));
+            trips = file
             break;
           case "stops.txt":
-            promises.push(parseGTFSToObjectArray(file!, FileType.STOPS).then(result => stops = result))
+            stops = file
             break;
           case "routes.txt":
-            promises.push(parseGTFSToObjectArray(file!, FileType.ROUTES).then(result => routes = result))
+            routes = file
             break;
           case "stop_times.txt":
-            promises.push(parseGTFSToObjectArray(file!, FileType.STOPTIMES).then(result => stopTimes = result))
+            stopTimes = file
             break;
           default: //Ignore
         }
       })
-      Promise.all(promises).then(_ => {
-        this.inputGraph = parseDataToInputGraph([trips, stops, routes, stopTimes])
-        this.prepareTable()
-        this.showLoadingData = false;
-        this.firstPage = false
+      let that = this
+      this.gtfsService.OnReceivedResult.subscribe(graph=>{
+        that.inputGraph = extractInputgraph(graph)
+        that.prepareTable()
+        that.showLoadingData = false;
+        that.firstPage = false
       })
+     this.gtfsService.loadData(routes, trips, stops, stopTimes)
     } else {
       if (this.preparedDataSelection != undefined) {
         switch (this.preparedDataSelection!) {
@@ -227,13 +283,14 @@ export class DialogDataSelection {
    * @private
    */
   private prepareTable() {
-    let lines: string[] = []
-    this.inputGraph!.edges.forEach(edge => lines.push(...edge.line))
-    this.lines = Array.from(new Set(lines)).map(line => {
-      let obj = {name: line, visible: true}
-      this.selection.select(obj)
-      return obj
-    })
+    const lines = new Map<string, FilterLine>();
+
+    this.inputGraph!.edges.forEach(edge => {
+      if (!lines.has(edge.line[0]))
+        lines.set(edge.line[0], {name: edge.line[0], visible: false, routeType: edge.routeType})
+    });
+
+    this.lines = Array.from(lines.values());
   }
 
   /**
@@ -260,61 +317,42 @@ export class DialogDataSelection {
   /**
    * Increases the number of string filters and initializes its values.
    */
-  increaseChoice() {
-    let id: number;
-    if (this.filterIDs.length == 0) id = 0
-    else id = this.filterIDs[this.filterIDs.length - 1] + 1
+  addFilter(ref: MatSelect, value: string, whitelist: boolean) {
+    ref.value = "";
 
-    this.filterIDs.push(id)
-    this.filterSelection.push("must not start")
-    this.filterInput.push("")
+    if (whitelist)
+      this.whitelist.push(new FilterData(value));
+    else
+      this.blacklist.push(new FilterData(value));
+
+    this.updateSelection();
   }
 
   /**
    * Removes the element with the given id from the list of string filters.
    * @param id The id of the element to remove.
    */
-  removeElementFromFilterList(id: number) {
-    for (let i = 0; i < this.filterIDs.length; i++) {
-      if (this.filterIDs[i] == id) {
-        this.filterIDs.splice(i, 1)
-        this.filterInput.splice(i, 1)
-        this.filterSelection.splice(i, 1)
-        break;
-      }
-    }
+  removeElementFromFilterList(filter: FilterData, whitelist: boolean) {
+    if (whitelist)
+      this.whitelist = this.whitelist.filter(f => f != filter);
+    else
+    this.blacklist = this.blacklist.filter(f => f != filter);
+
     this.updateSelection()
   }
 
-  /**
-   * Callback for the selection of the string filters.
-   * @param value The new value of the selection.
-   * @param elementID The ID of the element which has changed.
-   */
-  changeSelected(value: string, elementID: number) {
-    for (let i = 0; i < this.filterIDs.length; i++) {
-      let id = this.filterIDs[i]
-      if (id == elementID) {
-        this.filterSelection[i] = value
-        break;
-      }
-    }
-    this.updateSelection()
+  filterChanged(event: Event, filterData: FilterData) {
+    const target = event.target as HTMLTextAreaElement;
+    const value = target.value;
+    filterData.value = value;
+
+    this.updateSelection();
   }
 
-  /**
-   * Callback for changes in the input fields of the string filters.
-   * @param event The event of the change.
-   * @param id The id of the element which has detected a change.
-   */
-  updateListOfStrings(event: Event, id: number) {
-    for (let i = 0; i < this.filterIDs.length; i++) {
-      if (this.filterIDs[i] == id) {
-        this.filterInput[i] = (<HTMLInputElement>(event.target)!).value
-        this.updateSelection()
-        break;
-      }
-    }
+  filterSelectChanged(matSelect: MatSelect, filterData: FilterData) {
+    filterData.value = (<string[]>matSelect.value).join(",");
+
+    this.updateSelection();
   }
 
   /**
@@ -322,66 +360,23 @@ export class DialogDataSelection {
    */
   updateSelection() {
     this.lines.forEach(line => {
-      let keep = true;
-      for (let i = 0; i < this.filterInput.length; i++) {
-        let input = DialogDataSelection.getIndividualStrings(this.filterInput[i]);
-        if (input.length == 0) continue
-        let select = this.filterSelection[i];
-        switch (select) {
-          case "must not start":
-            for (let j = 0; j < input.length; j++) {
-              let val = input[j]
-              if (line.name.startsWith(val)) keep = false;
-            }
-            break;
-          case "must not end":
-            for (let j = 0; j < input.length; j++) {
-              let val = input[j]
-              if (line.name.endsWith(val)) keep = false;
-            }
-            break;
-          case "must start":
-            keep = false
-            for (let j = 0; j < input.length; j++) {
-              let val = input[j]
-              if (line.name.startsWith(val)) {
-                keep = true
-                break;
-              }
-            }
-            break;
-          case "must end":
-            keep = false
-            for (let j = 0; j < input.length; j++) {
-              let val = input[j]
-              if (line.name.endsWith(val)) {
-                keep = true
-                break;
-              }
-            }
-            break;
-        }
-        if (!keep) break
-      }
+      let keep = false;
+      this.whitelist.forEach(filter => {
+        if (filter.match(line)) keep = true;
+      });
+
+      this.blacklist.forEach(filter => {
+        if (filter.match(line)) keep = false;
+      });
+
       if (!keep) this.selection.deselect(line)
       else this.selection.select(line)
     })
-  }
-
-  /**
-   * Takes a string as input and returns an array of the contained individual strings. Splits by comma, whitespace is removed.
-   * @param input The string which should be split.
-   * @private
-   */
-  private static getIndividualStrings(input: string) {
-    input = input.replace(/\s/g, "")
-    let inputArr = input.split(",")
-    inputArr = inputArr.filter(str => str.length > 0);
-    return inputArr
   }
 }
 
 export interface FilterLine {
   name: string,
   visible: boolean,
+  routeType: string,
 }
