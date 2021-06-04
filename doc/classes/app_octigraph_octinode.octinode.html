@@ -1,0 +1,597 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>OctiNode | octilinear-maps</title>
+	<meta name="description" content="Documentation for octilinear-maps">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">octilinear-maps</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../modules.html">octilinear-maps</a>
+				</li>
+				<li>
+					<a href="../modules/app_octigraph_octinode.html">app/octiGraph/octiNode</a>
+				</li>
+				<li>
+					<a href="app_octigraph_octinode.octinode.html">OctiNode</a>
+				</li>
+			</ul>
+			<h1>Class OctiNode</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>A single node in the graph. This shares a location with 8 other OctiNodes on the same GridNode.
+						It is connected to all OctiNodes on this GridNode.</p>
+					</div>
+					<p>It is either a sink node, which are used as endpoints for routing,
+					or a port node, which means that it has an additional edge to the port node of the neighbouring GridNode.</p>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">OctiNode</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="app_octigraph_octinode.octinode.html#_direction" class="tsd-kind-icon">_direction</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="app_octigraph_octinode.octinode.html#_dist" class="tsd-kind-icon">_dist</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="app_octigraph_octinode.octinode.html#_edges" class="tsd-kind-icon">_edges</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="app_octigraph_octinode.octinode.html#_gridnode" class="tsd-kind-icon">_grid<wbr>Node</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="app_octigraph_octinode.octinode.html#_id" class="tsd-kind-icon">_id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="app_octigraph_octinode.octinode.html#_prev" class="tsd-kind-icon">_prev</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="app_octigraph_octinode.octinode.html#_priority" class="tsd-kind-icon">_priority</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Accessors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#direction" class="tsd-kind-icon">direction</a></li>
+								<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#dist" class="tsd-kind-icon">dist</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#edges" class="tsd-kind-icon">edges</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#gridnode" class="tsd-kind-icon">grid<wbr>Node</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#prev" class="tsd-kind-icon">prev</a></li>
+								<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#priority" class="tsd-kind-icon">priority</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#addedge" class="tsd-kind-icon">add<wbr>Edge</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#closealledges" class="tsd-kind-icon">close<wbr>All<wbr>Edges</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="app_octigraph_octinode.octinode.html#getedge" class="tsd-kind-icon">get<wbr>Edge</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Octi<wbr>Node<span class="tsd-signature-symbol">(</span>gridNode<span class="tsd-signature-symbol">: </span><a href="app_octigraph_gridnode.gridnode.html" class="tsd-signature-type" data-tsd-kind="Class">GridNode</a>, id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, direction<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="app_octigraph_octinode.octinode.html" class="tsd-signature-type" data-tsd-kind="Class">OctiNode</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L11">app/octiGraph/octiNode.ts:11</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>gridNode: <a href="app_octigraph_gridnode.gridnode.html" class="tsd-signature-type" data-tsd-kind="Class">GridNode</a></h5>
+								</li>
+								<li>
+									<h5>id: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>direction: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="app_octigraph_octinode.octinode.html" class="tsd-signature-type" data-tsd-kind="Class">OctiNode</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_direction" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _direction</h3>
+					<div class="tsd-signature tsd-kind-icon">_direction<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L24">app/octiGraph/octiNode.ts:24</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_dist" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _dist</h3>
+					<div class="tsd-signature tsd-kind-icon">_dist<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L49">app/octiGraph/octiNode.ts:49</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_edges" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _edges</h3>
+					<div class="tsd-signature tsd-kind-icon">_edges<span class="tsd-signature-symbol">:</span> <a href="app_octigraph_octiedge.octiedge.html" class="tsd-signature-type" data-tsd-kind="Class">OctiEdge</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L33">app/octiGraph/octiNode.ts:33</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Edges to neighbouring OctiNodes (sink and port nodes)</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_gridnode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _grid<wbr>Node</h3>
+					<div class="tsd-signature tsd-kind-icon">_grid<wbr>Node<span class="tsd-signature-symbol">:</span> <a href="app_octigraph_gridnode.gridnode.html" class="tsd-signature-type" data-tsd-kind="Class">GridNode</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L42">app/octiGraph/octiNode.ts:42</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The GridNode this OctiNode belongs to</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_id" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _id</h3>
+					<div class="tsd-signature tsd-kind-icon">_id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L18">app/octiGraph/octiNode.ts:18</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_prev" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _prev</h3>
+					<div class="tsd-signature tsd-kind-icon">_prev<span class="tsd-signature-symbol">:</span> <a href="app_octigraph_octinode.octinode.html" class="tsd-signature-type" data-tsd-kind="Class">OctiNode</a><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L70">app/octiGraph/octiNode.ts:70</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_priority" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _priority</h3>
+					<div class="tsd-signature tsd-kind-icon">_priority<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L59">app/octiGraph/octiNode.ts:59</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Accessors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="direction" class="tsd-anchor"></a>
+					<h3>direction</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> direction<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L26">app/octiGraph/octiNode.ts:26</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class">
+					<a name="dist" class="tsd-anchor"></a>
+					<h3>dist</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> dist<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> dist<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L51">app/octiGraph/octiNode.ts:51</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L55">app/octiGraph/octiNode.ts:55</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="edges" class="tsd-anchor"></a>
+					<h3>edges</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> edges<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="app_octigraph_octiedge.octiedge.html" class="tsd-signature-type" data-tsd-kind="Class">OctiEdge</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L35">app/octiGraph/octiNode.ts:35</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="app_octigraph_octiedge.octiedge.html" class="tsd-signature-type" data-tsd-kind="Class">OctiEdge</a><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="gridnode" class="tsd-anchor"></a>
+					<h3>grid<wbr>Node</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> gridNode<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="app_octigraph_gridnode.gridnode.html" class="tsd-signature-type" data-tsd-kind="Class">GridNode</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L44">app/octiGraph/octiNode.ts:44</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="app_octigraph_gridnode.gridnode.html" class="tsd-signature-type" data-tsd-kind="Class">GridNode</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="id" class="tsd-anchor"></a>
+					<h3>id</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> id<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L20">app/octiGraph/octiNode.ts:20</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class">
+					<a name="prev" class="tsd-anchor"></a>
+					<h3>prev</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> prev<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="app_octigraph_octinode.octinode.html" class="tsd-signature-type" data-tsd-kind="Class">OctiNode</a></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> prev<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="app_octigraph_octinode.octinode.html" class="tsd-signature-type" data-tsd-kind="Class">OctiNode</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L72">app/octiGraph/octiNode.ts:72</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="app_octigraph_octinode.octinode.html" class="tsd-signature-type" data-tsd-kind="Class">OctiNode</a></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L76">app/octiGraph/octiNode.ts:76</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <a href="app_octigraph_octinode.octinode.html" class="tsd-signature-type" data-tsd-kind="Class">OctiNode</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class">
+					<a name="priority" class="tsd-anchor"></a>
+					<h3>priority</h3>
+					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> priority<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> priority<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L62">app/octiGraph/octiNode.ts:62</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L66">app/octiGraph/octiNode.ts:66</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="addedge" class="tsd-anchor"></a>
+					<h3>add<wbr>Edge</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Edge<span class="tsd-signature-symbol">(</span>edge<span class="tsd-signature-symbol">: </span><a href="app_octigraph_octiedge.octiedge.html" class="tsd-signature-type" data-tsd-kind="Class">OctiEdge</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L80">app/octiGraph/octiNode.ts:80</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>edge: <a href="app_octigraph_octiedge.octiedge.html" class="tsd-signature-type" data-tsd-kind="Class">OctiEdge</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="closealledges" class="tsd-anchor"></a>
+					<h3>close<wbr>All<wbr>Edges</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">close<wbr>All<wbr>Edges<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L84">app/octiGraph/octiNode.ts:84</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getedge" class="tsd-anchor"></a>
+					<h3>get<wbr>Edge</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Edge<span class="tsd-signature-symbol">(</span>neighborNode<span class="tsd-signature-symbol">: </span><a href="app_octigraph_octinode.octinode.html" class="tsd-signature-type" data-tsd-kind="Class">OctiNode</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="app_octigraph_octiedge.octiedge.html" class="tsd-signature-type" data-tsd-kind="Class">OctiEdge</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/VCPY/Octilinear_Maps/blob/7e5f061/src/src/app/octiGraph/octiNode.ts#L88">app/octiGraph/octiNode.ts:88</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>neighborNode: <a href="app_octigraph_octinode.octinode.html" class="tsd-signature-type" data-tsd-kind="Class">OctiNode</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="app_octigraph_octiedge.octiedge.html" class="tsd-signature-type" data-tsd-kind="Class">OctiEdge</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../modules.html">Exports</a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/app_octigraph_octinode.html">app/octi<wbr>Graph/octi<wbr>Node</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-module">
+						<a href="app_octigraph_octinode.octinode.html" class="tsd-kind-icon">Octi<wbr>Node</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="app_octigraph_octinode.octinode.html#_direction" class="tsd-kind-icon">_direction</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="app_octigraph_octinode.octinode.html#_dist" class="tsd-kind-icon">_dist</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="app_octigraph_octinode.octinode.html#_edges" class="tsd-kind-icon">_edges</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="app_octigraph_octinode.octinode.html#_gridnode" class="tsd-kind-icon">_grid<wbr>Node</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="app_octigraph_octinode.octinode.html#_id" class="tsd-kind-icon">_id</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="app_octigraph_octinode.octinode.html#_prev" class="tsd-kind-icon">_prev</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="app_octigraph_octinode.octinode.html#_priority" class="tsd-kind-icon">_priority</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#direction" class="tsd-kind-icon">direction</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#dist" class="tsd-kind-icon">dist</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#edges" class="tsd-kind-icon">edges</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#gridnode" class="tsd-kind-icon">grid<wbr>Node</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#id" class="tsd-kind-icon">id</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#prev" class="tsd-kind-icon">prev</a>
+							</li>
+							<li class=" tsd-kind-accessor tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#priority" class="tsd-kind-icon">priority</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#addedge" class="tsd-kind-icon">add<wbr>Edge</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#closealledges" class="tsd-kind-icon">close<wbr>All<wbr>Edges</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="app_octigraph_octinode.octinode.html#getedge" class="tsd-kind-icon">get<wbr>Edge</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
