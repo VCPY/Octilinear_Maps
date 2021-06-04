@@ -38,6 +38,8 @@ export function extractInputgraph(data: any): InputGraph {
  * Listener which takes the retrieved data and applies the algorithm onto it.
  */
 addEventListener('message', ({data}) => {
+  if (data["graph"] == undefined) return;
+
   console.log("[algorithm-worker] preparing");
   let graphData = data["graph"]
   let inputGraph = extractInputgraph(graphData);
