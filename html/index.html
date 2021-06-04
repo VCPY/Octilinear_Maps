@@ -13,12 +13,16 @@
     .paragraph {
         margin-left: 1em;
     }
-    html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
+
+    html, body, h1, h2, h3, h4, h5, h6 {
+        font-family: "Roboto", sans-serif;
+    }
 
 </style>
 <body>
 <h1 style="text-align: center">Metro Maps on Octilinear Grid Graphs</h1>
 <h3 style="text-align: center">By Georg Schenzel 01633078 & Viktoria Pundy 01633403</h3>
+<div style="text-align: center"><a>This is a link to the project</a></div>
 <div>This project is based on the paper <a href="https://diglib.eg.org/handle/10.1111/cgf13986">Metro Maps on Octilinear
     Grid Graphs</a> by Bast et al.
 </div>
@@ -61,7 +65,7 @@
     </p>
 </div>
 <div>
-    <img src="window.PNG"/>
+    <img src="window.PNG" style="width: 100%"/>
     <p>Afterwards the graph is drawn in the browser window. On the right is a list with the drawn lines. Each line has a
         color
         bar. Clicking on the bar reveals a colour picker with which the colour of the according line can be changed.
@@ -73,6 +77,10 @@
 The algorithm was implemented with TypeScript and Angular. The drawing of
 the graph is done with the library d3.js
 <h2>Links</h2>
-<div>TODO</div>
+<div style="display: flex; flex-flow: column">
+    <a href="../src">Source Code</a>
+    <a href="../bin">Program</a>
+    <a href="../doc">Documentation</a>
+</div>
 </body>
 </html>
