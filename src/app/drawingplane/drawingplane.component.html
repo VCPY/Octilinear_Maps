@@ -1,0 +1,29 @@
+<div class="grid-container">
+    <div class="graph">
+        <div id="container" class="svg-container">
+            <div *ngIf="!hideSpinner"
+                 style="justify-content: center; display:flex; align-items: center; width: 100%; height: 100%">
+                <mat-spinner mode="indeterminate"></mat-spinner>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="lines">
+        <h2>Octilinear Grid Graph</h2>
+        <div *ngFor="let el of keys" style="display: flex; flex-flow: row; margin-bottom: 2em">
+            <div style="margin-right: 2em">{{el}}:</div>
+            <input [(colorPicker)]="colors[el]" [style.background]="colors[el]"
+                   (colorPickerChange)="changeColor($event, el)"/>
+        </div>
+    </div>
+</div>
+
+<div style="height: 100%; display: flex; flex-flow: row">
+    <div style="width: 80%; height: 99%; overflow-y: auto; overflow-x: auto">
+
+    </div>
+    <div style="height: 99%;  width: 20%; overflow-y: auto; padding-left: 2em; background-color: #eceaea">
+
+    </div>
+</div>

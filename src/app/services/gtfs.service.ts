@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
+import {Observable, Subject} from 'rxjs';
+import {InputGraph} from "../inputGraph/inputGraph";
 
 @Injectable({
   providedIn: 'root'
@@ -6,19 +8,25 @@ import { Injectable } from '@angular/core';
 export class GtfsService {
 
   worker: Worker;
+  private subject = new Subject<InputGraph>();
 
-  constructor() { 
+  private _inputGraphSubject: Subject<InputGraph> = new Subject<InputGraph>();
+
+  public readonly OnReceivedResult: Observable<InputGraph> = this._inputGraphSubject.asObservable();
+
+  constructor() {
     if (typeof Worker !== 'undefined') {
       // worker not supported
     }
-    
-    this.worker = new Worker('../workers/gtfs.worker', { type: 'module' });
-    this.worker.onmessage = ({ data }) => {
-      console.log("Service got message from worker");
+
+    this.worker = new Worker('../workers/gtfs.worker', {type: 'module', name: "gtfs-worker"});
+    this.worker.onmessage = ({data}) => {
+      this._inputGraphSubject.next(data);
     };
   }
 
-  fetchAndParse() {
-    this.worker.postMessage("");
+  loadData(routes: any[], trips: any[], stops: any[], stopTimes: any[]){
+    this.worker.postMessage({routes: routes, trips: trips, stops: stops, stopTimes: stopTimes})
+    return this.subject.asObservable();
   }
 }

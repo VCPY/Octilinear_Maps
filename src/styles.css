@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css'; /*Needed for popup*/
+
+.highlight {
+    filter: drop-shadow(0 0 0.4rem rgba(0, 0, 0, 0.8));
+    transition: opacity 0.3s ease-in-out;
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+    font-family: arial,x-locale-body,sans-serif;
+}
