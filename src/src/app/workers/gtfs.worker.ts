@@ -45,7 +45,7 @@ export async function parseGTFSToObjectArray(file: File, type: FileType) {
         result = createObjectsFromXLSX(data, keys)
         resolve(result)
       }
-      reader.readAsBinaryString(file);
+      reader.readAsText(file, "UTF-8");
     })
   } else {
     await file.text().then((text) => {
