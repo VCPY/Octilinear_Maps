@@ -299,7 +299,7 @@ export class DialogDataSelection {
   sendData() {
     Filters.ALLOWCROSSING = this.allowCrossing
     Filters.r = 1 - this.sliderRValue
-    this.updateSelection()
+
     let acceptedLines = this.selection.selected.map(selection => selection.name)
     if (this.uploadedFiles) {
       this.dialogRef.close({

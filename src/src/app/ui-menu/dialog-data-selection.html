@@ -89,7 +89,7 @@
                     <div style="width: 30%">{{filterData.type}}</div>
 
                     <div style="width: 60%">
-                        <input *ngIf="['Starts with', 'Ends with', 'Is'].includes(filterData.type)" (change)="filterChanged($event, filterData)"
+                        <input *ngIf="['Starts with', 'Ends with', 'Is'].includes(filterData.type)" (input)="filterChanged($event, filterData)"
                                placeholder="Enter value"
                                value="">
 
