@@ -2,7 +2,11 @@ import {OctiEdge} from "./octiEdge";
 import {GridNode} from "./gridNode";
 
 /**
- * TODO: Add information
+ * A single node in the graph. This shares a location with 8 other OctiNodes on the same GridNode.
+ * It is connected to all OctiNodes on this GridNode.
+ *
+ * It is either a sink node, which are used as endpoints for routing,
+ * or a port node, which means that it has an additional edge to the port node of the neighbouring GridNode.
  */
 export class OctiNode {
   constructor(gridNode: GridNode, id: number, direction: number = 0) {

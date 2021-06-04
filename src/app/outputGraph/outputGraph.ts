@@ -2,6 +2,9 @@ import {Type} from "class-transformer";
 import {OutputEdge} from "./outputEdge";
 import {OutputStation} from "./outputStation";
 
+/**
+ * A simplfied datastructure containing the results of the algorithma and all neccesariy data to draw the graph.
+ */
 export class OutputGraph {
   constructor(width: number, height: number, stations: OutputStation[], paths: OutputEdge[]) {
     this._width = width;

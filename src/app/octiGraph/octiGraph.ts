@@ -4,7 +4,9 @@ import {OctiEdge} from "./octiEdge";
 import {GridNode} from "./gridNode";
 
 /**
- * TODO: Add information
+ * An OctiGraph consists of multiple OctiNodes that are connected by OctiEdges.
+ * For an higher level of abstration, the OctiNodes are grouped together in multiple GridNodes.
+ * These GridNodes are connected using matching OctiNodes, called port nodes.
  */
 export class OctiGraph {
 

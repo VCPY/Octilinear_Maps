@@ -1,5 +1,9 @@
 /**
- * TODO: Add information
+ * Generic binary heap implementation.
+ * Allows for
+ *   insertion in O(log n)
+ *   getting the smallest element in O(log n)
+ *   updating individual elements in O(log n)
  */
 export class BinaryHeap<T> {
   content: T[];
@@ -22,6 +26,9 @@ export class BinaryHeap<T> {
     this.indexMapping.set(element, position);
   }
 
+  /**
+   * Returns the element with the smallest value
+   */
   pop(): T {
     if (this.content.length <= 1) {
       const ret = this.content.pop();
@@ -36,6 +43,11 @@ export class BinaryHeap<T> {
     return retval;
   }
 
+  /**
+   * Call this to reevaluate an element.
+   * Used to ensure correct order after elements change state.
+   * @param element
+   */
   update(element: T) {
     let n = this.indexMapping.get(element);
     this.siftUp(n!);
@@ -61,6 +73,10 @@ export class BinaryHeap<T> {
     return (x << 1) + 2;
   }
 
+  /**
+   * Move an element up the tree
+   * @param n
+   */
   private siftUp(n: number) {
     let idx = n;
     while (idx > 0) {
@@ -75,6 +91,10 @@ export class BinaryHeap<T> {
     }
   }
 
+  /**
+   * Move an element down the tree
+   * @param idx
+   */
   private siftDown(idx = 0) {
     while (true) {
       const lidx = this.leftIdx(idx);

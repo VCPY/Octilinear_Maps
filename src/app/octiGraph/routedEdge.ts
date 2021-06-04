@@ -2,7 +2,7 @@ import {Station} from "../inputGraph/station";
 import {InputEdge} from "../inputGraph/inputEdge";
 
 /**
- * TODO: Add information
+ * Stores information of a routing that ends with a station.
  */
 export class RoutedEdge {
   constructor(to: Station, direction: number, edge: InputEdge) {

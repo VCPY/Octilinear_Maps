@@ -80,6 +80,9 @@ export class Station {
     this._adjacentNodes = value;
   }
 
+  /**
+   * All edges from this station in a clockwise ordering.
+   */
   private _edgeOrdering: InputEdge[] = [];
 
   get edgeOrdering(): InputEdge[] {
@@ -91,7 +94,10 @@ export class Station {
   }
 
   /**
-   * TODO: Add information
+   * Calculates the edge ordering for this station.
+   *
+   * This is done by comparing the angle from the y axis to each adjecent edge.
+   *
    * @param adjacentEdges
    * @param adjacentNodes
    */
@@ -112,10 +118,11 @@ export class Station {
   }
 
   /**
-   * TODO: Add information
-   * @param beforeId
-   * @param after
-   * @param newEdge
+   * Replace an edge to a station with another one. This is usefull for merging 2-degree nodes.
+   * All edge information gets updated correctly.
+   * @param beforeId The Id of the station to be removed
+   * @param after The new station.
+   * @param newEdge The new edge, connecting this station with the new station.
    */
   replaceStation(beforeId: string, after: Station, newEdge: InputEdge) {
     let nodeArray = Array.from(this.adjacentNodes);

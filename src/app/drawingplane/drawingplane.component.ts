@@ -31,10 +31,14 @@ export class DrawingplaneComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.algorithmService.OnReceivedResult.subscribe(o => this.callback(o));
+    this.algorithmService.OnReceivedResult.subscribe(o => this.drawGraph(o));
   }
 
-  callback(outputGraph: OutputGraph) {
+  /**
+   * Draws the outputGraph received from the algorithmService.
+   * @param outputGraph
+   */
+  drawGraph(outputGraph: OutputGraph) {
     this.calculatePlaneSize(outputGraph);
     this.createColorPicker(outputGraph)
     this.keys = Object.keys(this.colors)

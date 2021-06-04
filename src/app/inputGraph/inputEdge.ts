@@ -71,6 +71,11 @@ export class InputEdge {
     this._color = value;
   }
 
+  /**
+   * The type of this route, following the gtfs specification
+   *
+   * This is only valid before merging multiple edges. Use this obnly in the filtering stage.
+   */
   private _routeType: string = "";
 
   get routeType(): string {

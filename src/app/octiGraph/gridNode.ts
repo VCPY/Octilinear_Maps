@@ -7,6 +7,7 @@ import {InputEdge} from "../inputGraph/inputEdge";
 
 /**
  * Represents a node within a 2D Array/Grid.
+ * Each grid node consist of 9 OctiNode, which are fully connected internally.
  */
 export class GridNode {
   constructor(id: number, x: number, y: number) {
@@ -82,6 +83,8 @@ export class GridNode {
 
   /**
    * All OctiNodes that belong to this GridNode
+   *
+   * The OctiNodes have a fixed order and can be accessed using an index from the Constants class.
    */
   private _octiNodes: OctiNode[];
 
@@ -89,6 +92,9 @@ export class GridNode {
     return this._octiNodes;
   }
 
+  /**
+   * All edges that already have been routed to this GridNode.
+   */
   private _routedEdges: RoutedEdge[] = [];
 
   get routedEdges(): RoutedEdge[] {
@@ -210,8 +216,8 @@ export class GridNode {
     this.octiNodes[Constants.SINK].edges[value].weight = Infinity;
   }
 
-  /*
-  * rior to routing an edge ei, we calculate the line bend penalty between
+  /**
+  * Prior to routing an edge ei, we calculate the line bend penalty between
   * every routed edge ej, j < i and ei for each of the possible placements
   * of ei on adjacent sink edges.
   * The sum of the line bend penalties on each adjacent sink edge is then

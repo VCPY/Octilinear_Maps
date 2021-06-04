@@ -20,7 +20,12 @@ export function resetTime() {
 let lastModified: OctiNode[] = [];
 
 /**
- * Calculates the set to set shortest path
+ * Calculates the set to set shortest path using the dijkstra algorithm
+ *
+ * For better performance multiple optimizations have been made:
+ *   a binary heap is used to efficiently get candidate nodes
+ *   a heuristic function is used to reach the target with visiting less nodes
+ *   only a minimal amount of nodes geth visited and processed
  */
 export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): OctiNode[] {
   var start1 = performance.now();
@@ -93,14 +98,15 @@ export function setToSet(graph: OctiGraph, from: GridNode[], to: GridNode[]): Oc
 }
 
 /**
- * TODO: Add information
+ * The heuristic function used in the dijkstra algorithm provided by the paper.
+ * We can estimate the path length by getting the shortest Chebyshev distance between the current node and all candidate nodes.
  * @param from
  * @param to
  */
 function heuristic(from: OctiNode, to: GridNode[]): number {
   let min = Infinity;
   to.forEach(toNode => {
-    const h = dist(from.gridNode, toNode) - 1;
+    const h = chebyshevDist(from.gridNode, toNode) - 1;
     if (h < min) min = h;
   })
 
@@ -108,23 +114,29 @@ function heuristic(from: OctiNode, to: GridNode[]): number {
 }
 
 /**
- * TODO: Add information
+ * Chebyshev distance between two nodes has a cost of 1 when walking in any direction
  * @param from
  * @param to
  */
-function dist(from: GridNode, to:GridNode): number {
+function chebyshevDist(from: GridNode, to:GridNode): number {
   const dx = Math.abs(from.x - to.x);
   const dy = Math.abs(from.y - to.y);
 
   return Math.max(dx, dy);
 }
 
+/**
+ * The comparison function used for the binary heap.
+ * OctiNodes are sorted by priority.
+ * @param a
+ * @param b
+ */
 function comparator(a: OctiNode, b: OctiNode): number {
   return b.priority - a.priority;
 }
 
 /**
- * TODO: Add information
+ * Traverse the the grid backwards and gather all nodes forming the path.
  * @param tmpNode
  * @param toNodes
  */
