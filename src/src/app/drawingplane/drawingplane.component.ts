@@ -47,13 +47,14 @@ export class DrawingplaneComponent implements OnInit {
       .on('zoom', (event) => {
         this.svg.attr('transform', event.transform);
       })
-      .scaleExtent([1, 40]);
+      .scaleExtent([0.1, 40]);
 
     this.svg = d3.select<SVGSVGElement, unknown>("div#container")
       .append("svg")
       .attr("preserveAspectRatio", "xMinYMin meet")
-      .attr("viewBox", "0 0 " + this.planeWidth + " " + this.planeHeight)
       .style("display", "inline-block")
+      .style("width", "100%")
+      .style("height", "100%")
       .style("position", "absolute-block")
       .style("top", 0)
       .style("left", 0);
