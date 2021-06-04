@@ -8,6 +8,7 @@ import vienna from "../saves/vienna.json"
 import rome from "../saves/rome.json"
 import prague from "../saves/prague.json"
 import detroit from "../saves/detroit.json"
+import stuttgart from "../saves/stuttgart.json"
 import {plainToClass} from "class-transformer";
 import {MatSelect} from "@angular/material/select";
 import {GtfsService} from "../services/gtfs.service";
@@ -65,6 +66,9 @@ export class UiMenuComponent implements OnInit {
           case "Detroit":
             graph = plainToClass(InputGraph, detroit)
             break;
+          case "Stuttgart":
+            graph = plainToClass(InputGraph, stuttgart)
+            break;
           default:
             alert("Error: Data could not be found")
             return
@@ -99,10 +103,26 @@ class FilterData {
       case "All":
         return true;
       case "Route Type":
-        return this.getIndividualStrings().some(value => line.routeType == value);
+        return this.getIndividualStrings().some(value => this.routeTypeMatches(+line.routeType, +value));
 
       default: return false;
     };
+  }
+
+  routeTypeMatches(toCheck: number, value: number): boolean {
+    if (toCheck < 100)
+      return toCheck == value;
+
+    const digit = Math.floor(toCheck/100);
+    if (digit == 9) return value == 0;
+    if (digit == 4) return value == 1;
+    if (digit == 1) return value == 2;
+    if (digit == 7) return value == 3;
+    if (digit == 10) return value == 4;
+    if (digit == 13) return value == 6;
+    if (digit == 14) return value == 7;
+
+    return false;
   }
 
   get type(): string {
@@ -268,6 +288,9 @@ export class DialogDataSelection {
             break;
           case "Detroit":
             this.inputGraph = plainToClass(InputGraph, detroit)
+            break;
+          case "Stuttgart":
+            this.inputGraph = plainToClass(InputGraph, stuttgart)
             break;
           default:
             alert("Error: Data could not be found")
