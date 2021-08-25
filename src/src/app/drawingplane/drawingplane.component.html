@@ -11,10 +11,12 @@
     </div>
     <div class="lines">
         <h2>Octilinear Grid Graph</h2>
-        <div *ngFor="let el of keys" style="display: flex; flex-flow: row; margin-bottom: 2em">
+        <div *ngFor="let el of keys" style="display: flex; flex-flow: column; margin-right: 1rem" >
+            <div style="display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 2em">
             <div style="margin-right: 2em">{{el}}:</div>
             <input [(colorPicker)]="colors[el]" [style.background]="colors[el]"
                    (colorPickerChange)="changeColor($event, el)"/>
+            </div>
         </div>
     </div>
 </div>
