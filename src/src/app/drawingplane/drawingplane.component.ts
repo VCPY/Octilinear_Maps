@@ -188,14 +188,7 @@ export class DrawingplaneComponent implements OnInit {
       .style("text-anchor", "middle")
       .attr("x", d3.pointer(event)[0] + 50)
       .attr("y", d3.pointer(event)[1] - 10)
-      .text(() => {
-        let result = ""
-        for (let i = 0; i < edge.lines.length - 1; i++) {
-          result += edge.lines[i] + ", "
-        }
-        result += edge.lines[edge.lines.length - 1]
-        return result
-      })
+      .text(() => edge.lines.join(", "))
 
     let bbox = text.node().getBBox()
     bar.insert("rect", "text")
